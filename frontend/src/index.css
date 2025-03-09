@@ -1,0 +1,34 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 15px;
+}
+
+.otp-input {
+  width: 200px;
+  text-align: center;
+}
+
+.login-button {
+  width: 200px;
+}
+.index-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 20px;
+}
+
+.food-button {
+  width: 200px;
+  height: 60px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Desactivación</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+         .navbar {
+            background-color: #ff0f4f;
+            padding: 10px;
+            text-align: center;
+        }
+        .navbar img {
+            max-width: 200px;
+            height: auto;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #222;
+        }
+        .info {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .info p {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .info strong {
+            color: #000;
+        }
+        .list {
+            padding: 0;
+            list-style: none;
+        }
+        .list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+        }
+        .list li:last-child {
+            border-bottom: none;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+     
+
+    <div class="container">
+        <div class="navbar">
+            <img src="https://i.imgur.com/eu9B1NE.png" alt="IT Support Logo">
+        </div>
+        <h1>Reporte de Desactivación de Usuario</h1>
+
+        <div class="info">
+            <p><strong>Responsable:</strong> {{ $('Webhook1').item.json.body.user }}</p>
+            <p><strong>Usuario afectado:</strong> {{ $('Webhook1').item.json.body.email }}</p>
+        </div>
+
+        <h2>Acciones realizadas</h2>
+        <ul class="list">
+            <li><strong>Usuario PC:</strong> {{ $json.data[2].user_jc }}</li>
+            <li><strong>Licencia Jira:</strong> {{ $json.data[3].user_jira }}</li>
+            <li><strong>Licencia Microsoft:</strong> {{ $json.data[4].user_azure }}</li>
+           
+        </ul>
+
+        <p>Si esta desactivación fue un error o necesitas más información, por favor contacta al equipo de IT Support.</p>
+
+        <div class="footer">
+            © 2024 Internal IT Support. Todos los derechos reservados.
+        </div>
+    </div>
+
+</body>
+</html>
