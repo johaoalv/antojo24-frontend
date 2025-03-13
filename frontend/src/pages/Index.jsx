@@ -59,9 +59,8 @@ const Index = () => {
       });
   
       notification.success({
-        message: "Pedido Recibido",
-        description: "El pedido fue enviado correctamente a la cocina.",
-        placement: "bottomLeft",
+        message: "Venta Registrada",
+        placement: "bottom",
       });
   
       setPedido({});
@@ -101,7 +100,7 @@ const Index = () => {
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}
         onOk={confirmarPedido}
-        okText="Confirmar Pedido"
+        okText="Registrar"
       >
         <List
           bordered
