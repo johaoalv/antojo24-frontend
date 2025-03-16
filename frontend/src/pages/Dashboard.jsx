@@ -1,43 +1,55 @@
 import React, { useState, useEffect } from "react";
-import { obtenerVentasHoy } from "../data/axios_ventasHoy";
-import { Card, Typography, Spin } from "antd";
+import { Row, Col} from "antd"
+import { obtenerDashboard } from "../data/axios_dashboard";
+import CardInfo from "../components/Cards";
 
-const { Title, Text } = Typography;
+
+
+
 
 function Dashboard() {
-  const [totalVentas, setTotalVentas] = useState(null);
+  const [datos, setDatos] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const cargarVentasHoy = async () => {
+    const cargarDatos = async () => {
       try {
-        const data = await obtenerVentasHoy();
-        setTotalVentas(data.total_ventas);
+        const data = await obtenerDashboard();
+        setDatos(data);
       } catch (error) {
-        console.error("Error al obtener ventas:", error);
+        console.error("Error al obtener datos del dashboard:", error);
       }
     };
-
-    cargarVentasHoy();
+    cargarDatos();
   }, []);
+  if (error) {
+    return <p className="error">{error}</p>;
+  }
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-      <Card
-        style={{
-          width: 300,
-          textAlign: "center",
-          borderRadius: "10px",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <Text type="secondary" style={{ fontSize: "16px" }}>
-          Ventas Hoy
-        </Text>
-        <Title level={1} style={{ marginTop: 10, fontWeight: "bold", color: "#1890ff" }}>
-          {totalVentas !== null ? `$${totalVentas}` : <Spin />}
-        </Title>
-      </Card>
-    </div>
+    <div>
+    {datos ? (
+      <div>
+        <h1>Dashboard</h1>
+        <Row gutter={[16, 16]} justify="center">
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <CardInfo title="Ventas Totales" value={datos.ventas_hoy} />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <CardInfo title="Ventas Ayer" value={datos.ventas_ayer} />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <CardInfo title="Producto Más Vendido" value={datos.producto_mas_vendido} />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={6}>
+            <CardInfo title="Método de Pago Más Usado" value={datos.metodo_pago_mas_usado} />
+          </Col>
+        </Row>
+      </div>
+    ) : (
+      <p>Cargando datos...</p>
+    )}
+  </div>
   );
 }
 

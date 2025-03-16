@@ -1,0 +1,40 @@
+/* .dashboard-container {
+    background-color: black;
+    color: yellow;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Courier New", monospace;
+  }
+  
+  .titulo {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-tabla {
+    border: 3px solid yellow;
+    width: 80%;
+    text-align: center;
+    font-size: 1.8rem;
+  }
+  
+  .dashboard-tabla th, .dashboard-tabla td {
+    border: 2px solid yellow;
+    padding: 15px;
+  }
+  
+  .error {
+    color: red;
+    font-size: 1.5rem;
+  }
+  
+  .cargando {
+    font-size: 2rem;
+    color: yellow;
+    font-weight: bold;
+  }
+   */
