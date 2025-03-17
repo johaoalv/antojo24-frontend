@@ -33,7 +33,7 @@ function Dashboard() {
         <h1>Dashboard</h1>
         <Row gutter={[16, 16]} justify="center">
           <Col xs={24} sm={12} md={8} lg={6}>
-            <CardInfo title="Ventas Totales" value={datos.ventas_hoy} />
+            <CardInfo title="Ventas Hoy" value={datos.ventas_hoy} />
           </Col>
           <Col xs={24} sm={12} md={8} lg={6}>
             <CardInfo title="Ventas Ayer" value={datos.ventas_ayer} />

@@ -1,40 +1,64 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Typography, Input, Button, message } from "antd";
-import axios from "axios";
+import { Button, Input, Space, Typography, message } from "antd";
+import { autenticarPin } from "../data/axios_auth";
+import { DeleteOutlined } from "@ant-design/icons";
 
-const { Title } = Typography;
-
-const Login = () => {
-  const navigate = useNavigate();
+const PinLogin = () => {
   const [pin, setPin] = useState("");
-  const [loading, setLoading] = useState(false);
+  const maxLength = 6;
 
-  const handleLogin = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.post("https://rapidfood.app.n8n.cloud/webhook-test/login", { pin });
-      console.log(response.data)
-      if (response.data.valid === true) {
-        navigate("/");
-      } else {
-        message.error("PIN incorrecto. Inténtalo de nuevo.");
-      }
-    } catch (error) {
-      message.error("Error al validar el PIN.");
+  const handleButtonClick = (value) => {
+    if (pin.length < maxLength) {
+      setPin(pin + value);
     }
-    setLoading(false);
+  };
+
+  const handleDelete = () => {
+    setPin(pin.slice(0, -1));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await autenticarPin(pin);
+      message.success(`Bienvenido, ${response.data.nombre} ${response.data.apellido}`);
+      setPin("");
+    } catch (error) {
+      message.error(error.response?.data?.error || "Error al autenticar");
+      setPin("");
+    }
   };
 
   return (
-    <div className="login-container">
-      <Title level={2}>Rapid Food</Title>
-      <Input.OTP length={4} value={pin} onChange={setPin} className="otp-input" />
-      <Button type="primary" onClick={handleLogin} loading={loading} className="login-button">
-        Ingresar
-      </Button>
+    <div className="pin-container">
+    <Typography.Title level={2} className="pin-title">Ingrese PIN</Typography.Title>
+    <Input.Password
+      value={"●".repeat(pin.length)}
+      readOnly
+      className="pin-input"
+    />
+    <div className="pin-keypad">
+      {["123", "456", "789", "⌫0"].map((row, rowIndex) => (
+        <div key={rowIndex} className="pin-row">
+          {row.split("").map((num) => (
+            <Button
+              key={num}
+              type="default"
+              shape="circle"
+              className="pin-button"
+              size="large"
+              onClick={() => (num === "⌫" ? handleDelete() : handleButtonClick(num))}
+            >
+              {num === "⌫" ? <DeleteOutlined /> : num}
+            </Button>
+          ))}
+        </div>
+      ))}
     </div>
+    <Button type="primary" className="pin-submit" onClick={handleSubmit} disabled={pin.length < maxLength}>
+      Confirmar
+    </Button>
+  </div>
   );
 };
 
-export default Login;
+export default PinLogin;
