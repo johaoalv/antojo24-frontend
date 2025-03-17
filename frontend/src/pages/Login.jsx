@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Input, Space, Typography, message } from "antd";
 import { autenticarPin } from "../data/axios_auth";
 import { DeleteOutlined } from "@ant-design/icons";
 
 const PinLogin = () => {
+  const navigate = useNavigate();
   const [pin, setPin] = useState("");
   const maxLength = 6;
 
@@ -21,7 +23,9 @@ const PinLogin = () => {
     try {
       const response = await autenticarPin(pin);
       message.success(`Bienvenido, ${response.data.nombre} ${response.data.apellido}`);
+      localStorage.setItem("user", JSON.stringify(response));
       setPin("");
+      navigate("/");
     } catch (error) {
       message.error(error.response?.data?.error || "Error al autenticar");
       setPin("");
