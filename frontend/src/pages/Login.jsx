@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button, Input, Space, Typography, message } from "antd";
 import { autenticarPin } from "../data/axios_auth";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -60,7 +60,9 @@ const PinLogin = () => {
     </div>
     <Button type="primary" className="pin-submit" onClick={handleSubmit} disabled={pin.length < maxLength}>
       Confirmar
-    </Button>
+    </Button> <br />
+
+    <Link to="/signup">Crear Cuenta</Link>
   </div>
   );
 };
