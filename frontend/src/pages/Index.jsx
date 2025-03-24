@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button, Modal, List, notification, Select } from "antd";
+import Navbar from "./Navbar";
+import { Button, notification, Select } from "antd";
 import productosData from "../data/productos.json";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { enviarPedido } from "../data/axios_pedidos";
@@ -9,12 +10,12 @@ const PRECIOS = productosData.reduce((acc, item) => {
   return acc;
 }, {});
 
+const buscarProducto = (nombre) =>
+  productosData.find((p) => p.producto === nombre);
+
 const Index = () => {
   const [pedido, setPedido] = useState({});
-  const [modalVisible, setModalVisible] = useState(false);
   const [metodoPago, setMetodoPago] = useState("");
-
-
 
   const agregarAlPedido = (producto) => {
     setPedido((prevPedido) => ({
@@ -51,7 +52,7 @@ const Index = () => {
     }));
   
     try {
-      const response = await enviarPedido({ 
+       await enviarPedido({ 
         pedido: pedidoFormateado,
         total_pedido: calcularTotal(),
         pedido_id,
@@ -64,7 +65,6 @@ const Index = () => {
       });
   
       setPedido({});
-      setModalVisible(false);
     } catch (error) {
       notification.error({
         message: "Error de Conexión",
@@ -77,57 +77,128 @@ const Index = () => {
   
 
   return (
-    <div className="index-container">
-      <h1>Rapid Food</h1>
-      <Button type="primary" className="food-button" onClick={() => agregarAlPedido("Hot Dog")}>
-        Hot Dog 
-      </Button>
-      <Button type="primary" className="food-button" onClick={() => agregarAlPedido("Hamburguesa")}>
-        Hamburguesa 
-      </Button>
-      <Button type="primary" className="food-button" onClick={() => agregarAlPedido("Soda")}>
-        Soda 
-      </Button>
-
-      {Object.keys(pedido).length > 0 && (
-        <Button type="default" className="checkout-button" onClick={() => setModalVisible(true)}>
-          Ver Pedido
-        </Button>
-      )}
-
-      <Modal
-        title="Resumen del Pedido"
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onOk={confirmarPedido}
-        okText="Registrar"
+    <>
+    <Navbar />
+    <div style={{ display: "flex", padding: 20 }}>
+    {/* Panel izquierdo */}
+    <div style={{ width: "70%" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: 20,
+        }}
       >
-        <List
-          bordered
-          dataSource={Object.entries(pedido)}
-          renderItem={([producto, cantidad]) => (
-            <List.Item>
-              <span>{`${producto}: ${cantidad} x $${PRECIOS[producto]} = $${cantidad * PRECIOS[producto]}`}</span>
-              <div>
-                <Button size="small" onClick={() => ajustarCantidad(producto, cantidad - 1)}>-</Button>
-                <Button size="small" onClick={() => ajustarCantidad(producto, cantidad + 1)}>+</Button>
-              </div>
-            </List.Item>
-          )}
-        />
-        <h3>Total: ${calcularTotal()}</h3>
-        <Select
-  placeholder="Selecciona el método de pago"
-  style={{ width: "100%", marginBottom: "1rem" }}
-  onChange={(value) => setMetodoPago(value)}
->
-  <Select.Option value="visa">Visa</Select.Option>
-  <Select.Option value="yappy">Yappy</Select.Option>
-  <Select.Option value="efectivo">Efectivo</Select.Option>
-</Select>
+        {productosData.map((item) => (
+          <div
+            key={item.producto}
+            onClick={() => agregarAlPedido(item.producto)}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: 12,
+              padding: 10,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <img
+              src={item.imagen}
+              alt={item.producto}
+              style={{ height: 100 }}
+            />
+            <div style={{ marginTop: 10 }}>{item.producto}</div>
+          </div>
+        ))}
+      </div>
 
-      </Modal>
+      {/* Método de pago */}
+      <div style={{ marginTop: 30 }}>
+        <Select
+          placeholder="Método de Pago"
+          style={{ width: "100%" }}
+          onChange={(value) => setMetodoPago(value)}
+        >
+          <Select.Option value="efectivo">
+            <img src="/assets/efectivo.png" alt="efectivo" style={{ height: 20, marginRight: 10 }} />
+            Efectivo
+          </Select.Option>
+          <Select.Option value="tarjeta">
+            <img src="/assets/tarjeta.png" alt="tarjeta" style={{ height: 20, marginRight: 10 }} />
+            Tarjeta
+          </Select.Option>
+          <Select.Option value="yappy">
+            <img src="/assets/yappy.png" alt="yappy" style={{ height: 20, marginRight: 10 }} />
+            Yappy
+          </Select.Option>
+        </Select>
+      </div>
     </div>
+
+    {/* Carrito derecho */}
+    <div
+      style={{
+        width: "30%",
+        marginLeft: 20,
+        border: "1px solid #ddd",
+        borderRadius: 12,
+        padding: 15,
+      }}
+    >
+      <h3>Carrito</h3>
+      {Object.entries(pedido).map(([producto, cantidad]) => {
+        const productoInfo = buscarProducto(producto);
+        return (
+          <div
+            key={producto}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottom: "1px solid #eee",
+              padding: "10px 0",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img
+                src={productoInfo?.imagen}
+                alt={producto}
+                style={{ height: 30, marginRight: 10 }}
+              />
+              <div>
+                <strong>{producto}</strong>
+                <div>${PRECIOS[producto]}</div>
+              </div>
+            </div>
+            <div>
+              <Button size="small" onClick={() => ajustarCantidad(producto, cantidad - 1)}>
+                -
+              </Button>
+              <span style={{ margin: "0 10px" }}>{cantidad}</span>
+              <Button size="small" onClick={() => ajustarCantidad(producto, cantidad + 1)}>
+                +
+              </Button>
+            </div>
+          </div>
+        );
+      })}
+
+      <div style={{ marginTop: 20, fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
+        <span>Total:</span>
+        <span>${calcularTotal().toFixed(2)}</span>
+      </div>
+
+      <Button
+        type="primary"
+        block
+        style={{ marginTop: 15 }}
+        onClick={confirmarPedido}
+        disabled={Object.keys(pedido).length === 0 || !metodoPago}
+      >
+        REGISTRAR
+      </Button>
+    </div>
+  </div>
+  </>
   );
 };
 
