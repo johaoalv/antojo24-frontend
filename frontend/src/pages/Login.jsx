@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Input, Space, Typography, message } from "antd";
 import { autenticarPin } from "../data/axios_auth";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -22,7 +22,7 @@ const PinLogin = () => {
   const handleSubmit = async () => {
     try {
       const response = await autenticarPin(pin);
-      message.success(`Bienvenido, ${response.data.nombre} ${response.data.apellido}`);
+      message.success(`Bienvenido, ${response.data.nombre_tienda}`);
       localStorage.setItem("user", JSON.stringify(response));
       setPin("");
       navigate("/");
@@ -61,8 +61,6 @@ const PinLogin = () => {
     <Button type="primary" className="pin-submit" onClick={handleSubmit} disabled={pin.length < maxLength}>
       Confirmar
     </Button> <br />
-
-    <Link to="/signup">Crear Cuenta</Link>
   </div>
   );
 };

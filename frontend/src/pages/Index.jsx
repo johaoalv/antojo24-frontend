@@ -74,8 +74,6 @@ const Index = () => {
     }
   };
   
-  
-
   return (
     <>
     <Navbar />
