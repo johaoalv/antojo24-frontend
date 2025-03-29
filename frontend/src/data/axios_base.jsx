@@ -1,9 +1,8 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL_NGROK || 
-  import.meta.env.VITE_API_BASE_URL_LOCAL || 
-  import.meta.env.VITE_API_BASE_URL_CLOUD; 
+  import.meta.env.VITE_API_BASE_URL_NGROK
+; 
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
