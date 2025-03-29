@@ -4,6 +4,7 @@ import { Button, notification, Select } from "antd";
 import productosData from "../data/productos.json";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { enviarPedido } from "../data/axios_pedidos";
+import { imprimirTicket } from "../data/axios_print";
 
 const PRECIOS = productosData.reduce((acc, item) => {
   acc[item.producto] = item.precio;
@@ -50,6 +51,12 @@ const Index = () => {
       total_item: cantidad * PRECIOS[producto],
       pedido_id
     }));
+
+    const datos = {
+      pedido:pedidoFormateado,
+      total_pedido: calcularTotal(),
+      metodo_pago:metodoPago
+    };
   
     try {
        await enviarPedido({ 
@@ -58,6 +65,8 @@ const Index = () => {
         pedido_id,
         metodo_pago: metodoPago
       });
+
+      await imprimirTicket(datos);
   
       notification.success({
         message: "Venta Registrada",
