@@ -1,4 +1,13 @@
 import axiosInstance from "./axios_base";
+import axios  from "axios";
+
+const axiosPrint = axios.create({
+  baseUrl: import.meta.env.VITE_API_BASE_URL_NGROK,
+  headers: {
+    "Content-Type": "application/json",
+  },
+
+})
 
 export const imprimirTicket = async (datos) => {
     console.log("enviando datos al backend para impresion:", datos)
