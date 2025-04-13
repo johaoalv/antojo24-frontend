@@ -32,8 +32,8 @@ const Navbar = () => {
       }}
     >
        
-      <img src="/assets/delivery-truck.png" alt="Rapid Food Logo" style={{ height: 40 }} />
-      <h3>Rapid Food</h3>
+      <img src="/assets/a24.png" alt="a24 Logo" style={{ height: 40 }} />
+      <h3>Antojo24</h3>
 
       <Dropdown overlay={menu} placement="bottomRight">
         <Button>
