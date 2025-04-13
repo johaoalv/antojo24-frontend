@@ -4,7 +4,7 @@ import { Button, notification, Select } from "antd";
 import productosData from "../data/productos.json";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { enviarPedido } from "../data/axios_pedidos";
-import { imprimirTicket } from "../data/axios_print";
+import { imprimirTicket } from "../utils/print";
 
 const PRECIOS = productosData.reduce((acc, item) => {
   acc[item.producto] = item.precio;
