@@ -1,0 +1,33 @@
+// src/utils/PrivateRoute.jsx
+import React from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+
+const rolePermissions = {
+  admin: ["/admin"],
+  tienda: ["/"], // puedes agregar más si en el futuro creas /ventas, etc.
+};
+
+const PrivateRoute = () => {
+  const location = useLocation();
+  const token = localStorage.getItem("app_token");
+  const userRole = localStorage.getItem("user_role"); // 👈 lo guardamos al login
+
+  // 🔒 Si no está logueado, va al login
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // ✅ Si el rol actual tiene permiso para acceder a esta ruta
+  const currentPath = location.pathname;
+  const allowedPaths = rolePermissions[userRole];
+
+  if (allowedPaths && allowedPaths.includes(currentPath)) {
+    return <Outlet />;
+  }
+
+  // ❌ Si no tiene permiso, lo redirigimos según su rol
+  const defaultRoute = userRole === "admin" ? "/dashboard" : "/";
+  return <Navigate to={defaultRoute} replace />;
+};
+
+export default PrivateRoute;

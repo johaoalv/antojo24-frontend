@@ -118,7 +118,6 @@ const Index = () => {
         ))}
       </div>
 
-      {/* Método de pago */}
       <div style={{ marginTop: 30 }}>
         <Select
           placeholder="Método de Pago"

@@ -38,23 +38,37 @@ const PinLogin = () => {
   const handleSubmit = async () => {
     const pin = inputs.join("");
     if (pin.length < maxLength) return;
-
+  
     try {
       const response = await autenticarPin(pin);
+      const { nombre_tienda, sucursal_id, rol } = response.data;
+      console.log(response.data.rol);
+  
       notification.success({
-        message: `Bienvenido, ${response.data.nombre_tienda}`,
+        message: `Bienvenido, ${nombre_tienda}`,
         placement: "bottomLeft",
       });
-      localStorage.setItem("user", JSON.stringify(response));
+  
+      localStorage.setItem("user", JSON.stringify(response.data));
+      localStorage.setItem("user_role", rol);
       localStorage.setItem("lastLoginDate", new Date().toISOString().split("T")[0]);
-      setInputs(Array(maxLength).fill(""));
-      navigate("/");
+  
+      setInputs(Array(maxLength).fill("")); // limpio los inputs antes de navegar
+  
+      // 🔁 Redirección según rol
+      if (rol === "admin") {
+        navigate("/admin/inicio");
+      } else {
+        navigate("/");
+      }
+  
     } catch (error) {
       message.error(error.response?.data?.error || "Error al autenticar");
       setInputs(Array(maxLength).fill(""));
       inputsRef.current[0].focus();
     }
   };
+  
 
   return (
     <div className="pin-container" style={{ textAlign: "center", padding: 30 }}>

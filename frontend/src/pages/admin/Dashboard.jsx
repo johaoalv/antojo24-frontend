@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col} from "antd"
-import { obtenerDashboard } from "../data/axios_dashboard";
-import CardInfo from "../components/Cards";
-
-
-
+import { obtenerDashboard } from "../../data/axios_dashboard";
+import CardInfo from "../../components/Cards";
 
 
 function Dashboard() {
@@ -27,6 +24,7 @@ function Dashboard() {
   }
 
   return (
+    <>
     <div>
     {datos ? (
       <div>
@@ -50,6 +48,7 @@ function Dashboard() {
       <p>Cargando datos...</p>
     )}
   </div>
+  </>
   );
 }
 
