@@ -1,67 +1,101 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Space, Typography, message } from "antd";
+import { Button, Input, Typography, message, notification } from "antd";
 import { autenticarPin } from "../data/axios_auth";
-import { DeleteOutlined } from "@ant-design/icons";
+import { LockOutlined } from "@ant-design/icons";
 
 const PinLogin = () => {
   const navigate = useNavigate();
-  const [pin, setPin] = useState("");
   const maxLength = 6;
+  const [inputs, setInputs] = useState(Array(maxLength).fill(""));
+  const inputsRef = useRef([]);
 
-  const handleButtonClick = (value) => {
-    if (pin.length < maxLength) {
-      setPin(pin + value);
+  const handleChange = (e, idx) => {
+    const value = e.target.value.replace(/\D/g, ""); // solo números
+    if (!value) return;
+
+    const newInputs = [...inputs];
+    newInputs[idx] = value[0];
+    setInputs(newInputs);
+
+    if (idx < maxLength - 1) {
+      inputsRef.current[idx + 1].focus();
     }
   };
 
-  const handleDelete = () => {
-    setPin(pin.slice(0, -1));
+  const handleKeyDown = (e, idx) => {
+    if (e.key === "Backspace") {
+      if (inputs[idx]) {
+        const newInputs = [...inputs];
+        newInputs[idx] = "";
+        setInputs(newInputs);
+      } else if (idx > 0) {
+        inputsRef.current[idx - 1].focus();
+      }
+    }
   };
 
   const handleSubmit = async () => {
+    const pin = inputs.join("");
+    if (pin.length < maxLength) return;
+
     try {
       const response = await autenticarPin(pin);
-      message.success(`Bienvenido, ${response.data.nombre_tienda}`);
+      notification.success({
+        message: `Bienvenido, ${response.data.nombre_tienda}`,
+        placement: "bottomLeft",
+      });
       localStorage.setItem("user", JSON.stringify(response));
-      setPin("");
+      localStorage.setItem("lastLoginDate", new Date().toISOString().split("T")[0]);
+      setInputs(Array(maxLength).fill(""));
       navigate("/");
     } catch (error) {
       message.error(error.response?.data?.error || "Error al autenticar");
-      setPin("");
+      setInputs(Array(maxLength).fill(""));
+      inputsRef.current[0].focus();
     }
   };
 
   return (
-    <div className="pin-container">
-    <Typography.Title level={2} className="pin-title">Ingrese PIN</Typography.Title>
-    <Input.Password
-      value={"●".repeat(pin.length)}
-      readOnly
-      className="pin-input"
-    />
-    <div className="pin-keypad">
-      {["123", "456", "789", "⌫0"].map((row, rowIndex) => (
-        <div key={rowIndex} className="pin-row">
-          {row.split("").map((num) => (
-            <Button
-              key={num}
-              type="default"
-              shape="circle"
-              className="pin-button"
-              size="large"
-              onClick={() => (num === "⌫" ? handleDelete() : handleButtonClick(num))}
-            >
-              {num === "⌫" ? <DeleteOutlined /> : num}
-            </Button>
-          ))}
-        </div>
-      ))}
+    <div className="pin-container" style={{ textAlign: "center", padding: 30 }}>
+      <LockOutlined style={{ fontSize: 32, marginBottom: 10, color: "#8c8c8c" }} />
+      <Typography.Title level={4} style={{ marginBottom: 20 }}>
+        Enter the code
+      </Typography.Title>
+
+      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20 }}>
+        {inputs.map((value, idx) => (
+          <Input
+            key={idx}
+            ref={(el) => (inputsRef.current[idx] = el)}
+            maxLength={1}
+            value={value}
+            autoFocus={idx === 0}
+            onChange={(e) => handleChange(e, idx)}
+            onKeyDown={(e) => handleKeyDown(e, idx)}
+            style={{
+              width: 45,
+              height: 50,
+              textAlign: "center",
+              fontSize: 24,
+              borderRadius: 8,
+              borderColor: idx === inputs.findIndex(i => i === "") ? "#91caff" : "#d9d9d9",
+              boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px #bae7ff" : "none",
+            }}
+          />
+        ))}
+      </div>
+
+      <Button
+        type="primary"
+        style={{ marginTop: 20, width: "200px", fontWeight: "bold" }}
+        size="large"
+        onClick={handleSubmit}
+        disabled={inputs.join("").length < maxLength}
+      >
+        Confirmar
+      </Button>
     </div>
-    <Button type="primary" className="pin-submit" onClick={handleSubmit} disabled={pin.length < maxLength}>
-      Confirmar
-    </Button> <br />
-  </div>
   );
 };
 
