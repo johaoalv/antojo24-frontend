@@ -48,6 +48,8 @@ const Index = () => {
     const pedido_id = generateUUID();
     const fecha = getPanamaTime();
     const total = calcularTotal();
+    const sucursal_id = localStorage.getItem("sucursal_id");
+
   
     const pedidoFormateado = Object.entries(pedido).map(([producto, cantidad]) => ({
       producto,
@@ -61,7 +63,8 @@ const Index = () => {
       pedido: pedidoFormateado,
       total_pedido: total,
       metodo_pago: metodoPago,
-      fecha
+      fecha, 
+      sucursal_id
     };
   
     try {

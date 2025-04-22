@@ -51,6 +51,7 @@ const PinLogin = () => {
   
       localStorage.setItem("user", JSON.stringify(response.data));
       localStorage.setItem("user_role", rol);
+      localStorage.setItem("sucursal_id", sucursal_id);
       localStorage.setItem("lastLoginDate", new Date().toISOString().split("T")[0]);
   
       setInputs(Array(maxLength).fill("")); // limpio los inputs antes de navegar
