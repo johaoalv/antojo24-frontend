@@ -3,7 +3,6 @@ import { Row, Col} from "antd"
 import { obtenerDashboard } from "../../data/axios_dashboard";
 import CardInfo from "../../components/Cards";
 
-
 function Dashboard() {
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState(null);
@@ -28,7 +27,7 @@ function Dashboard() {
     <div>
     {datos ? (
       <div>
-        <h1>Dashboard</h1>
+        <h1>Global Stats</h1>
         <Row gutter={[16, 16]} justify="center">
           <Col xs={24} sm={12} md={8} lg={6}>
             <CardInfo title="Ventas Hoy" value={datos.ventas_hoy} />

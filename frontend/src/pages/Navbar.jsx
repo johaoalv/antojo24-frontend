@@ -11,7 +11,7 @@ const cerrarSesion = () => {
   const menu = (
     <Menu>
       <Menu.Item key="dashboard">
-        <a href="/dashboard">Dashboard</a>
+        <a href="admin/inicio">Dashboard</a>
       </Menu.Item>
       <Menu.Item key="logout" danger onClick={cerrarSesion}>
         Cerrar Sesión

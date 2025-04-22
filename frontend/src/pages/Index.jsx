@@ -5,6 +5,7 @@ import productosData from "../data/productos.json";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { enviarPedido } from "../data/axios_pedidos";
 import { imprimirTicket } from "../utils/print";
+import { getPanamaTime } from "../utils/get_time";
 
 const PRECIOS = productosData.reduce((acc, item) => {
   acc[item.producto] = item.precio;
@@ -45,27 +46,26 @@ const Index = () => {
 
   const confirmarPedido = async () => {
     const pedido_id = generateUUID();
+    const fecha = getPanamaTime();
+    const total = calcularTotal();
+  
     const pedidoFormateado = Object.entries(pedido).map(([producto, cantidad]) => ({
       producto,
       cantidad,
       total_item: cantidad * PRECIOS[producto],
       pedido_id
     }));
-
+  
     const datos = {
-      pedido:pedidoFormateado,
-      total_pedido: calcularTotal(),
-      metodo_pago:metodoPago
+      pedido_id,
+      pedido: pedidoFormateado,
+      total_pedido: total,
+      metodo_pago: metodoPago,
+      fecha
     };
   
     try {
-       await enviarPedido({ 
-        pedido: pedidoFormateado,
-        total_pedido: calcularTotal(),
-        pedido_id,
-        metodo_pago: metodoPago
-      });
-
+      await enviarPedido(datos);
       await imprimirTicket(datos);
   
       notification.success({
@@ -82,6 +82,7 @@ const Index = () => {
       });
     }
   };
+  
   
   return (
     <>
