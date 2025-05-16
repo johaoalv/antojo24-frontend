@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "../pages/Index";
 import Login from "../pages/Login";
+import CierreCaja from "../pages/CierreCaja";
 import PrivateRoute from "../utils/PrivateRoute";
 
 import AdminLayout from "../pages/admin/AdminLayout";
@@ -17,6 +18,7 @@ const AppRouter = () => {
 
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Index />} /> {/* Ruta para rol "tienda" */}
+          <Route path="/cierre" element={<CierreCaja />} /> 
           
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} /> {/* 👉 Maneja /admin */}

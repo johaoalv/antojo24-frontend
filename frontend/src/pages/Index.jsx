@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import { Button, notification, Select } from "antd";
+import { useNavigate } from "react-router-dom";
 import productosData from "../data/productos.json";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { enviarPedido } from "../data/axios_pedidos";
 import { imprimirTicket } from "../utils/print";
 import { getPanamaTime } from "../utils/get_time";
+
+
 
 const PRECIOS = productosData.reduce((acc, item) => {
   acc[item.producto] = item.precio;
@@ -16,6 +19,7 @@ const buscarProducto = (nombre) =>
   productosData.find((p) => p.producto === nombre);
 
 const Index = () => {
+  const navigate = useNavigate();
   const [pedido, setPedido] = useState({});
   const [metodoPago, setMetodoPago] = useState("");
 
@@ -205,6 +209,13 @@ const Index = () => {
         disabled={Object.keys(pedido).length === 0 || !metodoPago}
       >
         REGISTRAR
+      </Button>
+      <Button
+        type="primary"
+        style={{ marginTop: 20 }}
+        onClick={() => navigate("/cierre")}
+      >
+        Ir al Cierre de Caja
       </Button>
     </div>
   </div>
