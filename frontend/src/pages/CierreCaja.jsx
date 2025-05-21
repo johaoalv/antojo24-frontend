@@ -1,73 +1,109 @@
 import React, { useEffect, useState } from "react";
+import { Table, Button, Spin, Typography, message } from "antd";
+import { DollarCircleOutlined } from "@ant-design/icons";
 import { hacerCierreCaja, getResumenVentas } from "../data/axios_cierre";
+import Navbar from "./Navbar";
 
-
+const { Title } = Typography;
 
 const CierreCaja = () => {
-  const [pedidos, setPedidos] = useState([]); 
+  const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [loadingCierre, setLoadingCierre] = useState(false);
+  const nombreSucursal = JSON.parse(localStorage.getItem("user"))?.nombre_tienda;
 
- useEffect(() => {
+
+  useEffect(() => {
     const cargarPedidos = async () => {
       try {
         const datos = await getResumenVentas();
-        console.log(datos);
         setPedidos(datos);
       } catch (error) {
         console.error("Error al cargar:", error);
+        message.error("Error al cargar los pedidos");
       } finally {
         setCargando(false);
       }
     };
-       cargarPedidos();
+    cargarPedidos();
   }, []);
-  
 
-  // Función para ejecutar el cierre (POST)
-const handleCierre = async () => {
-  try {
-    const resultado = await hacerCierreCaja();
-    alert(`✅ Cierre exitoso!\nTotal: $${resultado.resumen.total_general}`);
-  } catch (error) {
-    if (error.response?.status === 409) {
-      alert("Ya existe un cierre de caja hoy");
-    } else {
-      alert(`❌ Error: ${error.message}`);
+  const handleCierre = async () => {
+    setLoadingCierre(true);
+    try {
+      const resultado = await hacerCierreCaja();
+      message.success(`Cierre exitoso. Total: $${resultado.resumen.total_general}`);
+    } catch (error) {
+      if (error.response?.status === 409) {
+        message.warning("Ya existe un cierre de caja hoy");
+      } else {
+        message.error(`❌ Error: ${error.message}`);
+      }
+      console.error("Detalle error:", error.response?.data || error);
+    } finally {
+      setLoadingCierre(false);
     }
-    console.error("Detalle error:", error.response?.data || error);
-  }
-};
+  };
 
-  if (cargando) return <div>Cargando pedidos...</div>;
-
+  const columnas = [
+    {
+      title: "Producto",
+      dataIndex: "producto",
+      key: "producto",
+    },
+    {
+      title: "Cantidad",
+      dataIndex: "cantidad",
+      key: "cantidad",
+      align: "center",
+    },
+    {
+      title: "Precio",
+      dataIndex: "total_item",
+      key: "precio",
+      align: "right",
+      render: (precio) => `$${precio.toFixed(2)}`,
+    },
+    {
+      title: "Método de Pago",
+      dataIndex: "metodo_pago",
+      key: "metodo_pago",
+    },
+  ];
 
   return (
-      <div style={{ margin: '20px' }}>
-      <h2>Pedidos de Hoy</h2>
-      <table border="1" style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Método Pago</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pedidos.map((pedido) => (
-            <tr key={pedido.id}>
-              <td>{pedido.producto}</td>
-              <td style={{ textAlign: 'center' }}>{pedido.cantidad}</td>
-              <td style={{ textAlign: 'right' }}>${pedido.total_item.toFixed(2)}</td>
-              <td>{pedido.metodo_pago}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table> <br /> <br />
-      <button onClick={handleCierre}>cierre de caja</button>
-    </div>
-  );
- };
+    <>
+    <Navbar />
+    <div style={{ padding: 24 }}>
+      <Title level={3}>Resumen de Pedidos - {nombreSucursal}</Title>
 
+      {cargando ? (
+        <div style={{ textAlign: "center", marginTop: 50 }}>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Table
+          dataSource={pedidos}
+          columns={columnas}
+          rowKey="id"
+          pagination={false}
+          bordered
+        />
+      )}
+
+      <div style={{ textAlign: "right", marginTop: 24 }}>
+        <Button
+          type="primary"
+          icon={<DollarCircleOutlined />}
+          loading={loadingCierre}
+          onClick={handleCierre}
+          size="large"
+        >
+          Cierre de Caja
+        </Button>
+      </div>
+    </div></>
+  );
+};
 
 export default CierreCaja;

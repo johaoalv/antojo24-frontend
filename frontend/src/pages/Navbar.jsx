@@ -33,7 +33,7 @@ const Navbar = () => {
     >
        
       <img src="/assets/a24.png" alt="a24 Logo" style={{ height: 40 }} />
-      <h3>Antojo24</h3>
+    <a href="/"> <h3>Antojo24</h3></a> 
 
       <Dropdown overlay={menu} placement="bottomRight">
         <Button>
