@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Input, Typography, message, notification } from "antd";
 import { autenticarPin } from "../data/axios_auth";
 import { LockOutlined } from "@ant-design/icons";
+import a24logo from "../../public/assets/A_24_LOGO_OFICIAL.png"
 
 const PinLogin = () => {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ const PinLogin = () => {
 
   return (
     <div className="pin-container" style={{ textAlign: "center", padding: 30 }}>
-      <LockOutlined style={{ fontSize: 32, marginBottom: 10, color: "#8c8c8c" }} />
+      <img src={a24logo} style={{ width:200 }} />
       <Typography.Title level={4} style={{ marginBottom: 20 }}>
         Enter the code
       </Typography.Title>
