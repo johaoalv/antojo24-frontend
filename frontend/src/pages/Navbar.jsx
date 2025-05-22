@@ -1,18 +1,22 @@
 import React from "react";
 import { Button, Dropdown, Menu, Space } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { DownOutlined, ShopOutlined } from "@ant-design/icons";
+
 
 const cerrarSesion = () => {
     localStorage.clear();
     sessionStorage.clear();
     window.location.href = "/login"; // o redirige donde quieras
   };
+
+const nombreTienda = JSON.parse(localStorage.getItem("user"))?.nombre_tienda || "Sucursal";
+
   
   const menu = (
     <Menu>
-      <Menu.Item key="dashboard">
-        <a href="admin/inicio">Dashboard</a>
-      </Menu.Item>
+      <Menu.Item key="sucursal" icon={<ShopOutlined />}>
+      <span>{nombreTienda}</span>
+    </Menu.Item>
       <Menu.Item key="logout" danger onClick={cerrarSesion}>
         Cerrar Sesión
       </Menu.Item>
@@ -32,7 +36,7 @@ const Navbar = () => {
       }}
     >
        
-      <img src="/assets/a24.png" alt="a24 Logo" style={{ height: 40 }} />
+      <img src="/assets/a244.png" alt="a24 Logo" style={{ width:80 }} />
     <a href="/"> <h3>Antojo24</h3></a> 
 
       <Dropdown overlay={menu} placement="bottomRight">
