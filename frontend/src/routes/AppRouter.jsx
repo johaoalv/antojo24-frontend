@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "../pages/Index";
 import Login from "../pages/Login";
 import CierreCaja from "../pages/CierreCaja";
-import PrivateRoute from "../utils/PrivateRoute";
+import PrivateRoute from "./PrivateRoute";
 
 import AdminLayout from "../pages/admin/AdminLayout";
 import Dashboard from "../pages/admin/Dashboard";
