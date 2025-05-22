@@ -3,32 +3,51 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import ErrorPage from "../pages/ErrorPage";
 
 const rolePermissions = {
-  admin: ["/admin", "/admin/inicio", "/admin/productos", "/admin/configuracion"],
-  tienda: ["/"],
+  admin: ["/admin"],
+  tienda: ["/", "/cierre"],
 };
 
 const PrivateRoute = () => {
   const location = useLocation();
   const token = localStorage.getItem("app_token");
-  const userRole = localStorage.getItem("user_role");
-  const currentPath = location.pathname.replace(/\/$/, "");
+  const userRole = localStorage.getItem("user_role"); // ✅ CORRECTO
+  const currentPath = location.pathname === "/" ? "/" : location.pathname.replace(/\/$/, "");
+
+
+  console.log("🔐 Entrando a PrivateRoute");
+  console.log("➡️ Ruta actual:", currentPath);
+  console.log("🔑 Rol:", userRole);
+  console.log("✅ Paths permitidos:", rolePermissions[userRole]);
 
   if (!token) return <Navigate to="/login" replace />;
 
   if (!userRole || !rolePermissions[userRole]) {
-    return <ErrorPage
-      status="403"
-      title="Rol no reconocido"
-      subtitle="Tu sesión puede estar dañada. Intenta iniciar sesión nuevamente."
-    />;
+    return (
+      <ErrorPage
+        status="403"
+        title="Rol no reconocido"
+        subtitle="Tu sesión puede estar dañada. Intenta iniciar sesión nuevamente."
+      />
+    );
   }
 
   const allowedPaths = rolePermissions[userRole];
-  const isAllowed = allowedPaths.some((path) => currentPath.startsWith(path));
+  const isAllowed = allowedPaths.some(
+    (path) => currentPath === path || currentPath.startsWith(path + "/")
+  );
 
-  if (isAllowed) return <Outlet />;
+  if (!isAllowed) {
+    console.warn("❌ Ruta NO permitida para el rol:", userRole, "→", currentPath);
+    return (
+      <ErrorPage
+        status="403"
+        title="403"
+        subtitle="No tienes permiso para acceder a esta sección."
+      />
+    );
+  }
 
-  return <ErrorPage status="403" title="403" subtitle="No tienes permiso para acceder a esta sección." />;
+  return <Outlet />;
 };
 
 export default PrivateRoute;

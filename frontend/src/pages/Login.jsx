@@ -42,6 +42,7 @@ const PinLogin = () => {
     try {
       const response = await autenticarPin(pin);
       const { nombre_tienda, sucursal_id, rol } = response.data;
+      localStorage.setItem("app_token", response.token); // ✅ Guardar token
       console.log(response.data.rol);
   
       notification.success({
