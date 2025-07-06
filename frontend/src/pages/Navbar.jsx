@@ -41,7 +41,7 @@ const Navbar = () => {
 
       <Dropdown menu={menu} placement="bottomRight">
         <Button>
-          Opciones <DownOutlined />
+          Options <DownOutlined />
         </Button>
       </Dropdown>
     </div>
