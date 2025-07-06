@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Row, Col} from "antd"
 import { obtenerDashboard } from "../../data/axios_dashboard";
 import CardInfo from "../../components/Cards";
@@ -6,35 +6,45 @@ import { io } from "socket.io-client";
 
 function Dashboard() {
   const [datos, setDatos] = useState(null);
-  const [error, setError] = useState(null);
-  const socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
-  transports: ["websocket"],
-});
+   const socketRef = useRef(null);
 
+  // Cargar datos iniciales
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const data = await obtenerDashboard();
+        setDatos(data);
+      } catch (error) {
+        console.error("Error al obtener datos del dashboard:", error);
+      }
+    };
+    cargarDatos();
+  }, []);
 
-useEffect(() => {
-  const cargarDatos = async () => {
-    try {
-      const data = await obtenerDashboard();
+  // Conexión WebSocket
+  useEffect(() => {
+    socketRef.current = io(import.meta.env.VITE_WEBSOCKET_URL, {
+      transports: ["websocket"],
+    });
+
+    socketRef.current.on("connect", () => {
+      console.log("🟢 WebSocket conectado");
+    });
+
+    socketRef.current.on("dashboard_update", (data) => {
+      console.log("📡 Actualización en vivo:", data);
       setDatos(data);
-    } catch (error) {
-      console.error("Error al obtener datos del dashboard:", error);
-    }
-  };
-  cargarDatos();
-}, []);
+    });
 
-useEffect(() => {
-  socket.on("dashboard_update", (data) => {
-    console.log("📡 Actualización en vivo:", data);
-    setDatos(data);
-  });
+    socketRef.current.on("disconnect", () => {
+      console.log("🔴 WebSocket desconectado");
+    });
 
-  return () => {
-    socket.off("dashboard_update");
-  };
-}, []);
-
+    return () => {
+      socketRef.current.disconnect();
+      console.log("🧹 WebSocket cerrado");
+    };
+  }, []);
 
   return (
     <>
