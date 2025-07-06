@@ -2,25 +2,39 @@ import React, { useState, useEffect } from "react";
 import { Row, Col} from "antd"
 import { obtenerDashboard } from "../../data/axios_dashboard";
 import CardInfo from "../../components/Cards";
+import { io } from "socket.io-client";
 
 function Dashboard() {
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState(null);
+  const socket = io(import.meta.env.VITE_WEBSOCKET_URL, {
+  transports: ["websocket"],
+});
 
-  useEffect(() => {
-    const cargarDatos = async () => {
-      try {
-        const data = await obtenerDashboard();
-        setDatos(data);
-      } catch (error) {
-        console.error("Error al obtener datos del dashboard:", error);
-      }
-    };
-    cargarDatos();
-  }, []);
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
+
+useEffect(() => {
+  const cargarDatos = async () => {
+    try {
+      const data = await obtenerDashboard();
+      setDatos(data);
+    } catch (error) {
+      console.error("Error al obtener datos del dashboard:", error);
+    }
+  };
+  cargarDatos();
+}, []);
+
+useEffect(() => {
+  socket.on("dashboard_update", (data) => {
+    console.log("📡 Actualización en vivo:", data);
+    setDatos(data);
+  });
+
+  return () => {
+    socket.off("dashboard_update");
+  };
+}, []);
+
 
   return (
     <>
