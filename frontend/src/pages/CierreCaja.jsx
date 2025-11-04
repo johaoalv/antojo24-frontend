@@ -86,8 +86,27 @@ const CierreCaja = () => {
           dataSource={pedidos}
           columns={columnas}
           rowKey="id"
-          pagination={false}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`
+          }}
           bordered
+          summary={(pageData) => {
+            const total = pedidos.reduce((acc, current) => acc + current.total_item, 0);
+            return (
+              <Table.Summary fixed="bottom">
+                <Table.Summary.Row>
+                  <Table.Summary.Cell index={0}>Total General</Table.Summary.Cell>
+                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                  <Table.Summary.Cell index={2} align="right">
+                    <Typography.Text strong>${total.toFixed(2)}</Typography.Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                </Table.Summary.Row>
+              </Table.Summary>
+            );
+          }}
         />
       )}
 
