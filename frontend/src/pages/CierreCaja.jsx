@@ -11,6 +11,7 @@ const CierreCaja = () => {
   const [cargando, setCargando] = useState(true);
   const [loadingCierre, setLoadingCierre] = useState(false);
   const nombreSucursal = JSON.parse(localStorage.getItem("user"))?.nombre_tienda;
+  console.log("Sucursal:", nombreSucursal);
 
 
   useEffect(() => {
@@ -62,7 +63,7 @@ const CierreCaja = () => {
       dataIndex: "total_item",
       key: "precio",
       align: "right",
-      render: (precio) => `$${precio.toFixed(2)}`,
+      render: (precio) => `$${parseFloat(precio).toFixed(2)}`,
     },
     {
       title: "Método de Pago",
@@ -93,7 +94,7 @@ const CierreCaja = () => {
           }}
           bordered
           summary={(pageData) => {
-            const total = pedidos.reduce((acc, current) => acc + current.total_item, 0);
+            const total = pedidos.reduce((acc, current) => acc + parseFloat(current.total_item), 0);
             return (
               <Table.Summary fixed="bottom">
                 <Table.Summary.Row>
