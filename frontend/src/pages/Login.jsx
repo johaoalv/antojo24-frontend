@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, Typography, message, notification } from "antd";
+import axios from "axios";
 import { autenticarPin } from "../data/axios_auth";
-import { LockOutlined } from "@ant-design/icons";
 import a24logo from "../../public/assets/A_24_LOGO_OFICIAL.png"
 
 const PinLogin = () => {
@@ -39,10 +39,21 @@ const PinLogin = () => {
   const handleSubmit = async () => {
     const pin = inputs.join("");
     if (pin.length < maxLength) return;
-  
+
     try {
-      const response = await autenticarPin(pin);
+      let ip_cliente = null;
+      try {
+        const { data } = await axios.get("https://api.ipify.org?format=json");
+        ip_cliente = data.ip;
+      } catch (ipError) {
+        console.error("Error al obtener la IP pública:", ipError);
+        message.error("No se pudo obtener la dirección IP. Revisa tu conexión a internet.");
+        return;
+      }
+
+      const response = await autenticarPin(pin, ip_cliente);
       const { nombre_tienda, sucursal_id, rol } = response.data;
+
       localStorage.setItem("app_token", response.token); // ✅ Guardar token
       console.log(response.data.rol);
   
@@ -66,7 +77,14 @@ const PinLogin = () => {
       }
   
     } catch (error) {
-      message.error(error.response?.data?.error || "Error al autenticar");
+      let errorMessage = "Error al autenticar"; // Mensaje genérico por defecto
+
+      if (error.response && error.response.data && error.response.data.error) {
+        // Si el backend envía un mensaje de error específico (incluyendo para 403), lo usamos.
+        // Esto cumple con "no personalices el msj, solo el que llegue del backend".
+        errorMessage = error.response.data.error;
+      }
+      message.error(errorMessage);
       setInputs(Array(maxLength).fill(""));
       inputsRef.current[0].focus();
     }
