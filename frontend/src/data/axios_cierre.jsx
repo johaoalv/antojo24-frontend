@@ -2,7 +2,7 @@ import axiosInstance from "./axios_base";
 
 export const getResumenVentas = async () => {
   const sucursal_id = localStorage.getItem("sucursal_id");
-  const response = await axiosInstance.get(`/pedidos-hoy?sucursal_id=${sucursal_id}`); // 👈 URL corregida
+  const response = await axiosInstance.get(`/pedidos-hoy?sucursal_id=${sucursal_id}`);
   console.log(response.data);
   return response.data; 
 };

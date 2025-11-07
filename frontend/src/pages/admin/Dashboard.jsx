@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Row, Col} from "antd"
 import { obtenerDashboard } from "../../data/axios_dashboard";
 import CardInfo from "../../components/Cards";
+import { io } from "socket.io-client";
 
 function Dashboard() {
   const [datos, setDatos] = useState(null);
-  const [error, setError] = useState(null);
+   const socketRef = useRef(null);
 
+  // Cargar datos iniciales
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -18,9 +20,31 @@ function Dashboard() {
     };
     cargarDatos();
   }, []);
-  if (error) {
-    return <p className="error">{error}</p>;
-  }
+
+  // Conexión WebSocket
+  useEffect(() => {
+    socketRef.current = io(import.meta.env.VITE_WEBSOCKET_URL, {
+      transports: ["websocket"],
+    });
+
+    socketRef.current.on("connect", () => {
+      console.log("🟢 WebSocket conectado");
+    });
+
+    socketRef.current.on("dashboard_update", (data) => {
+      console.log("📡 Actualización en vivo:", data);
+      setDatos(data);
+    });
+
+    socketRef.current.on("disconnect", () => {
+      console.log("🔴 WebSocket desconectado");
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+      console.log("🧹 WebSocket cerrado");
+    };
+  }, []);
 
   return (
     <>
