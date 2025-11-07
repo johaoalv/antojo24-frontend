@@ -11,7 +11,6 @@ const CierreCaja = () => {
   const [cargando, setCargando] = useState(true);
   const [loadingCierre, setLoadingCierre] = useState(false);
   const nombreSucursal = JSON.parse(localStorage.getItem("user"))?.nombre_tienda;
-  console.log("Sucursal:", nombreSucursal);
 
 
   useEffect(() => {
@@ -33,6 +32,7 @@ const CierreCaja = () => {
     setLoadingCierre(true);
     try {
       const resultado = await hacerCierreCaja();
+      console.log("Resultado del cierre:", resultado);
       message.success(`Cierre exitoso. Total: $${resultado.resumen.total_general}`);
     } catch (error) {
       if (error.response?.status === 409) {
