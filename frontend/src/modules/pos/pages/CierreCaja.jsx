@@ -3,6 +3,7 @@ import { Table, Button, Spin, Typography, message } from "antd";
 import { DollarCircleOutlined } from "@ant-design/icons";
 import { hacerCierreCaja, getResumenVentas } from "../../../api/pos/axios_cierre";
 import Navbar from "../../common/components/Navbar";
+import SecondaryButton from "../../common/components/SecondaryButton";
 
 const { Title } = Typography;
 
@@ -115,15 +116,14 @@ const CierreCaja = () => {
       )}
 
       <div style={{ textAlign: "right", marginTop: 40 }}>
-        <Button
-          type="primary"
-          icon={<DollarCircleOutlined style={{ fontSize: '1.2em' }}/>}
+        <SecondaryButton
+          icon={<DollarCircleOutlined/>}
           loading={loadingCierre}
           onClick={handleCierre}
-          style={{ height: 60, fontSize: '1.5em', padding: '0 30px' }}
+        
         >
           Cierre de Caja
-        </Button>
+        </SecondaryButton>
       </div>
     </div></>
   );

@@ -4,6 +4,7 @@ import { Button, Input, Typography, message, notification } from "antd";
 import axios from "axios";
 import { autenticarPin } from "../../../api/auth/axios_auth";
 import a24logo from "../../../../public/assets/A_24_LOGO_OFICIAL.png"
+import PrimaryButton from "../components/PrimaryButton";
 
 const PinLogin = () => {
   const navigate = useNavigate();
@@ -121,15 +122,15 @@ const PinLogin = () => {
         ))}
       </div>
 
-      <Button
-        type="primary"
+      <PrimaryButton
+        
         style={{ marginTop: 30, width: "300px", fontWeight: "bold", padding: '20px 0', height: 'auto', fontSize: '1.5em' }}
         size="large"
         onClick={handleSubmit}
         disabled={inputs.join("").length < maxLength}
       >
         Confirmar
-      </Button>
+      </PrimaryButton>
     </div>
   );
 };

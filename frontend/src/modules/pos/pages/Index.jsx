@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
 import productosData from "../../../api/productos.json";
 import ProductsGrid from "../components/ProductsGrid";
-import PaymentsSelect from "../components/PaymentsSelect";
 import Cart from "../components/Cart";
 import CashModal from "../components/CashModal";
 import usePedidoState from "../hooks/usePedidoState";
@@ -47,22 +46,10 @@ const Index = () => {
     <>
       <Navbar />
       <div style={{ display: "flex", padding: 30, gap: 30 }}>
-        <div
-          style={{
-            width: "60%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 40,
-          }}
-        >
+        <div style={{ width: "60%" }}>
           <ProductsGrid
             productos={productosData}
             onAddProduct={agregarAlPedido}
-          />
-          <PaymentsSelect
-            value={metodoPagoState.metodoPago}
-            options={PAYMENT_OPTIONS}
-            onChange={metodoPagoState.handleMetodoPagoChange}
           />
         </div>
         <Cart
@@ -71,6 +58,9 @@ const Index = () => {
           priceMap={priceMap}
           onAjustarCantidad={ajustarCantidad}
           total={total}
+          metodoPago={metodoPagoState.metodoPago}
+          paymentOptions={PAYMENT_OPTIONS}
+          onMetodoPagoChange={metodoPagoState.handleMetodoPagoChange}
           onConfirmar={confirmarPedido}
           disabled={isPedidoVacio || !metodoPagoState.metodoPago}
           onNavigateToCierre={() => navigate("/cierre")}

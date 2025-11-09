@@ -1,4 +1,18 @@
- body {
+body {
   font-family: 'Inter', sans-serif;
-  font-size: 18px; 
+  font-size: 18px;
+}
+
+.primary-button:not(.ant-btn-disabled):hover {
+  border-color: #ffd60a !important;
+  background-color: #111111 !important;
+  color: #ffd60a !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+.secondary-button:not(.ant-btn-disabled):hover {
+  border-color: #000000 !important;
+  background-color: #ffd60a !important;
+  color: #000000 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35) !important;
 }

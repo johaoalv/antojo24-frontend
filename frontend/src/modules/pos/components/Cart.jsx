@@ -1,7 +1,10 @@
 import React from "react";
-import { Button } from "antd";
+import { DollarCircleOutlined } from "@ant-design/icons";
 import CartItem from "./CartItem";
+import PaymentsSelect from "./PaymentsSelect";
 import { formatCurrency } from "../utils/formatters";
+import PrimaryButton from "../../common/components/PrimaryButton";
+import SecondaryButton from "../../common/components/SecondaryButton";
 
 const Cart = ({
   pedido,
@@ -9,6 +12,9 @@ const Cart = ({
   priceMap,
   onAjustarCantidad,
   total,
+  metodoPago,
+  paymentOptions,
+  onMetodoPagoChange,
   onConfirmar,
   disabled,
   onNavigateToCierre,
@@ -41,6 +47,14 @@ const Cart = ({
       );
     })}
 
+    <div style={{ marginTop: 30 }}>
+      <PaymentsSelect
+        value={metodoPago}
+        options={paymentOptions}
+        onChange={onMetodoPagoChange}
+      />
+    </div>
+
     <div
       style={{
         marginTop: 30,
@@ -54,23 +68,20 @@ const Cart = ({
       <span>{formatCurrency(total)}</span>
     </div>
 
-    <Button
-      type="primary"
-      block
-      style={{ marginTop: 25, height: 70, fontSize: "2em" }}
+    <PrimaryButton
+      style={{ marginTop: 25 }}
       onClick={onConfirmar}
       disabled={disabled}
     >
-      Continuar
-    </Button>
-    <Button
-      type="default"
-      block
-      style={{ marginTop: 20, height: 50, fontSize: "1.2em" }}
+      CONTINUAR
+    </PrimaryButton>
+    <SecondaryButton
+      style={{ marginTop: 20 }}
       onClick={onNavigateToCierre}
+      icon={<DollarCircleOutlined />}
     >
-      Ir al Cierre de Caja
-    </Button>
+      CIERRE DE CAJA
+    </SecondaryButton>
   </div>
 );
 
