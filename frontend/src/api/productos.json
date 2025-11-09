@@ -1,0 +1,10 @@
+[
+  { "producto": "Hot Dog", "precio": 2.5, "imagen": "/assets/hotdog.png" },
+  { "producto": "Hamburguesa", "precio": 3.65, "imagen": "/assets/hamburguesa.png" },
+  { "producto": "Soda", "precio": 1.25, "imagen": "/assets/soda.png" },
+  { "producto": "Postre", "precio": 2.0, "imagen": "/assets/icecream.png" },
+  { "producto": "Arepa", "precio": 4.0, "imagen": "/assets/arepa.png" },
+  { "producto": "Empanada", "precio": 1.5, "imagen": "/assets/empanada.png" },
+  { "producto": "Café", "precio": 1.0, "imagen": "/assets/cafe.png" },
+  { "producto": "Papitas", "precio": 1.5, "imagen": "/assets/papitas.png" }
+]

@@ -1,14 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Index from "../pages/Index";
-import Login from "../pages/Login";
-import CierreCaja from "../pages/CierreCaja";
+import Index from "../modules/pos/pages/Index";
+import Login from "../modules/common/pages/Login";
+import CierreCaja from "../modules/pos/pages/CierreCaja";
 import PrivateRoute from "./PrivateRoute";
 
-import AdminLayout from "../pages/admin/AdminLayout";
-import Dashboard from "../pages/admin/Dashboard";
-import Productos from "../pages/admin/Products";
-import Configuracion from "../pages/admin/Config";
+import AdminLayout from "../modules/admin/pages/AdminLayout";
+import Dashboard from "../modules/admin/pages/Dashboard";
+import Productos from "../modules/admin/pages/Products";
+import Configuracion from "../modules/admin/pages/Config";
 
 const AppRouter = () => {
   return (

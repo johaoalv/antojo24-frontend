@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import ErrorPage from "../pages/ErrorPage";
+import ErrorPage from "../modules/common/pages/ErrorPage";
 
 const rolePermissions = {
   admin: ["/admin"],
@@ -10,7 +10,7 @@ const rolePermissions = {
 const PrivateRoute = () => {
   const location = useLocation();
   const token = localStorage.getItem("app_token");
-  const userRole = localStorage.getItem("user_role"); // ✅ CORRECTO
+  const userRole = localStorage.getItem("user_role");
   const currentPath = location.pathname === "/" ? "/" : location.pathname.replace(/\/$/, "");
 
 
