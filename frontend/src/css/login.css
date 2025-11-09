@@ -9,34 +9,34 @@
   }
   
   .pin-title {
-    font-size: 32px;
+    font-size: 42px; /* Aumentado */
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 40px; /* Aumentado */
   }
   
   .pin-input {
-    width: 280px;
-    height: 50px;
+    width: 350px; /* Aumentado */
+    height: 70px; /* Aumentado */
     text-align: center;
-    font-size: 32px;
-    margin-bottom: 25px;
-    border-radius: 10px;
+    font-size: 42px; /* Aumentado */
+    margin-bottom: 35px; /* Aumentado */
+    border-radius: 15px; /* Aumentado */
     border: 1px solid #ccc;
     background-color: #fff;
-    gap: 10px;
+    gap: 15px; /* Aumentado */
   }
   
   .pin-keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 25px;
+    gap: 30px; /* Aumentado */
+    margin-bottom: 35px; /* Aumentado */
   }
   
   .pin-button {
-    width: 90px;
-    height: 90px;
-    font-size: 28px;
+    width: 120px; /* Aumentado */
+    height: 120px; /* Aumentado */
+    font-size: 38px; /* Aumentado */
     font-weight: bold;
     background-color: #e0e0e0;
     border: none;
@@ -53,16 +53,16 @@
   }
   
   .pin-submit {
-    width: 220px;
-    height: 60px;
-    font-size: 22px;
+    width: 280px; /* Aumentado */
+    height: 80px; /* Aumentado */
+    font-size: 28px; /* Aumentado */
     font-weight: bold;
     background-color: #4CAF50;
     border: none;
-    border-radius: 10px;
+    border-radius: 15px; /* Aumentado */
     color: #fff;
     cursor: pointer;
-    margin-top: 15px;
+    margin-top: 20px; /* Aumentado */
   }
   
   .pin-submit:disabled {

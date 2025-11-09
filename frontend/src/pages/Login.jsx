@@ -93,12 +93,12 @@ const PinLogin = () => {
 
   return (
     <div className="pin-container" style={{ textAlign: "center", padding: 30 }}>
-      <img src={a24logo} style={{ width:200 }} />
-      <Typography.Title level={4} style={{ marginBottom: 20 }}>
+      <img src={a24logo} style={{ width:250 }} />
+      <Typography.Title level={2} style={{ marginBottom: 30 }}>
         Enter the code
       </Typography.Title>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 20 }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 15, marginBottom: 30 }}>
         {inputs.map((value, idx) => (
           <Input
             key={idx}
@@ -109,10 +109,10 @@ const PinLogin = () => {
             onChange={(e) => handleChange(e, idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
             style={{
-              width: 45,
-              height: 50,
+              width: 60,
+              height: 70,
               textAlign: "center",
-              fontSize: 24,
+              fontSize: 32,
               borderRadius: 8,
               borderColor: idx === inputs.findIndex(i => i === "") ? "#91caff" : "#d9d9d9",
               boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px #bae7ff" : "none",
@@ -123,7 +123,7 @@ const PinLogin = () => {
 
       <Button
         type="primary"
-        style={{ marginTop: 20, width: "200px", fontWeight: "bold" }}
+        style={{ marginTop: 30, width: "300px", fontWeight: "bold", padding: '20px 0', height: 'auto', fontSize: '1.5em' }}
         size="large"
         onClick={handleSubmit}
         disabled={inputs.join("").length < maxLength}

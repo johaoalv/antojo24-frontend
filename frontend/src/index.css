@@ -1,5 +1,6 @@
 body {
   font-family: 'Inter', sans-serif;
+  font-size: 18px; /* Aumenta el tamaño de fuente base */
 }
 
 .login-container {
@@ -8,16 +9,20 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  gap: 15px;
+  gap: 25px; /* Aumenta el espacio entre elementos */
 }
 
 .otp-input {
-  width: 200px;
+  width: 300px; /* Aumenta el ancho del input */
+  padding: 15px;
   text-align: center;
+  font-size: 1.2em;
 }
 
 .login-button {
-  width: 200px;
+  width: 300px; /* Aumenta el ancho del botón */
+  padding: 15px;
+  font-size: 1.2em;
 }
 .index-container {
   display: flex;
@@ -25,14 +30,15 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  gap: 20px;
+  gap: 30px; /* Aumenta el espacio entre botones */
 }
 
 .food-button {
-  width: 200px;
-  height: 60px;
-  font-size: 18px;
+  width: 350px; /* Aumenta el ancho del botón */
+  height: 80px; /* Aumenta la altura del botón */
+  font-size: 24px; /* Aumenta el tamaño de la fuente */
   display: flex;
   align-items: center;
   justify-content: center;
 }
+

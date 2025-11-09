@@ -28,23 +28,23 @@ const AdminLayout = () => {
   const menuItems = [
     {
       key: "inicio",
-      icon: <DashboardOutlined />,
-      label: "Inicio",
+      icon: <DashboardOutlined style={{ fontSize: '1.5em' }}/>,
+      label: <span style={{ fontSize: '1.3em' }}>Inicio</span>,
     },
     {
       key: "productos",
-      icon: <ShopOutlined />,
-      label: "Productos",
+      icon: <ShopOutlined style={{ fontSize: '1.5em' }}/>,
+      label: <span style={{ fontSize: '1.3em' }}>Productos</span>,
     },
     {
       key: "configuracion",
-      icon: <SettingOutlined />,
-      label: "Configuración",
+      icon: <SettingOutlined style={{ fontSize: '1.5em' }}/>,
+      label: <span style={{ fontSize: '1.3em' }}>Configuración</span>,
     },
     {
       key: "logout",
-      icon: <LogoutOutlined />,
-      label: "Salir",
+      icon: <LogoutOutlined style={{ fontSize: '1.5em' }}/>,
+      label: <span style={{ fontSize: '1.3em' }}>Salir</span>,
     },
   ];
 
@@ -61,32 +61,33 @@ const AdminLayout = () => {
       {/* LAYOUT INTERNO */}
       <Layout>
         {/* SIDEBAR */}
-        <Sider width={200} theme="light">
+        <Sider width={300} theme="light">
           <Menu
             mode="inline"
             selectedKeys={[currentPath.split("/")[2] || "inicio"]}
-            style={{ height: "100%", borderRight: 0 }}
+            style={{ height: "100%", borderRight: 0, padding: '20px 0' }}
             items={menuItems}
             onClick={handleMenuClick}
+            itemPadding="30px"
           />
         </Sider>
 
         {/* CONTENIDO CENTRAL */}
-        <Layout style={{ padding: "24px" }}>
+        <Layout style={{ padding: "30px" }}>
           <Content
             style={{
               background: "#fff",
-              padding: 24,
+              padding: 40,
               margin: 0,
               minHeight: 280,
-              borderRadius: 10,
+              borderRadius: 16,
             }}
           >
             <Outlet />
           </Content>
 
           {/* FOOTER */}
-          <Footer style={{ textAlign: "center", marginTop: 20 }}>
+          <Footer style={{ textAlign: "center", marginTop: 20, fontSize: '1.1em' }}>
             Antojo24 ©{new Date().getFullYear()} - Todos los derechos reservados
           </Footer>
         </Layout>

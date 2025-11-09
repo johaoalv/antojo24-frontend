@@ -48,35 +48,38 @@ const CierreCaja = () => {
 
   const columnas = [
     {
-      title: "Producto",
+      title: <strong style={{ fontSize: '1.2em' }}>Producto</strong>,
       dataIndex: "producto",
       key: "producto",
+      render: text => <span style={{ fontSize: '1.1em' }}>{text}</span>
     },
     {
-      title: "Cantidad",
+      title: <strong style={{ fontSize: '1.2em' }}>Cantidad</strong>,
       dataIndex: "cantidad",
       key: "cantidad",
       align: "center",
+      render: text => <span style={{ fontSize: '1.1em' }}>{text}</span>
     },
     {
-      title: "Precio",
+      title: <strong style={{ fontSize: '1.2em' }}>Precio</strong>,
       dataIndex: "total_item",
       key: "precio",
       align: "right",
-      render: (precio) => `$${parseFloat(precio).toFixed(2)}`,
+      render: (precio) => <span style={{ fontSize: '1.1em' }}>{`$${parseFloat(precio).toFixed(2)}`}</span>,
     },
     {
-      title: "Método de Pago",
+      title: <strong style={{ fontSize: '1.2em' }}>Método de Pago</strong>,
       dataIndex: "metodo_pago",
       key: "metodo_pago",
+      render: text => <span style={{ fontSize: '1.1em' }}>{text}</span>
     },
   ];
 
   return (
     <>
     <Navbar />
-    <div style={{ padding: 24 }}>
-      <Title level={3}>Resumen de Pedidos - {nombreSucursal}</Title>
+    <div style={{ padding: 40 }}>
+      <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Resumen de Pedidos - {nombreSucursal}</Title>
 
       {cargando ? (
         <div style={{ textAlign: "center", marginTop: 50 }}>
@@ -88,7 +91,7 @@ const CierreCaja = () => {
           columns={columnas}
           rowKey="id"
           pagination={{
-            pageSize: 10,
+            pageSize: 15, 
             showSizeChanger: true,
             showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`
           }}
@@ -98,10 +101,10 @@ const CierreCaja = () => {
             return (
               <Table.Summary fixed="bottom">
                 <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}>Total General</Table.Summary.Cell>
+                  <Table.Summary.Cell index={0}><strong style={{ fontSize: '1.4em' }}>Total General</strong></Table.Summary.Cell>
                   <Table.Summary.Cell index={1}></Table.Summary.Cell>
                   <Table.Summary.Cell index={2} align="right">
-                    <Typography.Text strong>${total.toFixed(2)}</Typography.Text>
+                    <Typography.Text strong style={{ fontSize: '1.4em' }}>${total.toFixed(2)}</Typography.Text>
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={3}></Table.Summary.Cell>
                 </Table.Summary.Row>
@@ -111,13 +114,13 @@ const CierreCaja = () => {
         />
       )}
 
-      <div style={{ textAlign: "right", marginTop: 24 }}>
+      <div style={{ textAlign: "right", marginTop: 40 }}>
         <Button
           type="primary"
-          icon={<DollarCircleOutlined />}
+          icon={<DollarCircleOutlined style={{ fontSize: '1.2em' }}/>}
           loading={loadingCierre}
           onClick={handleCierre}
-          size="large"
+          style={{ height: 60, fontSize: '1.5em', padding: '0 30px' }}
         >
           Cierre de Caja
         </Button>
