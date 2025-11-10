@@ -35,6 +35,7 @@ const PrimaryButton = ({
       style={{
         backgroundColor,
         borderColor: backgroundColor,
+        border: `3px solid ${backgroundColor}`,
         color: textColor,
         fontWeight: 700,
         fontSize: "2em",

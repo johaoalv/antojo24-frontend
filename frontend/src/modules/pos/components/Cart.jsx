@@ -26,6 +26,7 @@ const Cart = ({
       borderRadius: 16,
       padding: 25,
       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      marginBottom: 100,
     }}
   >
     <h3 style={{ fontSize: "2.5em", marginBottom: 20, textAlign: "center" }}>
