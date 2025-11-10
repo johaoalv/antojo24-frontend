@@ -106,6 +106,10 @@ const PinLogin = () => {
             ref={(el) => (inputsRef.current[idx] = el)}
             maxLength={1}
             value={value}
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="one-time-code"
             autoFocus={idx === 0}
             onChange={(e) => handleChange(e, idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
@@ -122,8 +126,7 @@ const PinLogin = () => {
         ))}
       </div>
 
-      <PrimaryButton
-        
+      <PrimaryButton 
         style={{ marginTop: 30, width: "300px", fontWeight: "bold", padding: '20px 0', height: 'auto', fontSize: '1.5em' }}
         size="large"
         onClick={handleSubmit}
