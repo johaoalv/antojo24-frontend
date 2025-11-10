@@ -3,14 +3,13 @@ import React from "react";
 const ProductCard = ({ product, onAdd }) => {
   return (
     <div
+      className="pos-product-card"
       onClick={() => onAdd(product.producto)}
       style={{
-        border: "1px solid #ddd",
         borderRadius: 16,
         padding: 20,
         textAlign: "center",
         cursor: "pointer",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

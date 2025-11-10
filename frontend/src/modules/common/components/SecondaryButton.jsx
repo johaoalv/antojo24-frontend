@@ -36,6 +36,7 @@ const SecondaryButton = ({
         backgroundColor,
         borderColor: backgroundColor,
         color: textColor,
+        border: `3px solid ${backgroundColor}`,
         fontWeight: 700,
         fontSize: "2em",
         height: 70,

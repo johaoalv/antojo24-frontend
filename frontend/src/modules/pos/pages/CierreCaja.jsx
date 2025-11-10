@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Spin, Typography, message } from "antd";
+import { Table, Typography, message } from "antd";
 import { DollarCircleOutlined } from "@ant-design/icons";
 import { hacerCierreCaja, getResumenVentas } from "../../../api/pos/axios_cierre";
 import Navbar from "../../common/components/Navbar";
 import SecondaryButton from "../../common/components/SecondaryButton";
+import Loader from "../../common/components/Loader";
 
 const { Title } = Typography;
 
@@ -84,7 +85,7 @@ const CierreCaja = () => {
 
       {cargando ? (
         <div style={{ textAlign: "center", marginTop: 50 }}>
-          <Spin size="large" />
+          <Loader size={64} />
         </div>
       ) : (
         <Table
