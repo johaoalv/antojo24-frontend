@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Table, Typography, message } from "antd";
 import { DollarCircleOutlined } from "@ant-design/icons";
 import { hacerCierreCaja, getResumenVentas } from "../../../api/pos/axios_cierre";
 import Navbar from "../../common/components/Navbar";
 import SecondaryButton from "../../common/components/SecondaryButton";
 import Loader from "../../common/components/Loader";
+import ClosingSummaryModal from "../components/ClosingSummaryModal";
 
 const { Title } = Typography;
 
@@ -12,8 +13,18 @@ const CierreCaja = () => {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [loadingCierre, setLoadingCierre] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [totalReal, setTotalReal] = useState(0);
   const nombreSucursal = JSON.parse(localStorage.getItem("user"))?.nombre_tienda;
 
+  const totalCalculado = useMemo(
+    () =>
+      pedidos.reduce(
+        (acc, current) => acc + parseFloat(current.total_item || 0),
+        0
+      ),
+    [pedidos]
+  );
 
   useEffect(() => {
     const cargarPedidos = async () => {
@@ -30,12 +41,24 @@ const CierreCaja = () => {
     cargarPedidos();
   }, []);
 
+  const handleOpenModal = () => {
+    setTotalReal(totalCalculado);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    if (!loadingCierre) {
+      setModalVisible(false);
+    }
+  };
+
   const handleCierre = async () => {
     setLoadingCierre(true);
     try {
-      const resultado = await hacerCierreCaja();
+      const resultado = await hacerCierreCaja(totalReal);
       console.log("Resultado del cierre:", resultado);
       message.success(`Cierre exitoso. Total: $${resultado.resumen.total_general}`);
+      setModalVisible(false);
     } catch (error) {
       if (error.response?.status === 409) {
         message.warning("Ya existe un cierre de caja hoy");
@@ -98,35 +121,45 @@ const CierreCaja = () => {
             showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`
           }}
           bordered
-          summary={(pageData) => {
-            const total = pedidos.reduce((acc, current) => acc + parseFloat(current.total_item), 0);
-            return (
-              <Table.Summary fixed="bottom">
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}><strong style={{ fontSize: '1.4em' }}>Total General</strong></Table.Summary.Cell>
-                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={2} align="right">
-                    <Typography.Text strong style={{ fontSize: '1.4em' }}>${total.toFixed(2)}</Typography.Text>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                </Table.Summary.Row>
-              </Table.Summary>
-            );
-          }}
+          summary={() => (
+            <Table.Summary fixed="bottom">
+              <Table.Summary.Row>
+                <Table.Summary.Cell index={0}>
+                  <strong style={{ fontSize: "1.4em" }}>Total General</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                <Table.Summary.Cell index={2} align="right">
+                  <Typography.Text strong style={{ fontSize: "1.4em" }}>
+                    ${totalCalculado.toFixed(2)}
+                  </Typography.Text>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3}></Table.Summary.Cell>
+              </Table.Summary.Row>
+            </Table.Summary>
+          )}
         />
       )}
 
       <div style={{ textAlign: "right", marginTop: 40 }}>
         <SecondaryButton
           icon={<DollarCircleOutlined/>}
-          loading={loadingCierre}
-          onClick={handleCierre}
-        
+          onClick={handleOpenModal}
+          disabled={cargando || pedidos.length === 0}
         >
           Cierre de Caja
         </SecondaryButton>
       </div>
-    </div></>
+    </div>
+    <ClosingSummaryModal
+      visible={modalVisible}
+      totalCalculado={totalCalculado}
+      totalReal={totalReal}
+      onTotalRealChange={(value) => setTotalReal(value || 0)}
+      onConfirm={handleCierre}
+      onCancel={handleCloseModal}
+      loading={loadingCierre}
+    />
+    </>
   );
 };
 
