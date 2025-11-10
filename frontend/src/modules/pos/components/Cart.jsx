@@ -29,7 +29,7 @@ const Cart = ({
       marginBottom: 100,
     }}
   >
-    <h3 style={{ fontSize: "2.5em", marginBottom: 20, textAlign: "center" }}>
+    <h3 style={{ fontSize: "2.5em",  textAlign: "center" }}>
       Carrito
     </h3>
     {Object.entries(pedido).map(([producto, cantidad]) => {
