@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Typography, message, notification } from "antd";
+import { Button, Input, Typography, message } from "antd";
 import axios from "axios";
 import { autenticarPin } from "../../../api/auth/axios_auth";
 import a24logo from "../../../../public/assets/A_24_LOGO_OFICIAL.png"
+import { notifySuccess } from "../components/notifications.jsx";
 import PrimaryButton from "../components/PrimaryButton";
 
 const PinLogin = () => {
@@ -58,7 +59,7 @@ const PinLogin = () => {
       localStorage.setItem("app_token", response.token); // ✅ Guardar token
       console.log(response.data.rol);
   
-      notification.success({
+      notifySuccess({
         message: `Bienvenido, ${nombre_tienda}`,
         placement: "bottomLeft",
       });
