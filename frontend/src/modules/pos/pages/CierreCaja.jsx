@@ -65,7 +65,6 @@ const CierreCaja = () => {
     setLoadingCierre(true);
     try {
       const resultado = await hacerCierreCaja(totalReal);
-      console.log("Resultado del cierre:", resultado);
       notifySuccess({
         message: "Cierre exitoso",
         description: `Total reportado: $${resultado.resumen.total_general}`,
