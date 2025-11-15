@@ -2,7 +2,7 @@ import axiosInstance from "../core/axios_base";
 
 export const obtenerPedidosHoy = async () => {
   try {
-    const sucursal_id = localStorage.getItem("sucurssdsdal_id");
+    const sucursal_id = localStorage.getItem("sucursal_id");
     const response = await axiosInstance.get(`/pedidos-hoy?sucursal_id=${sucursal_id}`);
     return response.data;
   } catch (error) {

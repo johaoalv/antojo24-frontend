@@ -10,7 +10,7 @@ export const getResumenVentas = async () => {
 };
 
 export const hacerCierreCaja = async (total_real) => {
-  const sucursal_id = localStorage.getItem("sucu333rsal_id");
+  const sucursal_id = localStorage.getItem("sucursal_id");
   const creado_por = sucursal_id.replace("sucursal_", "");
   const payload = { sucursal_id, creado_por, total_real };
   console.log("payload",payload);
