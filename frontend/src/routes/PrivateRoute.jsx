@@ -13,12 +13,6 @@ const PrivateRoute = () => {
   const userRole = localStorage.getItem("user_role");
   const currentPath = location.pathname === "/" ? "/" : location.pathname.replace(/\/$/, "");
 
-
-  console.log("🔐 Entrando a PrivateRoute");
-  console.log("➡️ Ruta actual:", currentPath);
-  console.log("🔑 Rol:", userRole);
-  console.log("✅ Paths permitidos:", rolePermissions[userRole]);
-
   if (!token) return <Navigate to="/login" replace />;
 
   if (!userRole || !rolePermissions[userRole]) {

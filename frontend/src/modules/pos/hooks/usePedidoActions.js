@@ -1,10 +1,13 @@
-import { notification } from "antd";
 import { useCallback } from "react";
 import { enviarPedido } from "../../../api/pos/axios_pedidos";
 import { getPanamaTime } from "../utils/get_time";
 import { imprimirTicket } from "../utils/print";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { formatCurrency } from "../utils/formatters";
+import {
+  notifyError,
+  notifySuccess,
+} from "../../common/components/notifications.jsx";
 
 const usePedidoActions = ({
   pedido,
@@ -51,19 +54,18 @@ const usePedidoActions = ({
       const response = await enviarPedido(datos);
       await imprimirTicket(datos);
 
-      notification.success({
+      notifySuccess({
         message: "Venta Registrada",
         description: response?.monto_vuelto
           ? `Cambio a entregar: ${formatCurrency(response.monto_vuelto)}`
           : null,
         placement: "bottom",
-        duration: 4,
       });
 
       resetPedido();
       resetPagoState();
     } catch (error) {
-      notification.error({
+      notifyError({
         message: "Error de Conexión",
         description:
           "No se pudo conectar con el servidor. Revisa tu conexión.",

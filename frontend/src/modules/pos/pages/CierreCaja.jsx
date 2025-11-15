@@ -1,11 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Typography, message } from "antd";
+import { Table, Typography } from "antd";
 import { DollarCircleOutlined } from "@ant-design/icons";
 import { hacerCierreCaja, getResumenVentas } from "../../../api/pos/axios_cierre";
 import Navbar from "../../common/components/Navbar";
 import SecondaryButton from "../../common/components/SecondaryButton";
 import Loader from "../../common/components/Loader";
 import ClosingSummaryModal from "../components/ClosingSummaryModal";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "../../common/components/notifications.jsx";
 
 const { Title } = Typography;
 
@@ -33,7 +38,11 @@ const CierreCaja = () => {
         setPedidos(datos);
       } catch (error) {
         console.error("Error al cargar:", error);
-        message.error("Error al cargar los pedidos");
+        notifyError({
+          message: "Error al cargar los pedidos",
+          description: "Intenta nuevamente en unos momentos.",
+          placement: "topRight",
+        });
       } finally {
         setCargando(false);
       }
@@ -56,14 +65,25 @@ const CierreCaja = () => {
     setLoadingCierre(true);
     try {
       const resultado = await hacerCierreCaja(totalReal);
-      console.log("Resultado del cierre:", resultado);
-      message.success(`Cierre exitoso. Total: $${resultado.resumen.total_general}`);
+      notifySuccess({
+        message: "Cierre exitoso",
+        description: `Total reportado: $${resultado.resumen.total_general}`,
+        placement: "bottomRight",
+      });
       setModalVisible(false);
     } catch (error) {
       if (error.response?.status === 409) {
-        message.warning("Ya existe un cierre de caja hoy");
+        notifyWarning({
+          message: "Cierre existente",
+          description: "Ya registraste un cierre hoy.",
+          placement: "topRight",
+        });
       } else {
-        message.error(`❌ Error: ${error.message}`);
+        notifyError({
+          message: "Error al cerrar caja",
+          description: error.message,
+          placement: "topRight",
+        });
       }
       console.error("Detalle error:", error.response?.data || error);
     } finally {

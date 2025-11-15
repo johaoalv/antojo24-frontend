@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Typography, message, notification } from "antd";
+import { Button, Input, Typography, message } from "antd";
 import axios from "axios";
 import { autenticarPin } from "../../../api/auth/axios_auth";
 import a24logo from "../../../../public/assets/A_24_LOGO_OFICIAL.png"
+import { notifySuccess } from "../components/notifications.jsx";
 import PrimaryButton from "../components/PrimaryButton";
 
 const PinLogin = () => {
@@ -56,9 +57,8 @@ const PinLogin = () => {
       const { nombre_tienda, sucursal_id, rol } = response.data;
 
       localStorage.setItem("app_token", response.token); // ✅ Guardar token
-      console.log(response.data.rol);
   
-      notification.success({
+      notifySuccess({
         message: `Bienvenido, ${nombre_tienda}`,
         placement: "bottomLeft",
       });
@@ -106,6 +106,10 @@ const PinLogin = () => {
             ref={(el) => (inputsRef.current[idx] = el)}
             maxLength={1}
             value={value}
+            type="password"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="one-time-code"
             autoFocus={idx === 0}
             onChange={(e) => handleChange(e, idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
@@ -122,8 +126,7 @@ const PinLogin = () => {
         ))}
       </div>
 
-      <PrimaryButton
-        
+      <PrimaryButton 
         style={{ marginTop: 30, width: "300px", fontWeight: "bold", padding: '20px 0', height: 'auto', fontSize: '1.5em' }}
         size="large"
         onClick={handleSubmit}

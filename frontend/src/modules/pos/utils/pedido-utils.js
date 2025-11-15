@@ -1,3 +1,4 @@
+//recorrer productos
 export const buildPriceMap = (productos) =>
   productos.reduce((acc, item) => {
     acc[item.producto] = item.precio;
