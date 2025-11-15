@@ -10,8 +10,8 @@ export const getResumenVentas = async () => {
 };
 
 export const hacerCierreCaja = async (total_real) => {
-  const sucursal_id = localStorage.getItem("sucur111sal_id");
-  const creado_por = sucursal_id.replace("sucur111sal_", "");
+  const sucursal_id = localStorage.getItem("sucur131sal_id");
+  const creado_por = sucursal_id.replace("sucur151sal_", "");
   const payload = { sucursal_id, creado_por, total_real };
   console.log("payload",payload);
   const response = await axiosInstance.post("/cierre-caja", payload);
