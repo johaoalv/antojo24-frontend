@@ -7,7 +7,16 @@ export default defineConfig({
   plugins: [react()],
   base: '/',
   build: {
-    outDir: 'dist'  // Asegura que el build se guarde en dist/
+    outDir: 'dist',  // Asegura que el build se guarde en dist/
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          antd: ['antd', '@ant-design/icons'],
+        },
+      },
+    },
   },
   test: {
     globals: true,
