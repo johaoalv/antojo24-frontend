@@ -31,6 +31,14 @@ const CierreCaja = () => {
     [pedidos]
   );
 
+  const subtotales = useMemo(() => {
+    return pedidos.reduce((acc, current) => {
+      const metodo = current.metodo_pago || "otro";
+      acc[metodo] = (acc[metodo] || 0) + parseFloat(current.total_item || 0);
+      return acc;
+    }, {});
+  }, [pedidos]);
+
   useEffect(() => {
     const cargarPedidos = async () => {
       try {
@@ -122,63 +130,76 @@ const CierreCaja = () => {
 
   return (
     <>
-    <Navbar />
-    <div style={{ padding: 40 }}>
-      <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Resumen de Pedidos - {nombreSucursal}</Title>
+      <Navbar />
+      <div style={{ padding: 40 }}>
+        <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Resumen de Pedidos - {nombreSucursal}</Title>
 
-      {cargando ? (
-        <div style={{ textAlign: "center", marginTop: 50 }}>
-          <Loader size={64} />
+        {cargando ? (
+          <div style={{ textAlign: "center", marginTop: 50 }}>
+            <Loader size={64} />
+          </div>
+        ) : (
+          <Table
+            dataSource={pedidos}
+            columns={columnas}
+            rowKey="id"
+            pagination={{
+              pageSize: 15,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`
+            }}
+            bordered
+            summary={() => (
+              <Table.Summary fixed="bottom">
+                {Object.entries(subtotales).map(([metodo, total]) => (
+                  <Table.Summary.Row key={metodo} style={{ backgroundColor: '#fafafa' }}>
+                    <Table.Summary.Cell index={0}>
+                      <span style={{ fontSize: "1.1em", textTransform: 'capitalize' }}>Subtotal {metodo}</span>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                    <Table.Summary.Cell index={2} align="right">
+                      <span style={{ fontSize: "1.1em" }}>${total.toFixed(2)}</span>
+                    </Table.Summary.Cell>
+                    <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                  </Table.Summary.Row>
+                ))}
+                <Table.Summary.Row>
+                  <Table.Summary.Cell index={0}>
+                    <strong style={{ fontSize: "1.4em" }}>Total General</strong>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                  <Table.Summary.Cell index={2} align="right">
+                    <Typography.Text strong style={{ fontSize: "1.4em" }}>
+                      ${totalCalculado.toFixed(2)}
+                    </Typography.Text>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                </Table.Summary.Row>
+              </Table.Summary>
+            )}
+          />
+        )}
+
+        <div style={{ textAlign: "right", marginTop: 40 }}>
+          <SecondaryButton
+            icon={<DollarCircleOutlined />}
+            onClick={handleOpenModal}
+            disabled={cargando || pedidos.length === 0}
+          >
+            Cierre de Caja
+          </SecondaryButton>
         </div>
-      ) : (
-        <Table
-          dataSource={pedidos}
-          columns={columnas}
-          rowKey="id"
-          pagination={{
-            pageSize: 15, 
-            showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`
-          }}
-          bordered
-          summary={() => (
-            <Table.Summary fixed="bottom">
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0}>
-                  <strong style={{ fontSize: "1.4em" }}>Total General</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                <Table.Summary.Cell index={2} align="right">
-                  <Typography.Text strong style={{ fontSize: "1.4em" }}>
-                    ${totalCalculado.toFixed(2)}
-                  </Typography.Text>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3}></Table.Summary.Cell>
-              </Table.Summary.Row>
-            </Table.Summary>
-          )}
-        />
-      )}
-
-      <div style={{ textAlign: "right", marginTop: 40 }}>
-        <SecondaryButton
-          icon={<DollarCircleOutlined/>}
-          onClick={handleOpenModal}
-          disabled={cargando || pedidos.length === 0}
-        >
-          Cierre de Caja
-        </SecondaryButton>
       </div>
-    </div>
-    <ClosingSummaryModal
-      visible={modalVisible}
-      totalCalculado={totalCalculado}
-      totalReal={totalReal}
-      onTotalRealChange={(value) => setTotalReal(value || 0)}
-      onConfirm={handleCierre}
-      onCancel={handleCloseModal}
-      loading={loadingCierre}
-    />
+      <ClosingSummaryModal
+        visible={modalVisible}
+        totalCalculado={totalCalculado}
+        subtotales={subtotales}
+        totalReal={totalReal}
+        onTotalRealChange={(value) => setTotalReal(value || 0)}
+        onConfirm={handleCierre}
+        onCancel={handleCloseModal}
+        loading={loadingCierre}
+      />
     </>
   );
 };

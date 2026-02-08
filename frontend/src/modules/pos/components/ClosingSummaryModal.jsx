@@ -9,6 +9,7 @@ const { Text, Title } = Typography;
 const ClosingSummaryModal = ({
   visible,
   totalCalculado,
+  subtotales = {},
   totalReal,
   onTotalRealChange,
   onConfirm,
@@ -35,6 +36,17 @@ const ClosingSummaryModal = ({
           <Text strong>Total Sistema:</Text>
           <Text>{formatCurrency(totalCalculado)}</Text>
         </div>
+
+        <div style={{ backgroundColor: "#f9f9f9", padding: "8px 12px", borderRadius: 8, marginBottom: 16, border: '1px solid #eee' }}>
+          <Text type="secondary" style={{ fontSize: '0.85em', display: 'block', marginBottom: 4 }}>Desglose por método:</Text>
+          {Object.entries(subtotales).map(([metodo, total]) => (
+            <div key={metodo} style={{ display: "flex", justifyContent: "space-between" }}>
+              <Text style={{ textTransform: 'capitalize' }}>{metodo}:</Text>
+              <Text>{formatCurrency(total)}</Text>
+            </div>
+          ))}
+        </div>
+
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
           <Text strong>Monto Contado:</Text>
           <Text>{formatCurrency(totalReal)}</Text>
