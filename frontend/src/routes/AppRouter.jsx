@@ -8,6 +8,7 @@ import PrivateRoute from "./PrivateRoute";
 import AdminLayout from "../modules/admin/pages/AdminLayout";
 import Dashboard from "../modules/admin/pages/Dashboard";
 import Productos from "../modules/admin/pages/Products";
+import GestionInsumos from "../modules/admin/pages/GestionInsumos";
 import Configuracion from "../modules/admin/pages/Config";
 
 const AppRouter = () => {
@@ -17,13 +18,14 @@ const AppRouter = () => {
         <Route path="/login" element={<Login />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Index />} /> 
-          <Route path="/cierre" element={<CierreCaja />} /> 
-          
+          <Route path="/" element={<Index />} />
+          <Route path="/cierre" element={<CierreCaja />} />
+
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} /> 
+            <Route index element={<Dashboard />} />
             <Route path="inicio" element={<Dashboard />} />
             <Route path="productos" element={<Productos />} />
+            <Route path="insumos" element={<GestionInsumos />} />
             <Route path="configuracion" element={<Configuracion />} />
           </Route>
         </Route>

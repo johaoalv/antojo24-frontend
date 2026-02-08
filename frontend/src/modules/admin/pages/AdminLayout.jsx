@@ -5,6 +5,7 @@ import {
   ShopOutlined,
   SettingOutlined,
   LogoutOutlined,
+  BlockOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -28,22 +29,27 @@ const AdminLayout = () => {
   const menuItems = [
     {
       key: "inicio",
-      icon: <DashboardOutlined style={{ fontSize: '1.5em' }}/>,
+      icon: <DashboardOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Inicio</span>,
     },
     {
       key: "productos",
-      icon: <ShopOutlined style={{ fontSize: '1.5em' }}/>,
+      icon: <ShopOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Productos</span>,
     },
     {
+      key: "insumos",
+      icon: <BlockOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Insumos</span>,
+    },
+    {
       key: "configuracion",
-      icon: <SettingOutlined style={{ fontSize: '1.5em' }}/>,
+      icon: <SettingOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Configuración</span>,
     },
     {
       key: "logout",
-      icon: <LogoutOutlined style={{ fontSize: '1.5em' }}/>,
+      icon: <LogoutOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Salir</span>,
     },
   ];
