@@ -65,12 +65,19 @@ const usePedidoActions = ({
       resetPedido();
       resetPagoState();
     } catch (error) {
-      notifyError({
-        message: "Error de Conexión",
-        description:
-          "No se pudo conectar con el servidor. Revisa tu conexión.",
-        placement: "topRight",
-      });
+      if (error.response && error.response.status === 400) {
+        notifyError({
+          message: error.response.data.error || "Agotado",
+          description: error.response.data.detalles || "No hay stock suficiente.",
+          placement: "topRight",
+        });
+      } else {
+        notifyError({
+          message: "Error de Conexión",
+          description: "No se pudo conectar con el servidor. Revisa tu conexión.",
+          placement: "topRight",
+        });
+      }
       console.error("Error en confirmarPedido:", error);
     }
   }, [

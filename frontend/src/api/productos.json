@@ -1,6 +1,11 @@
 [
   {
-    "producto": "soda",
+    "producto": "coca cola",
+    "precio": 1.0,
+    "imagen": "/assets/soda.png"
+  },
+  {
+    "producto": "canada dry",
     "precio": 1.0,
     "imagen": "/assets/soda.png"
   },
