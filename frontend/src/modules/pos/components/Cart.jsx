@@ -1,5 +1,6 @@
 import React from "react";
 import { DollarCircleOutlined } from "@ant-design/icons";
+import { Input } from "antd";
 import CartItem from "./CartItem";
 import PaymentsSelect from "./PaymentsSelect";
 import { formatCurrency } from "../utils/formatters";
@@ -18,6 +19,8 @@ const Cart = ({
   onConfirmar,
   disabled,
   onNavigateToCierre,
+  nombreCliente,
+  onNombreClienteChange,
 }) => (
   <div
     style={{
@@ -29,7 +32,7 @@ const Cart = ({
       marginBottom: 100,
     }}
   >
-    <h3 style={{ fontSize: "2.5em",  textAlign: "center" }}>
+    <h3 style={{ fontSize: "2.5em", textAlign: "center" }}>
       Carrito
     </h3>
     {Object.entries(pedido).map(([producto, cantidad]) => {
@@ -49,6 +52,19 @@ const Cart = ({
     })}
 
     <div style={{ marginTop: 30 }}>
+      <Input
+        placeholder="Nombre del cliente (opcional)"
+        value={nombreCliente}
+        onChange={(e) => onNombreClienteChange(e.target.value)}
+        style={{
+          fontSize: "1.2em",
+          padding: "10px",
+          borderRadius: "8px"
+        }}
+      />
+    </div>
+
+    <div style={{ marginTop: 20 }}>
       <PaymentsSelect
         value={metodoPago}
         options={paymentOptions}

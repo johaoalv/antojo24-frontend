@@ -12,6 +12,7 @@ export const imprimirTicket = (datos) => {
       pedido={datos.pedido}
       total_pedido={datos.total_pedido}
       metodo_pago={datos.metodo_pago}
+      nombre_cliente={datos.nombre_cliente}
     />,
     container,
     () => {

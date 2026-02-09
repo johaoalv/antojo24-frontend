@@ -25,6 +25,8 @@ const Index = () => {
 
   const {
     pedido,
+    nombreCliente,
+    setNombreCliente,
     agregarAlPedido,
     ajustarCantidad,
     calcularTotal,
@@ -35,6 +37,7 @@ const Index = () => {
 
   const { confirmarPedido } = usePedidoActions({
     pedido,
+    nombreCliente,
     metodoPago: metodoPagoState.metodoPago,
     montoRecibido: metodoPagoState.montoRecibido,
     calcularTotal,
@@ -76,6 +79,8 @@ const Index = () => {
           onConfirmar={confirmarPedido}
           disabled={isPedidoVacio || !metodoPagoState.metodoPago}
           onNavigateToCierre={() => navigate("/cierre")}
+          nombreCliente={nombreCliente}
+          onNombreClienteChange={setNombreCliente}
         />
       </div>
       <CashModal

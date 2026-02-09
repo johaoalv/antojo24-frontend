@@ -11,6 +11,7 @@ import {
 
 const usePedidoActions = ({
   pedido,
+  nombreCliente,
   metodoPago,
   montoRecibido,
   calcularTotal,
@@ -44,6 +45,7 @@ const usePedidoActions = ({
       metodo_pago: metodoPago,
       fecha,
       sucursal_id,
+      nombre_cliente: nombreCliente || "",
     };
 
     if (metodoPago === "efectivo" && typeof montoRecibido === "number") {
