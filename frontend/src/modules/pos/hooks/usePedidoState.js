@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 
 const usePedidoState = (priceMap) => {
   const [pedido, setPedido] = useState({});
+  const [nombreCliente, setNombreCliente] = useState("");
 
   const agregarAlPedido = useCallback((producto) => {
     setPedido((prevPedido) => ({
@@ -29,10 +30,15 @@ const usePedidoState = (priceMap) => {
     }, 0);
   }, [pedido, priceMap]);
 
-  const resetPedido = useCallback(() => setPedido({}), []);
+  const resetPedido = useCallback(() => {
+    setPedido({});
+    setNombreCliente("");
+  }, []);
 
   return {
     pedido,
+    nombreCliente,
+    setNombreCliente,
     agregarAlPedido,
     ajustarCantidad,
     calcularTotal,
