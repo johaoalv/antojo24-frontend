@@ -45,8 +45,12 @@ const usePedidoActions = ({
       metodo_pago: metodoPago,
       fecha,
       sucursal_id,
-      nombre_cliente: nombreCliente || "",
     };
+
+    // Solo incluir nombre_cliente si tiene valor
+    if (nombreCliente && nombreCliente.trim()) {
+      datos.nombre_cliente = nombreCliente;
+    }
 
     if (metodoPago === "efectivo" && typeof montoRecibido === "number") {
       datos.monto_recibido = montoRecibido;
