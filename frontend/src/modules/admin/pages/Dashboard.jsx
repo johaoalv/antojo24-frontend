@@ -1,12 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col } from "antd"
+import { Row, Col, Table, Card, Typography } from "antd"
 import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
 import CardInfo from "../components/Cards";
 import { io } from "socket.io-client";
 
+const { Title } = Typography;
+
 function Dashboard() {
   const [datos, setDatos] = useState(null);
   const socketRef = useRef(null);
+
+  const columns = [
+    { title: 'Fecha', dataIndex: 'fecha', key: 'fecha' },
+    { title: 'Total Ventas', dataIndex: 'total_ventas', key: 'total_ventas', render: (val) => `$${val.toFixed(2)}` },
+    { title: 'Efectivo', dataIndex: 'efectivo', key: 'efectivo', render: (val) => `$${val.toFixed(2)}` },
+    { title: 'Tarjeta', dataIndex: 'tarjeta', key: 'tarjeta', render: (val) => `$${val.toFixed(2)}` },
+    { title: 'Yappy', dataIndex: 'yappy', key: 'yappy', render: (val) => `$${val.toFixed(2)}` },
+    {
+      title: 'Total Cierre',
+      dataIndex: 'total_cierre',
+      key: 'total_cierre',
+      render: (val) => val > 0 ? `$${val.toFixed(2)}` : <span style={{ color: '#999' }}>No cerrado</span>
+    },
+  ];
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -27,14 +43,8 @@ function Dashboard() {
       transports: ["websocket"],
     });
 
-    socketRef.current.on("connect", () => {
-    });
-
     socketRef.current.on("dashboard_update", (data) => {
       setDatos(data);
-    });
-
-    socketRef.current.on("disconnect", () => {
     });
 
     return () => {
@@ -43,37 +53,33 @@ function Dashboard() {
   }, []);
 
   return (
-    <>
-      <div style={{ padding: '20px' }}>
-        {datos ? (
-          <div>
-            <h1 style={{ fontSize: '3em', textAlign: 'center', marginBottom: '30px' }}>Global Stats</h1>
-            <Row gutter={[32, 32]} justify="center">
-              <Col xs={24} sm={12} md={12} lg={8}>
-                <CardInfo title="Ventas Hoy" value={`$${datos.ventas_hoy}`} />
-              </Col>
-              <Col xs={24} sm={12} md={12} lg={8}>
-                <CardInfo title="Ventas Ayer" value={`$${datos.ventas_ayer}`} />
-              </Col>
-              <Col xs={24} sm={12} md={12} lg={8}>
-                <CardInfo title="Margen de Hoy" value={`$${datos.margen_hoy}`} />
-              </Col>
-              <Col xs={24} sm={12} md={12} lg={8}>
-                <CardInfo title="Inversión en Stock" value={`$${datos.inversion_actual}`} />
-              </Col>
-              <Col xs={24} sm={12} md={12} lg={8}>
-                <CardInfo title="Producto Más Vendido" value={datos.producto_mas_vendido} />
-              </Col>
-              <Col xs={24} sm={12} md={12} lg={8}>
-                <CardInfo title="Método de Pago Más Usado" value={datos.metodo_pago_mas_usado} />
-              </Col>
-            </Row>
-          </div>
-        ) : (
-          <p>Cargando datos...</p>
-        )}
-      </div>
-    </>
+    <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+      {datos ? (
+        <>
+          <Title level={1} style={{ textAlign: 'center', marginBottom: '40px', color: '#1a1a1a' }}>Dashboard Administrativo</Title>
+
+          <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
+            <Col xs={24} md={12}>
+              <CardInfo title="Inversión en Stock" value={`$${datos.inversion_actual}`} />
+            </Col>
+            <Col xs={24} md={12}>
+              <CardInfo title="Producto Más Vendido" value={datos.producto_mas_vendido} />
+            </Col>
+          </Row>
+
+          <Card title="Historial de Ventas Diarias" style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            <Table
+              dataSource={datos.historial}
+              columns={columns}
+              rowKey="fecha"
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </>
+      ) : (
+        <p style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos estratégicos...</p>
+      )}
+    </div>
   );
 }
 
