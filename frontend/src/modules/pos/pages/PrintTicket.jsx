@@ -23,7 +23,7 @@ const PrintTicket = ({ pedido, total_pedido, metodo_pago, nombre_cliente }) => {
       <div className="left">Método de pago: {metodo_pago}</div>
       <div className="right">Total: ${total_pedido.toFixed(2)}</div>
       <div className="linea" />
-      <div className="center">Gracias por su compra :3</div>
+      <div className="center">Gracias por su compra :D</div>
       <div className="center" style={{ fontSize: '14px', marginTop: 3 }}>@antojo24.pa</div>
     </div>
   );

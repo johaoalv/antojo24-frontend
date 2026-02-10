@@ -37,6 +37,7 @@ describe('usePedidoActions', () => {
 
   const baseProps = () => ({
     pedido,
+    nombreCliente: '',
     metodoPago: 'efectivo',
     montoRecibido: 30,
     calcularTotal: vi.fn(() => 25),
@@ -133,7 +134,7 @@ describe('usePedidoActions', () => {
   it('muestra una notificación de error cuando la API falla', async () => {
     enviarPedido.mockRejectedValueOnce(new Error('network'));
     const props = baseProps();
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => { });
 
     const { result } = renderHook(() => usePedidoActions(props));
 
