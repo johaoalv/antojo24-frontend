@@ -5,7 +5,9 @@ import {
   ShopOutlined,
   SettingOutlined,
   LogoutOutlined,
-  BlockOutlined
+  BlockOutlined,
+  HistoryOutlined,
+  FileTextOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -36,6 +38,16 @@ const AdminLayout = () => {
       key: "productos",
       icon: <ShopOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Productos</span>,
+    },
+    {
+      key: "ventas",
+      icon: <HistoryOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Ventas</span>,
+    },
+    {
+      key: "inversiones",
+      icon: <FileTextOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Inversiones</span>,
     },
     {
       key: "insumos",

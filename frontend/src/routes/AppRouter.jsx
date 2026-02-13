@@ -10,6 +10,8 @@ import Dashboard from "../modules/admin/pages/Dashboard";
 import Productos from "../modules/admin/pages/Products";
 import GestionInsumos from "../modules/admin/pages/GestionInsumos";
 import Configuracion from "../modules/admin/pages/Config";
+import SalesHistory from "../modules/admin/pages/SalesHistory";
+import Inversiones from "../modules/admin/pages/Inversiones";
 
 const AppRouter = () => {
   return (
@@ -25,6 +27,8 @@ const AppRouter = () => {
             <Route index element={<Dashboard />} />
             <Route path="inicio" element={<Dashboard />} />
             <Route path="productos" element={<Productos />} />
+            <Route path="ventas" element={<SalesHistory />} />
+            <Route path="inversiones" element={<Inversiones />} />
             <Route path="insumos" element={<GestionInsumos />} />
             <Route path="configuracion" element={<Configuracion />} />
           </Route>
