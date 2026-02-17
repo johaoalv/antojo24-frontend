@@ -57,8 +57,10 @@ function Dashboard() {
       {datos ? (
         <>
           <Title level={1} style={{ textAlign: 'center', marginBottom: '40px', color: '#1a1a1a' }}>Resumen Global del Negocio</Title>
-
-          <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
+          <Card title="Información Estratégica" style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            <p>Bienvenido al resumen global. Aquí puedes ver la salud financiera general de Antojo24 basada en las facturas registradas y las ventas totales.</p>
+          </Card>
+          <Row gutter={[24, 24]} style={{ marginBottom: '40px', marginTop: '40px' }}>
             <Col xs={24} md={8}>
               <CardInfo title="Monto Total Invertido" value={`$${datos.total_invertido}`} />
             </Col>
@@ -70,9 +72,7 @@ function Dashboard() {
             </Col>
           </Row>
 
-          <Card title="Información Estratégica" style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-            <p>Bienvenido al resumen global. Aquí puedes ver la salud financiera general de Antojo24 basada en las facturas registradas y las ventas totales.</p>
-          </Card>
+
         </>
       ) : (
         <p style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos estratégicos...</p>
