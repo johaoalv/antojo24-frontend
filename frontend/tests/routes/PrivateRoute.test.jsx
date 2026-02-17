@@ -14,6 +14,7 @@ const renderWithRoute = (initialPath) => {
         <Route path="/login" element={<LoginPage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<PosPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/admin/inicio" element={<AdminPage />} />
         </Route>
       </Routes>
@@ -40,17 +41,23 @@ describe('PrivateRoute role restrictions', () => {
     expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
   });
 
-  it('bloquea el acceso de un rol tienda a rutas admin', () => {
+  it('redirige a un admin a su página de inicio (/admin) si intenta entrar al POS', () => {
+    localStorage.setItem('app_token', 'token');
+    localStorage.setItem('user_role', 'admin');
+
+    renderWithRoute('/');
+
+    // El admin no tiene permiso para "/", debería ser redirigido a "/admin"
+    expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
+  });
+
+  it('redirige a un usuario tienda a la raíz si intenta entrar a admin', () => {
     localStorage.setItem('app_token', 'token');
     localStorage.setItem('user_role', 'tienda');
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     renderWithRoute('/admin/inicio');
 
-    expect(
-      screen.getByText('No tienes permiso para acceder a esta sección.')
-    ).toBeInTheDocument();
-
-    warnSpy.mockRestore();
+    // Debería ser redirigido a "/"
+    expect(screen.getByText('POS Home')).toBeInTheDocument();
   });
 });
