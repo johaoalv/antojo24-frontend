@@ -7,6 +7,11 @@ const rolePermissions = {
   tienda: ["/", "/cierre"],
 };
 
+const roleDefaults = {
+  admin: "/admin",
+  tienda: "/",
+};
+
 const PrivateRoute = () => {
   const location = useLocation();
   const token = localStorage.getItem("app_token");
@@ -31,7 +36,16 @@ const PrivateRoute = () => {
   );
 
   if (!isAllowed) {
-    console.warn("❌ Ruta NO permitida para el rol:", userRole, "→", currentPath);
+    // Si el usuario intenta acceder a una ruta no permitida (como "/" siendo admin),
+    // lo redirigimos a su ruta por defecto en lugar de mostrar 403.
+    const targetPath = roleDefaults[userRole] || "/";
+
+    // Evitamos bucles infinitos si la ruta por defecto tampoco está permitida (caso raro)
+    if (currentPath !== targetPath) {
+      console.warn(`🔄 Redirigiendo ${userRole} de ${currentPath} a ${targetPath}`);
+      return <Navigate to={targetPath} replace />;
+    }
+
     return (
       <ErrorPage
         status="403"

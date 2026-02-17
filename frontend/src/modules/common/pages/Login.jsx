@@ -57,26 +57,26 @@ const PinLogin = () => {
       const { nombre_tienda, sucursal_id, rol } = response.data;
 
       localStorage.setItem("app_token", response.token); // ✅ Guardar token
-  
+
       notifySuccess({
         message: `Bienvenido, ${nombre_tienda}`,
         placement: "bottomLeft",
       });
-  
+
       localStorage.setItem("user", JSON.stringify(response.data));
       localStorage.setItem("user_role", rol);
       localStorage.setItem("sucursal_id", sucursal_id);
       localStorage.setItem("lastLoginDate", new Date().toISOString().split("T")[0]);
-  
+
       setInputs(Array(maxLength).fill("")); // limpio los inputs antes de navegar
-  
+
       // 🔁 Redirección según rol
       if (rol === "admin") {
         navigate("/admin/inicio");
       } else {
         navigate("/");
       }
-  
+
     } catch (error) {
       let errorMessage = "Error al autenticar"; // Mensaje genérico por defecto
 
@@ -90,16 +90,22 @@ const PinLogin = () => {
       inputsRef.current[0].focus();
     }
   };
-  
+
 
   return (
-    <div className="pin-container" style={{ textAlign: "center", padding: 30 }}>
-      <img src={a24logo} style={{ width:250 }} />
-      <Typography.Title level={2} style={{ marginBottom: 30 }}>
+    <div className="pin-container responsive-container" style={{ textAlign: "center", padding: "clamp(15px, 5vw, 30px)", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <img src={a24logo} style={{ width: "clamp(150px, 40vw, 250px)", marginBottom: 20 }} />
+      <Typography.Title level={2} style={{ marginBottom: 30, fontSize: 'clamp(1.5em, 5vw, 2.5em)' }}>
         Enter the code
       </Typography.Title>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 15, marginBottom: 30 }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "clamp(8px, 2vw, 15px)",
+        marginBottom: 30,
+        flexWrap: 'wrap'
+      }}>
         {inputs.map((value, idx) => (
           <Input
             key={idx}
@@ -114,10 +120,10 @@ const PinLogin = () => {
             onChange={(e) => handleChange(e, idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
             style={{
-              width: 60,
-              height: 70,
+              width: "clamp(45px, 12vw, 60px)",
+              height: "clamp(55px, 15vw, 70px)",
               textAlign: "center",
-              fontSize: 32,
+              fontSize: "clamp(20px, 6vw, 32px)",
               borderRadius: 8,
               borderColor: idx === inputs.findIndex(i => i === "") ? "#91caff" : "#d9d9d9",
               boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px #bae7ff" : "none",
@@ -126,8 +132,15 @@ const PinLogin = () => {
         ))}
       </div>
 
-      <PrimaryButton 
-        style={{ marginTop: 30, width: "300px", fontWeight: "bold", padding: '20px 0', height: 'auto', fontSize: '1.5em' }}
+      <PrimaryButton
+        style={{
+          marginTop: 10,
+          width: "min(300px, 90vw)",
+          fontWeight: "bold",
+          padding: '15px 0',
+          height: 'auto',
+          fontSize: 'clamp(1.1em, 3vw, 1.5em)'
+        }}
         size="large"
         onClick={handleSubmit}
         disabled={inputs.join("").length < maxLength}

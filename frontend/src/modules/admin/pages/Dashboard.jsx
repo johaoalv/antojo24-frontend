@@ -53,26 +53,43 @@ function Dashboard() {
   }, []);
 
   return (
-    <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+    <div className="responsive-container">
       {datos ? (
         <>
-          <Title level={1} style={{ textAlign: 'center', marginBottom: '40px', color: '#1a1a1a' }}>Resumen Global del Negocio</Title>
-
-          <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
-            <Col xs={24} md={8}>
+          <Title
+            level={1}
+            style={{
+              textAlign: 'center',
+              marginBottom: '30px',
+              color: '#1a1a1a',
+              fontSize: 'clamp(1.5em, 4vw, 2.5em)'
+            }}
+          >
+            Resumen Global del Negocio
+          </Title>
+          <Card
+            title="Información Estratégica"
+            style={{
+              borderRadius: '15px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              marginBottom: '30px'
+            }}
+          >
+            <p>Bienvenido al resumen global. Aquí puedes ver la salud financiera general de Antojo24 basada en las facturas registradas y las ventas totales.</p>
+          </Card>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} lg={8}>
               <CardInfo title="Monto Total Invertido" value={`$${datos.total_invertido}`} />
             </Col>
-            <Col xs={24} md={8}>
+            <Col xs={24} sm={12} lg={8}>
               <CardInfo title="Ventas Totales" value={`$${datos.total_ventas}`} />
             </Col>
-            <Col xs={24} md={8}>
+            <Col xs={24} sm={24} lg={8}>
               <CardInfo title="Ganancia Bruta" value={`$${datos.ganancia_bruta}`} />
             </Col>
           </Row>
 
-          <Card title="Información Estratégica" style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-            <p>Bienvenido al resumen global. Aquí puedes ver la salud financiera general de Antojo24 basada en las facturas registradas y las ventas totales.</p>
-          </Card>
+
         </>
       ) : (
         <p style={{ textAlign: 'center', marginTop: '50px' }}>Cargando datos estratégicos...</p>

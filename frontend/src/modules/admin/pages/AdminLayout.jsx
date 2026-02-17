@@ -1,5 +1,6 @@
 
-import { Layout, Menu } from "antd";
+import React from "react";
+import { Layout, Menu, Drawer, Button } from "antd";
 import {
   DashboardOutlined,
   ShopOutlined,
@@ -7,7 +8,8 @@ import {
   LogoutOutlined,
   BlockOutlined,
   HistoryOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  MenuOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -17,9 +19,11 @@ const { Sider, Content, Footer } = Layout;
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [drawerVisible, setDrawerVisible] = React.useState(false);
   const currentPath = location.pathname;
 
   const handleMenuClick = ({ key }) => {
+    setDrawerVisible(false);
     if (key === "logout") {
       localStorage.clear();
       navigate("/login");
@@ -70,27 +74,63 @@ const AdminLayout = () => {
     <Layout style={{ minHeight: "100vh" }}>
       <Navbar />
       <Layout>
-        {/* SIDEBAR */}
-        <Sider width={300} theme="light">
+        {/* SIDEBAR DESKTOP */}
+        <Sider
+          width={300}
+          theme="light"
+          breakpoint="lg"
+          collapsedWidth="0"
+          trigger={null}
+        >
           <Menu
             mode="inline"
             selectedKeys={[currentPath.split("/")[2] || "inicio"]}
             style={{ height: "100%", borderRight: 0, padding: '20px 0' }}
             items={menuItems}
             onClick={handleMenuClick}
-            itemPadding="30px"
           />
         </Sider>
 
+        {/* DRAWER MOBILE */}
+        <Drawer
+          title="Menú Administrativo"
+          placement="left"
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          styles={{ body: { padding: 0 } }}
+          width={280}
+        >
+          <Menu
+            mode="inline"
+            selectedKeys={[currentPath.split("/")[2] || "inicio"]}
+            style={{ height: "100%", borderRight: 0 }}
+            items={menuItems}
+            onClick={handleMenuClick}
+          />
+        </Drawer>
+
         {/* CONTENIDO CENTRAL */}
-        <Layout style={{ padding: "30px" }}>
+        <Layout className="smooth-transition" style={{ padding: "clamp(10px, 3vw, 30px)" }}>
+          <div className="show-mobile" style={{ marginBottom: 20 }}>
+            <Button
+              type="primary"
+              icon={<MenuOutlined />}
+              onClick={() => setDrawerVisible(true)}
+              size="large"
+              style={{ backgroundColor: '#000', borderColor: '#000' }}
+            >
+              Menú
+            </Button>
+          </div>
+
           <Content
             style={{
               background: "#fff",
-              padding: 40,
+              padding: "clamp(15px, 5vw, 40px)",
               margin: 0,
               minHeight: 280,
               borderRadius: 16,
+              boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
             }}
           >
             <Outlet />

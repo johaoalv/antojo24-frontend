@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Typography } from "antd";
+import { Typography, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
 import productosData from "../../../api/productos.json";
@@ -60,28 +60,32 @@ const Index = () => {
   return (
     <>
       <Navbar />
-      <div style={{ display: "flex", padding: 30, gap: 30 }}>
-        <div style={{ width: "60%" }}>
-          <ProductsGrid
-            productos={productosData}
-            onAddProduct={agregarAlPedido}
-          />
-        </div>
-        <Cart
-          pedido={pedido}
-          buscarProducto={buscarProducto}
-          priceMap={priceMap}
-          onAjustarCantidad={ajustarCantidad}
-          total={total}
-          metodoPago={metodoPagoState.metodoPago}
-          paymentOptions={PAYMENT_OPTIONS}
-          onMetodoPagoChange={metodoPagoState.handleMetodoPagoChange}
-          onConfirmar={confirmarPedido}
-          disabled={isPedidoVacio || !metodoPagoState.metodoPago}
-          onNavigateToCierre={() => navigate("/cierre")}
-          nombreCliente={nombreCliente}
-          onNombreClienteChange={setNombreCliente}
-        />
+      <div className="responsive-container" style={{ padding: "clamp(10px, 3vw, 30px)" }}>
+        <Row gutter={[24, 24]}>
+          <Col xs={24} lg={14} xl={16}>
+            <ProductsGrid
+              productos={productosData}
+              onAddProduct={agregarAlPedido}
+            />
+          </Col>
+          <Col xs={24} lg={10} xl={8}>
+            <Cart
+              pedido={pedido}
+              buscarProducto={buscarProducto}
+              priceMap={priceMap}
+              onAjustarCantidad={ajustarCantidad}
+              total={total}
+              metodoPago={metodoPagoState.metodoPago}
+              paymentOptions={PAYMENT_OPTIONS}
+              onMetodoPagoChange={metodoPagoState.handleMetodoPagoChange}
+              onConfirmar={confirmarPedido}
+              disabled={isPedidoVacio || !metodoPagoState.metodoPago}
+              onNavigateToCierre={() => navigate("/cierre")}
+              nombreCliente={nombreCliente}
+              onNombreClienteChange={setNombreCliente}
+            />
+          </Col>
+        </Row>
       </div>
       <CashModal
         visible={metodoPagoState.isModalVisible}
