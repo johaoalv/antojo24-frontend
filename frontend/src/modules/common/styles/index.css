@@ -91,3 +91,32 @@ body {
     transform: rotate(-360deg);
   }
 }
+
+/* Responsive Utilities */
+.hide-mobile {
+  @media (max-width: 576px) {
+    display: none !important;
+  }
+}
+
+.show-mobile {
+  display: none !important;
+  @media (max-width: 576px) {
+    display: block !important;
+  }
+}
+
+.responsive-padding {
+  padding: 40px;
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+  @media (max-width: 480px) {
+    padding: 15px;
+  }
+}
+
+.smooth-transition {
+  transition: all 0.3s ease;
+}
+

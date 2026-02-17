@@ -40,7 +40,7 @@ function SalesHistory() {
     return (
         <div style={{ padding: '30px' }}>
             <Title level={2}>Historial de Ventas Diarias</Title>
-            <Card borderRadius="15px" boxShadow="0 4px 12px rgba(0,0,0,0.05)">
+            <Card style={{ borderRadius: "15px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
                 <Table
                     dataSource={historial}
                     columns={columns}
