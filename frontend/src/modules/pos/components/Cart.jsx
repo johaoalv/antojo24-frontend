@@ -24,15 +24,16 @@ const Cart = ({
 }) => (
   <div
     style={{
-      width: "40%",
+      width: "100%",
       border: "1px solid #ddd",
       borderRadius: 16,
-      padding: 25,
-      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      padding: "clamp(15px, 4vw, 25px)",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
       marginBottom: 100,
+      backgroundColor: "#fff"
     }}
   >
-    <h3 style={{ fontSize: "2.5em", textAlign: "center" }}>
+    <h3 style={{ fontSize: "clamp(1.5em, 5vw, 2.5em)", textAlign: "center", marginBottom: 20 }}>
       Carrito
     </h3>
     {Object.entries(pedido).map(([producto, cantidad]) => {

@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { Table, Card, Typography } from "antd";
 import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
+import { useStore } from "../../../context/StoreContext";
 
 const { Title } = Typography;
 
 function SalesHistory() {
     const [historial, setHistorial] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { selectedStoreId } = useStore();
 
     const columns = [
         { title: 'Fecha', dataIndex: 'fecha', key: 'fecha' },
@@ -23,19 +25,21 @@ function SalesHistory() {
         },
     ];
 
+    const cargarDatos = async () => {
+        setLoading(true);
+        try {
+            const data = await obtenerDashboard(selectedStoreId);
+            setHistorial(data.historial || []);
+        } catch (error) {
+            console.error("Error al obtener historial de ventas:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const cargarDatos = async () => {
-            try {
-                const data = await obtenerDashboard();
-                setHistorial(data.historial || []);
-            } catch (error) {
-                console.error("Error al obtener historial de ventas:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         cargarDatos();
-    }, []);
+    }, [selectedStoreId]);
 
     return (
         <div style={{ padding: '30px' }}>

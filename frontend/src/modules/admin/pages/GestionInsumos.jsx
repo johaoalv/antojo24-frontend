@@ -1,9 +1,10 @@
 
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Space, Typography, Card, Tag } from "antd";
+import { Table, Button, Modal, Form, Input, InputNumber, Space, Typography, Card, Tag, Select } from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { notifySuccess, notifyError } from "../../common/components/notifications";
+import { useStore } from "../../../context/StoreContext";
 
 const { Title } = Typography;
 
@@ -13,11 +14,13 @@ const GestionInsumos = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [editingInsumo, setEditingInsumo] = useState(null);
     const [form] = Form.useForm();
+    const { selectedStoreId, stores } = useStore();
 
     const fetchInsumos = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get("/insumos");
+            const params = selectedStoreId !== "global" ? { sucursal_id: selectedStoreId } : {};
+            const response = await axiosInstance.get("/insumos", { params });
             setInsumos(response.data);
         } catch (error) {
             notifyError({ message: "Error al cargar insumos", description: error.message });
@@ -28,11 +31,13 @@ const GestionInsumos = () => {
 
     useEffect(() => {
         fetchInsumos();
-    }, []);
+    }, [selectedStoreId]);
 
     const handleAdd = () => {
         setEditingInsumo(null);
         form.resetFields();
+        // Pre-seleccionar sucursal si no es global
+        form.setFieldsValue({ sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId });
         setModalVisible(true);
     };
 
@@ -77,6 +82,12 @@ const GestionInsumos = () => {
             render: (text) => <span style={{ textTransform: "capitalize", fontWeight: "bold" }}>{text}</span>,
         },
         {
+            title: "Sucursal",
+            dataIndex: "sucursal_id",
+            key: "sucursal_id",
+            render: (id) => stores.find(t => t.sucursal_id === id)?.nombre || "Global / Central"
+        },
+        {
             title: "Stock Actual",
             dataIndex: "stock",
             key: "stock",
@@ -112,7 +123,9 @@ const GestionInsumos = () => {
     return (
         <div style={{ padding: "10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
-                <Title level={2}>Gestión de Insumos</Title>
+                <Title level={2}>
+                    Insumos: {selectedStoreId === "global" ? "Todas las Sedes" : (stores.find(t => t.sucursal_id === selectedStoreId)?.nombre || "Sucursal")}
+                </Title>
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} size="large">
                     Agregar Insumo
                 </Button>
@@ -147,6 +160,13 @@ const GestionInsumos = () => {
                     </Form.Item>
                     <Form.Item name="unidad_medida" label="Unidad de Medida" rules={[{ required: true }]}>
                         <Input placeholder="Ej: unidad, kg, litro" />
+                    </Form.Item>
+                    <Form.Item name="sucursal_id" label="Sucursal" rules={[{ required: true }]}>
+                        <Select placeholder="Selecciona una sucursal">
+                            {stores.map(t => (
+                                <Select.Option key={t.sucursal_id} value={t.sucursal_id}>{t.nombre}</Select.Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>
