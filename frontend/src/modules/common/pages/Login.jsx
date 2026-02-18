@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Typography, message } from "antd";
+import { Input, Typography, message } from "antd";
 import axios from "axios";
 import { autenticarPin } from "../../../api/auth/axios_auth";
 import a24logo from "../../../../public/assets/A_24_LOGO_OFICIAL.png"

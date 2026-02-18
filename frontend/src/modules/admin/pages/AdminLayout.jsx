@@ -1,10 +1,7 @@
-
 import React from "react";
-import { Layout, Menu, Drawer, Button } from "antd";
+import { Layout, Menu, Drawer, Button, Select } from "antd";
 import {
   DashboardOutlined,
-  ShopOutlined,
-  SettingOutlined,
   LogoutOutlined,
   BlockOutlined,
   HistoryOutlined,
@@ -13,14 +10,30 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
+import { StoreProvider, useStore } from "../../../context/StoreContext";
+import { obtenerTiendas } from "../../../api/admin/axios_dashboard";
 
 const { Sider, Content, Footer } = Layout;
 
-const AdminLayout = () => {
+const AdminLayoutContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [drawerVisible, setDrawerVisible] = React.useState(false);
+  const { selectedStoreId, setSelectedStoreId, stores, setStores } = useStore();
+
   const currentPath = location.pathname;
+
+  React.useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const data = await obtenerTiendas();
+        setStores(data);
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+      }
+    };
+    fetchStores();
+  }, [setStores]);
 
   const handleMenuClick = ({ key }) => {
     setDrawerVisible(false);
@@ -39,11 +52,6 @@ const AdminLayout = () => {
       label: <span style={{ fontSize: '1.3em' }}>Inicio</span>,
     },
     {
-      key: "productos",
-      icon: <ShopOutlined style={{ fontSize: '1.5em' }} />,
-      label: <span style={{ fontSize: '1.3em' }}>Productos</span>,
-    },
-    {
       key: "ventas",
       icon: <HistoryOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Ventas</span>,
@@ -57,11 +65,6 @@ const AdminLayout = () => {
       key: "insumos",
       icon: <BlockOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Insumos</span>,
-    },
-    {
-      key: "configuracion",
-      icon: <SettingOutlined style={{ fontSize: '1.5em' }} />,
-      label: <span style={{ fontSize: '1.3em' }}>Configuración</span>,
     },
     {
       key: "logout",
@@ -111,16 +114,38 @@ const AdminLayout = () => {
 
         {/* CONTENIDO CENTRAL */}
         <Layout className="smooth-transition" style={{ padding: "clamp(10px, 3vw, 30px)" }}>
-          <div className="show-mobile" style={{ marginBottom: 20 }}>
-            <Button
-              type="primary"
-              icon={<MenuOutlined />}
-              onClick={() => setDrawerVisible(true)}
-              size="large"
-              style={{ backgroundColor: '#000', borderColor: '#000' }}
-            >
-              Menú
-            </Button>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 20,
+            gap: '15px',
+            flexWrap: 'wrap'
+          }}>
+            <div className="show-mobile">
+              <Button
+                type="primary"
+                icon={<MenuOutlined />}
+                onClick={() => setDrawerVisible(true)}
+                size="large"
+                style={{ backgroundColor: '#000', borderColor: '#000' }}
+              >
+                Menú
+              </Button>
+            </div>
+
+            <div style={{ flex: '1 1 300px', maxWidth: '400px' }}>
+              <span style={{ marginRight: 10, fontWeight: 600, fontSize: '1.1em' }}>📍 Sucursal:</span>
+              <Select
+                style={{ width: '200px' }}
+                value={selectedStoreId}
+                onChange={setSelectedStoreId}
+                options={[
+                  { label: "🌎 Todas las Sedes", value: "global" },
+                  ...stores.map(s => ({ label: s.nombre, value: s.sucursal_id }))
+                ]}
+              />
+            </div>
           </div>
 
           <Content
@@ -141,6 +166,14 @@ const AdminLayout = () => {
         </Layout>
       </Layout>
     </Layout>
+  );
+};
+
+const AdminLayout = () => {
+  return (
+    <StoreProvider>
+      <AdminLayoutContent />
+    </StoreProvider>
   );
 };
 
