@@ -6,7 +6,9 @@ import {
   BlockOutlined,
   HistoryOutlined,
   FileTextOutlined,
-  MenuOutlined
+  MenuOutlined,
+  ExperimentOutlined,
+  PieChartOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -65,6 +67,16 @@ const AdminLayoutContent = () => {
       key: "insumos",
       icon: <BlockOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Insumos</span>,
+    },
+    {
+      key: "produccion",
+      icon: <ExperimentOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Producción</span>,
+    },
+    {
+      key: "costeo",
+      icon: <PieChartOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Costeo</span>,
     },
     {
       key: "logout",
