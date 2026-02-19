@@ -10,6 +10,8 @@ import Dashboard from "../modules/admin/pages/Dashboard";
 import GestionInsumos from "../modules/admin/pages/GestionInsumos";
 import SalesHistory from "../modules/admin/pages/SalesHistory";
 import Inversiones from "../modules/admin/pages/Inversiones";
+import ProduccionSalsas from "../modules/admin/pages/ProduccionSalsas";
+import CosteoProductos from "../modules/admin/pages/CosteoProductos";
 
 const AppRouter = () => {
   return (
@@ -26,6 +28,8 @@ const AppRouter = () => {
             <Route path="inicio" element={<Dashboard />} />
             <Route path="ventas" element={<SalesHistory />} />
             <Route path="inversiones" element={<Inversiones />} />
+            <Route path="produccion" element={<ProduccionSalsas />} />
+            <Route path="costeo" element={<CosteoProductos />} />
             <Route path="insumos" element={<GestionInsumos />} />
           </Route>
         </Route>
