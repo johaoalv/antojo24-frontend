@@ -81,13 +81,16 @@ function Dashboard() {
       </Title>
 
       <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={6}>
           <CardInfo title="Ventas Totales" value={datos.total_ventas} />
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={6}>
           <CardInfo title="Inversión / Facturas" value={datos.total_invertido} />
         </Col>
-        <Col xs={24} sm={8}>
+        <Col xs={24} sm={12} md={6}>
+          <CardInfo title="Mermas (Pérdidas)" value={datos.total_merma || 0} />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
           <CardInfo title="Ganancia Neta" value={datos.ganancia_bruta} />
         </Col>
       </Row>
