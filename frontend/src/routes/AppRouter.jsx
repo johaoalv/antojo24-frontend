@@ -12,8 +12,10 @@ import SalesHistory from "../modules/admin/pages/SalesHistory";
 import Inversiones from "../modules/admin/pages/Inversiones";
 import ProduccionSalsas from "../modules/admin/pages/ProduccionSalsas";
 import CosteoProductos from "../modules/admin/pages/CosteoProductos";
+import ConfiguradorRecetas from "../modules/admin/pages/ConfiguradorRecetas";
 
 const AppRouter = () => {
+  // ...
   return (
     <Router>
       <Routes>
@@ -30,6 +32,7 @@ const AppRouter = () => {
             <Route path="inversiones" element={<Inversiones />} />
             <Route path="produccion" element={<ProduccionSalsas />} />
             <Route path="costeo" element={<CosteoProductos />} />
+            <Route path="recetas" element={<ConfiguradorRecetas />} />
             <Route path="insumos" element={<GestionInsumos />} />
           </Route>
         </Route>
