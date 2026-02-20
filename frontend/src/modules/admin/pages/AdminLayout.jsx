@@ -84,6 +84,11 @@ const AdminLayoutContent = () => {
       label: <span style={{ fontSize: '1.3em' }}>Recetas</span>,
     },
     {
+      key: "mermas",
+      icon: <BlockOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Mermas</span>,
+    },
+    {
       key: "logout",
       icon: <LogoutOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Salir</span>,

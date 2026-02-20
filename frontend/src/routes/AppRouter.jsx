@@ -13,6 +13,7 @@ import Inversiones from "../modules/admin/pages/Inversiones";
 import ProduccionSalsas from "../modules/admin/pages/ProduccionSalsas";
 import CosteoProductos from "../modules/admin/pages/CosteoProductos";
 import ConfiguradorRecetas from "../modules/admin/pages/ConfiguradorRecetas";
+import Mermas from "../modules/admin/pages/Mermas";
 
 const AppRouter = () => {
   // ...
@@ -33,6 +34,7 @@ const AppRouter = () => {
             <Route path="produccion" element={<ProduccionSalsas />} />
             <Route path="costeo" element={<CosteoProductos />} />
             <Route path="recetas" element={<ConfiguradorRecetas />} />
+            <Route path="mermas" element={<Mermas />} />
             <Route path="insumos" element={<GestionInsumos />} />
           </Route>
         </Route>
