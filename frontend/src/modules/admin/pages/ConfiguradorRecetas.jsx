@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Space, Divider, Tag, Button, Modal, Form, Select, InputNumber, Row, Col, Popconfirm, message, Tabs } from "antd";
+import { Table, Card, Typography, Space, Divider, Tag, Button, Modal, Form, Select, InputNumber, Row, Col, Popconfirm, message, Tabs, Input } from "antd";
 import { BookOutlined, PlusOutlined, DeleteOutlined, ExperimentOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 
@@ -225,6 +225,61 @@ const ConfiguradorRecetas = () => {
         }
     ];
 
+    const [modalNuevaRecetaVisible, setModalNuevaRecetaVisible] = useState(false);
+    const [modalNuevoInsumoVisible, setModalNuevoInsumoVisible] = useState(false);
+    const [nuevaRecetaForm] = Form.useForm();
+    const [nuevoInsumoForm] = Form.useForm();
+    const [tempIngredientes, setTempIngredientes] = useState([{ id: Date.now(), insumo_id: null, cantidad: 0 }]);
+
+    const handleCreateOriginalRecipe = async (values) => {
+        try {
+            const ingredientesValidos = tempIngredientes.filter(i => i.insumo_id && i.cantidad > 0);
+            if (ingredientesValidos.length === 0) {
+                message.warning("Añade al menos un ingrediente válido");
+                return;
+            }
+
+            await axiosInstance.post("/recetas/bulk", {
+                producto: values.nombre_producto,
+                ingredientes: ingredientesValidos.map(i => ({
+                    insumo_id: i.insumo_id,
+                    cantidad_requerida: i.cantidad
+                }))
+            });
+
+            message.success("¡Receta creada con éxito!");
+            setModalNuevaRecetaVisible(false);
+            nuevaRecetaForm.resetFields();
+            setTempIngredientes([{ id: Date.now(), insumo_id: null, cantidad: 0 }]);
+            fetchData();
+        } catch (error) {
+            console.error(error);
+            message.error("Error al crear la receta");
+        }
+    };
+
+    const handleQuickAddInsumo = async (values) => {
+        try {
+            // Calculamos costo unidad
+            const costo_unidad = values.costo_total / values.stock;
+            const res = await axiosInstance.post("/insumos", {
+                nombre: values.nombre,
+                stock: values.stock,
+                costo_unidad: costo_unidad,
+                unidad_medida: values.unidad_medida,
+                sucursal_id: values.sucursal_id
+            });
+            message.success("Insumo creado y listo para usar");
+            setModalNuevoInsumoVisible(false);
+            nuevoInsumoForm.resetFields();
+            // Recargamos insumos para que aparezca en el select de la receta
+            const insumosRes = await axiosInstance.get("/insumos");
+            setInsumos(insumosRes.data);
+        } catch (error) {
+            message.error("Error al crear insumo rápido");
+        }
+    };
+
     // Filtrar los productos excluyendo las sodas
     const productosFiltrados = Object.keys(recetas).filter(
         p => !productosExcluidos.includes(p.toLowerCase())
@@ -232,8 +287,23 @@ const ConfiguradorRecetas = () => {
 
     return (
         <div style={{ padding: 30 }}>
-            <Title level={2}><BookOutlined /> Configurador de Recetas</Title>
-            <Text type="secondary">Gestiona qué ingredientes lleva cada producto y cada salsa. Estos datos afectan directamente al Costeo e Inventario.</Text>
+            <Row justify="space-between" align="middle">
+                <Col>
+                    <Title level={2}><BookOutlined /> Configurador de Recetas</Title>
+                    <Text type="secondary">Gestiona qué ingredientes lleva cada producto y cada salsa. Estos datos afectan directamente al Costeo e Inventario.</Text>
+                </Col>
+                <Col>
+                    <Button
+                        type="primary"
+                        size="large"
+                        icon={<PlusOutlined />}
+                        onClick={() => setModalNuevaRecetaVisible(true)}
+                        style={{ backgroundColor: '#ffd60a', color: '#000', borderColor: '#ffd60a', fontWeight: 'bold' }}
+                    >
+                        CREAR NUEVA RECETA
+                    </Button>
+                </Col>
+            </Row>
 
             <Divider />
 
@@ -348,7 +418,131 @@ const ConfiguradorRecetas = () => {
                 }
             ]} />
 
-            {/* Modal para Añadir Ingrediente a Producto */}
+            {/* Modal para CREAR NUEVA RECETA (PRODUCTO COMPLETO) */}
+            <Modal
+                title={<Title level={3}>🚀 Crear Nueva Receta</Title>}
+                open={modalNuevaRecetaVisible}
+                onCancel={() => setModalNuevaRecetaVisible(false)}
+                onOk={() => nuevaRecetaForm.submit()}
+                width={800}
+                okText="Guardar Receta Completa"
+                cancelText="Cancelar"
+                destroyOnClose
+            >
+                <Form form={nuevaRecetaForm} layout="vertical" onFinish={handleCreateOriginalRecipe}>
+                    <Form.Item
+                        name="nombre_producto"
+                        label="Nombre del Nuevo Producto"
+                        rules={[{ required: true, message: 'Ej: Chili Burger' }]}
+                    >
+                        <Input size="large" placeholder="Nombre que aparecerá en el sistema..." />
+                    </Form.Item>
+
+                    <Divider orientation="left">Ingredientes de la Receta</Divider>
+
+                    {tempIngredientes.map((ing, index) => (
+                        <Row key={ing.id} gutter={12} align="middle" style={{ marginBottom: 16 }}>
+                            <Col span={12}>
+                                <Select
+                                    showSearch
+                                    placeholder="Selecciona Insumo..."
+                                    size="large"
+                                    style={{ width: '100%' }}
+                                    value={ing.insumo_id}
+                                    onChange={(val) => {
+                                        const newIngs = [...tempIngredientes];
+                                        newIngs[index].insumo_id = val;
+                                        setTempIngredientes(newIngs);
+                                    }}
+                                    optionFilterProp="children"
+                                >
+                                    {insumos.map(i => (
+                                        <Option key={i.id} value={i.id}>
+                                            {i.nombre} ({i.unidad_medida})
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Col>
+                            <Col span={8}>
+                                <InputNumber
+                                    placeholder="Cant."
+                                    size="large"
+                                    style={{ width: '100%' }}
+                                    value={ing.cantidad}
+                                    onChange={(val) => {
+                                        const newIngs = [...tempIngredientes];
+                                        newIngs[index].cantidad = val;
+                                        setTempIngredientes(newIngs);
+                                    }}
+                                    min={0}
+                                />
+                            </Col>
+                            <Col span={4}>
+                                <Button
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => setTempIngredientes(tempIngredientes.filter((_, idx) => idx !== index))}
+                                    disabled={tempIngredientes.length === 1}
+                                />
+                            </Col>
+                        </Row>
+                    ))}
+
+                    <Space>
+                        <Button
+                            type="dashed"
+                            icon={<PlusOutlined />}
+                            onClick={() => setTempIngredientes([...tempIngredientes, { id: Date.now(), insumo_id: null, cantidad: 0 }])}
+                        >
+                            Añadir otro ingrediente
+                        </Button>
+                        <Button
+                            icon={<ExperimentOutlined />}
+                            onClick={() => setModalNuevoInsumoVisible(true)}
+                        >
+                            Crear Insumo que no existe
+                        </Button>
+                    </Space>
+                </Form>
+            </Modal>
+
+            {/* Modal Rápido para Nuevo Insumo */}
+            <Modal
+                title="Añadir Nuevo Insumo a la Base de Datos"
+                open={modalNuevoInsumoVisible}
+                onCancel={() => setModalNuevoInsumoVisible(false)}
+                onOk={() => nuevoInsumoForm.submit()}
+                destroyOnClose
+            >
+                <Form form={nuevoInsumoForm} layout="vertical" onFinish={handleQuickAddInsumo}>
+                    <Form.Item name="nombre" label="Nombre del Insumo" rules={[{ required: true }]}>
+                        <Input placeholder="Ej: Salsa Chile" />
+                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item name="stock" label="Stock Inicial" rules={[{ required: true }]}>
+                                <InputNumber style={{ width: '100%' }} min={0} />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item name="costo_total" label="Costo Total Compra" rules={[{ required: true }]}>
+                                <InputNumber style={{ width: '100%' }} min={0} prefix="$" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Form.Item name="unidad_medida" label="Unidad de Medida" rules={[{ required: true }]}>
+                        <Input placeholder="Ej: gramos, unidades" />
+                    </Form.Item>
+                    <Form.Item name="sucursal_id" label="Sucursal" initialValue={1}>
+                        <Select>
+                            <Option value={1}>Sucursal 1 (Principal)</Option>
+                            {/* Aquí se podrían mapear más sucursales si existieran dinámicamente */}
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Modal para Añadir Ingrediente a Producto Existente (el original) */}
             <Modal
                 title={<span style={{ textTransform: 'capitalize' }}>Añadir ingrediente a {editingProduct}</span>}
                 open={modalVisible}
