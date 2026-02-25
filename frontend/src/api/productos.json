@@ -28,5 +28,10 @@
     "producto": "chilli burger",
     "precio": 3.50,
     "imagen": "/assets/chilli-burger.png"
+  },
+  {
+    "producto": "hawai burger",
+    "precio": 3.75,
+    "imagen": "/assets/hamburguesa.png"
   }
 ]
