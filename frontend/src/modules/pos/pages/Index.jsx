@@ -35,7 +35,7 @@ const Index = () => {
 
   const metodoPagoState = useMetodoPago(calcularTotal);
 
-  const { confirmarPedido } = usePedidoActions({
+  const { confirmarPedido, loading } = usePedidoActions({
     pedido,
     nombreCliente,
     metodoPago: metodoPagoState.metodoPago,
@@ -79,7 +79,8 @@ const Index = () => {
               paymentOptions={PAYMENT_OPTIONS}
               onMetodoPagoChange={metodoPagoState.handleMetodoPagoChange}
               onConfirmar={confirmarPedido}
-              disabled={isPedidoVacio || !metodoPagoState.metodoPago}
+              disabled={isPedidoVacio || !metodoPagoState.metodoPago || loading}
+              loading={loading}
               onNavigateToCierre={() => navigate("/cierre")}
               nombreCliente={nombreCliente}
               onNombreClienteChange={setNombreCliente}
