@@ -1,15 +1,13 @@
-
 import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Button, Modal, Form, Input, InputNumber, Space, message, Popconfirm } from "antd";
+import { Table, Card, Typography, Button, Modal, Form, Input, InputNumber, message, Popconfirm, Select } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { obtenerInversiones, agregarInversion, eliminarInversion } from "../../../api/admin/axios_inversiones";
+import { obtenerInyecciones, agregarInyeccion, eliminarInyeccion } from "../../../api/admin/axios_inyecciones";
 import { useStore } from "../../../context/StoreContext";
-import { Select } from "antd";
 
 const { Title } = Typography;
 
-function Inversiones() {
-    const [inversiones, setInversiones] = useState([]);
+function Inyecciones() {
+    const [inyecciones, setInyecciones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
@@ -18,10 +16,10 @@ function Inversiones() {
     const cargarDatos = async () => {
         setLoading(true);
         try {
-            const data = await obtenerInversiones(selectedStoreId);
-            setInversiones(data);
+            const data = await obtenerInyecciones(selectedStoreId);
+            setInyecciones(data);
         } catch (error) {
-            message.error("Error al cargar inversiones");
+            message.error("Error al cargar inyecciones");
         } finally {
             setLoading(false);
         }
@@ -33,43 +31,46 @@ function Inversiones() {
 
     const handleAdd = async (values) => {
         try {
-            // Si hay una sucursal seleccionada (distinta de global), la sugerimos en el form
-            // aunque el usuario puede cambiarla o dejarla global si el SELECT del form lo permite
-            await agregarInversion(values);
-            message.success("Inversión agregada");
+            await agregarInyeccion(values);
+            message.success("Inyección de capital registrada");
             setIsModalOpen(false);
             form.resetFields();
             cargarDatos();
         } catch (error) {
-            message.error("Error al agregar inversión");
+            message.error("Error al registrar inyección");
         }
     };
 
     const handleDelete = async (id) => {
         try {
-            await eliminarInversion(id);
-            message.success("Inversión eliminada");
+            await eliminarInyeccion(id);
+            message.success("Registro eliminado");
             cargarDatos();
         } catch (error) {
-            message.error("Error al eliminar inversión");
+            message.error("Error al eliminar registro");
         }
     };
 
     const columns = [
         { title: 'Fecha', dataIndex: 'fecha', key: 'fecha' },
-        { title: 'Concepto / Descripción', dataIndex: 'descripcion', key: 'descripcion' },
+        { title: 'Descripción / Origen', dataIndex: 'descripcion', key: 'descripcion' },
         {
-            title: 'Sucursal',
+            title: 'Sucursal Destino',
             dataIndex: 'sucursal_id',
             key: 'sucursal_id',
             render: (id) => stores.find(t => t.sucursal_id === id)?.nombre || "Global / Central"
         },
-        { title: 'Monto', dataIndex: 'monto', key: 'monto', render: (val) => `$${parseFloat(val).toFixed(2)}` },
+        {
+            title: 'Monto',
+            dataIndex: 'monto',
+            key: 'monto',
+            render: (val) => <Typography.Text strong style={{ color: '#52c41a' }}>+${Number(val || 0).toFixed(2)}</Typography.Text>
+        },
         {
             title: 'Acciones',
             key: 'acciones',
             render: (_, record) => (
-                <Popconfirm title="¿Eliminar esta inversión?" onConfirm={() => handleDelete(record.id)}>
+                <Popconfirm title="¿Eliminar este registro?" onConfirm={() => handleDelete(record.id)}>
                     <Button type="text" danger icon={<DeleteOutlined />} />
                 </Popconfirm>
             ),
@@ -78,43 +79,46 @@ function Inversiones() {
 
     return (
         <div style={{ padding: '30px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <Title level={2} style={{ margin: 0 }}>
-                    Inversiones: {selectedStoreId === "global" ? "Todas las Sedes" : (stores.find(t => t.sucursal_id === selectedStoreId)?.nombre || "Sucursal")}
+                    Inyecciones de Capital
                 </Title>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => {
                     setIsModalOpen(true);
-                    // Pre-seleccionar la sucursal actual en el modal
                     form.setFieldsValue({ sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId });
                 }}>
-                    Agregar Inversión
+                    Registrar Aporte
                 </Button>
             </div>
+            <Typography.Text type="secondary" style={{ display: 'block', marginBottom: '24px' }}>
+                Dinero que entra al negocio y NO proviene de ventas (ej. aportes propios, préstamos).
+            </Typography.Text>
 
             <Card>
                 <Table
-                    dataSource={inversiones}
+                    dataSource={inyecciones}
                     columns={columns}
                     rowKey="id"
                     loading={loading}
-                    pagination={{ pageSize: 10 }}
+                    pagination={{ pageSize: 12 }}
                 />
             </Card>
 
             <Modal
-                title="Nueva Inversión"
+                title="Nueva Inyección de Capital"
                 open={isModalOpen}
                 onCancel={() => setIsModalOpen(false)}
                 onOk={() => form.submit()}
+                destroyOnClose
             >
                 <Form form={form} layout="vertical" onFinish={handleAdd}>
-                    <Form.Item name="descripcion" label="Descripción / Factura" rules={[{ required: true }]}>
-                        <Input placeholder="Ej: Factura Proveedor Bebidas" />
+                    <Form.Item name="descripcion" label="Descripción (Ej: Inyección para Publicidad)" rules={[{ required: true }]}>
+                        <Input placeholder="Ej: Aporte socio para compra de insumos" />
                     </Form.Item>
                     <Form.Item name="monto" label="Monto ($)" rules={[{ required: true }]}>
                         <InputNumber style={{ width: '100%' }} precision={2} min={0} />
                     </Form.Item>
-                    <Form.Item name="sucursal_id" label="Sucursal (Opcional)">
+                    <Form.Item name="sucursal_id" label="Sucursal Destino (Opcional)">
                         <Select placeholder="Selecciona una sucursal" allowClear>
                             {stores.map(t => (
                                 <Select.Option key={t.sucursal_id} value={t.sucursal_id}>{t.nombre}</Select.Option>
@@ -130,4 +134,4 @@ function Inversiones() {
     );
 }
 
-export default Inversiones;
+export default Inyecciones;

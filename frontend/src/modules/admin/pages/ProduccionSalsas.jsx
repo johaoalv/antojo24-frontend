@@ -5,7 +5,7 @@ import { PlusOutlined, ExperimentOutlined, CheckCircleOutlined, CalculatorOutlin
 import axiosInstance from "../../../api/core/axios_base";
 import { useStore } from "../../../context/StoreContext";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const ProduccionSalsas = () => {
     const { selectedStoreId, stores } = useStore();
@@ -84,7 +84,7 @@ const ProduccionSalsas = () => {
         // Si X cantidad de ingrediente hace Y de salsa
         // Proporción = CantSalsa / CantIngredienteBase
         const newTotalProduction = amount / triggerIngredient.cantidad_proporcional;
-        setProductionQty(parseFloat(newTotalProduction.toFixed(2)));
+        setProductionQty(Number(newTotalProduction || 0).toFixed(2));
     };
 
     const columns = [
@@ -92,7 +92,7 @@ const ProduccionSalsas = () => {
         {
             title: 'Cant. Requerida',
             key: 'requerido',
-            render: (_, record) => (record.cantidad_proporcional * productionQty).toFixed(2) + " " + record.unidad_medida
+            render: (_, record) => Number((record.cantidad_proporcional || 0) * (productionQty || 0)).toFixed(2) + " " + record.unidad_medida
         },
         {
             title: 'Stock Actual',
@@ -124,7 +124,7 @@ const ProduccionSalsas = () => {
 
             <Row gutter={24}>
                 <Col xs={24} lg={8}>
-                    <Card title="Paso 1: Seleccionar Mezcla" bordered={false} className="card-shadow">
+                    <Card title="Paso 1: Seleccionar Mezcla" variant="borderless" className="card-shadow">
                         <Select
                             style={{ width: '100%', marginBottom: 20 }}
                             placeholder="Selecciona una salsa"
@@ -146,8 +146,8 @@ const ProduccionSalsas = () => {
                     </Card>
 
                     {selectedSauceId && (
-                        <Card title="Paso 2: Cantidad de Tandas/Lotes" style={{ marginTop: 24 }} bordered={false} className="card-shadow">
-                            <Text block style={{ marginBottom: 10 }}>¿Cuántas veces vas a preparar la receta original?</Text>
+                        <Card title="Paso 2: Cantidad de Tandas/Lotes" style={{ marginTop: 24 }} variant="borderless" className="card-shadow">
+                            <Typography.Paragraph style={{ marginBottom: 10 }}>¿Cuántas veces vas a preparar la receta original?</Typography.Paragraph>
                             <InputNumber
                                 style={{ width: '100%', fontSize: '1.5em', height: 50, display: 'flex', alignItems: 'center' }}
                                 min={0}
@@ -156,8 +156,8 @@ const ProduccionSalsas = () => {
                                 onChange={setProductionQty}
                             />
                             <div style={{ marginTop: 15 }}>
-                                <Text type="secondary">Total que se sumará al stock: </Text>
-                                <Tag color="blue">{(recipeDetails.reduce((acc, curr) => acc + parseFloat(curr.cantidad_proporcional), 0) * productionQty).toFixed(0)} ml/g</Tag>
+                                <Typography.Text type="secondary">Total que se sumará al stock: </Typography.Text>
+                                <Tag color="blue">{Number(recipeDetails.reduce((acc, curr) => acc + parseFloat(curr.cantidad_proporcional || 0), 0) * (productionQty || 0)).toFixed(0)} ml/g</Tag>
                             </div>
                             <Button
                                 type="primary"
@@ -176,7 +176,7 @@ const ProduccionSalsas = () => {
 
                 <Col xs={24} lg={16}>
                     {selectedSauceId ? (
-                        <Card title="Análisis de Receta e Inteligencia" bordered={false} className="card-shadow">
+                        <Card title="Análisis de Receta e Inteligencia" variant="borderless" className="card-shadow">
                             <Table
                                 columns={columns}
                                 dataSource={recipeDetails}
@@ -184,11 +184,11 @@ const ProduccionSalsas = () => {
                                 pagination={false}
                             />
                             <div style={{ marginTop: 20, padding: 20, backgroundColor: '#f9f9f9', borderRadius: 8 }}>
-                                <CalculatorOutlined /> <Text strong>Tip de Inteligencia:</Text>
+                                <CalculatorOutlined /> <Typography.Text strong>Tip de Inteligencia:</Typography.Text>
                                 <br />
-                                <Text type="secondary">
+                                <Typography.Text type="secondary">
                                     ¿Tienes un bote abierto? Pon cuántos ml tienes de ese ingrediente en el "Simulador" y el software te dirá cuántas tandas puedes preparar para que la receta no pierda el sabor.
-                                </Text>
+                                </Typography.Text>
                             </div>
                         </Card>
                     ) : (
@@ -246,7 +246,7 @@ const ProduccionSalsas = () => {
                                         >
                                             <InputNumber placeholder="Cantidad base" style={{ width: 150 }} />
                                         </Form.Item>
-                                        <Text type="secondary">x 1 unidad de mezcla</Text>
+                                        <Typography.Text type="secondary">x 1 unidad de mezcla</Typography.Text>
                                         <Button type="link" onClick={() => remove(name)} danger>Eliminar</Button>
                                     </Space>
                                 ))}

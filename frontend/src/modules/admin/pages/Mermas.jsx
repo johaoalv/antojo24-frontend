@@ -4,7 +4,7 @@ import { WarningOutlined, PlusOutlined, DollarOutlined, FireOutlined, DropboxOut
 import axiosInstance from "../../../api/core/axios_base";
 import { useStore } from "../../../context/StoreContext";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -74,7 +74,7 @@ const Mermas = () => {
             title: "Insumo",
             dataIndex: "nombre_insumo",
             key: "nombre",
-            render: (text) => <Text strong style={{ textTransform: "capitalize" }}>{text}</Text>
+            render: (text) => <Typography.Text strong style={{ textTransform: "capitalize" }}>{text}</Typography.Text>
         },
         {
             title: "Cantidad Perdida",
@@ -90,7 +90,7 @@ const Mermas = () => {
             title: "Costo Perdido",
             dataIndex: "costo_perdido",
             key: "costo",
-            render: (val) => <Text type="danger" strong>${parseFloat(val).toFixed(2)}</Text>
+            render: (val) => <Typography.Text type="danger" strong>${Number(val || 0).toFixed(2)}</Typography.Text>
         },
         {
             title: "Motivo",
@@ -102,7 +102,7 @@ const Mermas = () => {
             title: "Nota",
             dataIndex: "observacion",
             key: "obs",
-            render: (text) => <Text type="secondary">{text || "—"}</Text>
+            render: (text) => <Typography.Text type="secondary">{text || "—"}</Typography.Text>
         },
         {
             title: "Fecha",
@@ -117,7 +117,7 @@ const Mermas = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
                 <div>
                     <Title level={2} style={{ margin: 0 }}><WarningOutlined /> Control de Mermas</Title>
-                    <Text type="secondary">Registra las pérdidas de inventario para mantener tu stock sincronizado con la realidad.</Text>
+                    <Typography.Text type="secondary">Registra las pérdidas de inventario para mantener tu stock sincronizado con la realidad.</Typography.Text>
                 </div>
                 <Button
                     type="primary"
