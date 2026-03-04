@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Typography } from "antd";
-import { DollarCircleOutlined } from "@ant-design/icons";
+import { Popconfirm, Table, Typography, Button, Space } from "antd";
+import { DollarCircleOutlined, DeleteOutlined } from "@ant-design/icons";
 import { hacerCierreCaja, getResumenVentas } from "../../../api/pos/axios_cierre";
+import { eliminarPedido } from "../../../api/pos/axios_pedidos";
 import Navbar from "../../common/components/Navbar";
 import SecondaryButton from "../../common/components/SecondaryButton";
 import Loader from "../../common/components/Loader";
@@ -39,24 +40,57 @@ const CierreCaja = () => {
     }, {});
   }, [pedidos]);
 
+  const cargarPedidos = async () => {
+    setCargando(true);
+    try {
+      const datos = await getResumenVentas();
+      setPedidos(datos);
+    } catch (error) {
+      console.error("Error al cargar:", error);
+      notifyError({
+        message: "Error al cargar los pedidos",
+        description: "Intenta nuevamente en unos momentos.",
+        placement: "topRight",
+      });
+    } finally {
+      setCargando(false);
+    }
+  };
+
   useEffect(() => {
-    const cargarPedidos = async () => {
-      try {
-        const datos = await getResumenVentas();
-        setPedidos(datos);
-      } catch (error) {
-        console.error("Error al cargar:", error);
-        notifyError({
-          message: "Error al cargar los pedidos",
-          description: "Intenta nuevamente en unos momentos.",
-          placement: "topRight",
-        });
-      } finally {
-        setCargando(false);
-      }
-    };
     cargarPedidos();
   }, []);
+
+  const handleDeletePedido = async (pedido_id) => {
+    try {
+      const response = await eliminarPedido(pedido_id);
+
+      console.log("-----------------------------------------");
+      console.log(`🗑️ Venta eliminada: ${pedido_id}`);
+      if (response.restored_items && response.restored_items.length > 0) {
+        console.log("♻️ Insumos retornados al stock:");
+        response.restored_items.forEach(item => {
+          console.log(`   - ${item.insumo}: +${item.cantidad} (de producto: ${item.producto})`);
+        });
+      } else {
+        console.log("⚠️ No se encontraron insumos para restaurar en este pedido.");
+      }
+      console.log("-----------------------------------------");
+
+      notifySuccess({
+        message: "Pedido eliminado",
+        description: "El pedido ha sido eliminado y el stock restaurado.",
+        placement: "bottomRight",
+      });
+      cargarPedidos(); // Recargar la lista
+    } catch (error) {
+      notifyError({
+        message: "Error al eliminar",
+        description: error.response?.data?.error || "No se pudo eliminar el pedido.",
+        placement: "topRight",
+      });
+    }
+  };
 
   const handleOpenModal = () => {
     setTotalReal(totalCalculado);
@@ -124,7 +158,28 @@ const CierreCaja = () => {
       title: <strong style={{ fontSize: '1.2em' }}>Método de Pago</strong>,
       dataIndex: "metodo_pago",
       key: "metodo_pago",
-      render: text => <span style={{ fontSize: '1.1em' }}>{text}</span>
+      render: text => <span style={{ fontSize: '1.1em', textTransform: 'capitalize' }}>{text}</span>
+    },
+    {
+      title: <strong style={{ fontSize: '1.2em' }}>Acciones</strong>,
+      key: "acciones",
+      align: "center",
+      render: (_, record) => (
+        <Popconfirm
+          title="¿Estás seguro de eliminar esta venta?"
+          description="Se restaurará el inventario automáticamente."
+          onConfirm={() => handleDeletePedido(record.pedido_id)}
+          okText="Sí, eliminar"
+          cancelText="No"
+          okButtonProps={{ danger: true }}
+        >
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined style={{ fontSize: '1.2em' }} />}
+          />
+        </Popconfirm>
+      ),
     },
   ];
 

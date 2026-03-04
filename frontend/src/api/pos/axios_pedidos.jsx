@@ -11,3 +11,12 @@ export const enviarPedido = async (datos) => {
   }
 
 };
+export const eliminarPedido = async (pedido_id) => {
+  try {
+    const response = await axiosInstance.delete(`/pedido/${pedido_id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error en eliminarPedido:", error);
+    throw error;
+  }
+};

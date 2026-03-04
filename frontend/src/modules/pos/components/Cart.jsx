@@ -21,6 +21,7 @@ const Cart = ({
   onNavigateToCierre,
   nombreCliente,
   onNombreClienteChange,
+  loading,
 }) => (
   <div
     style={{
@@ -90,6 +91,7 @@ const Cart = ({
       style={{ marginTop: 25 }}
       onClick={onConfirmar}
       disabled={disabled}
+      loading={loading}
     >
       CONTINUAR
     </PrimaryButton>

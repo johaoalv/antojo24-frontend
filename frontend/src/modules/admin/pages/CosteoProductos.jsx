@@ -4,7 +4,7 @@ import { Table, Card, Typography, Space, Divider, Tag, InputNumber, Row, Col, Al
 import { CalculatorOutlined, DollarOutlined, PieChartOutlined, ArrowUpOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const CosteoProductos = () => {
     const [costeos, setCosteos] = useState([]);
@@ -38,7 +38,7 @@ const CosteoProductos = () => {
             title: 'Costo de Producción',
             dataIndex: 'costo_total',
             key: 'costo_total',
-            render: (val) => <Tag color="blue" style={{ fontSize: '1.1em' }}>${parseFloat(val).toFixed(2)}</Tag>
+            render: (val) => <Tag color="blue" style={{ fontSize: '1.1em' }}>${Number(val || 0).toFixed(2)}</Tag>
         },
         {
             title: `Precio Sugerido (${targetMargin}% Margen)`,
@@ -47,7 +47,7 @@ const CosteoProductos = () => {
                 const costo = parseFloat(record.costo_total);
                 // Fórmula: Precio = Costo / (1 - Margen/100)
                 const sugerido = costo / (1 - targetMargin / 100);
-                return <strong style={{ color: '#52c41a', fontSize: '1.2em' }}>${sugerido.toFixed(2)}</strong>;
+                return <strong style={{ color: '#52c41a', fontSize: '1.2em' }}>${Number(sugerido || 0).toFixed(2)}</strong>;
             }
         }
     ];
@@ -56,24 +56,24 @@ const CosteoProductos = () => {
         const subColumns = [
             { title: 'Ingrediente', dataIndex: 'nombre_insumo', key: 'nombre', render: (t) => <span style={{ textTransform: 'capitalize' }}>{t}</span> },
             { title: 'Cantidad', dataIndex: 'cantidad', key: 'cantidad', render: (v, r) => `${v} ${r.unidad}` },
-            { title: 'Costo Unitario', dataIndex: 'costo_unitario', key: 'unitario', render: (v) => `$${parseFloat(v).toFixed(4)}` },
-            { title: 'Subtotal', dataIndex: 'subtotal', key: 'subtotal', render: (v) => <strong>$${parseFloat(v).toFixed(2)}</strong> },
+            { title: 'Costo Unitario', dataIndex: 'costo_unitario', key: 'unitario', render: (v) => `$${Number(v || 0).toFixed(4)}` },
+            { title: 'Subtotal', dataIndex: 'subtotal', key: 'subtotal', render: (v) => <strong>$${Number(v || 0).toFixed(2)}</strong> },
         ];
-        return <Table columns={subColumns} dataSource={record.ingredientes} pagination={false} size="small" />;
+        return <Table columns={subColumns} dataSource={record.ingredientes} pagination={false} size="small" rowKey="nombre_insumo" />;
     };
 
     return (
         <div style={{ padding: 30 }}>
             <Title level={2}><PieChartOutlined /> Análisis de Costos y Rentabilidad</Title>
-            <Text type="secondary">Calcula automáticamente cuánto te cuesta producir cada plato basándose en las recetas y precios de insumos actuales.</Text>
+            <Typography.Text type="secondary">Calcula automáticamente cuánto te cuesta producir cada plato basándose en las recetas y precios de insumos actuales.</Typography.Text>
 
             <Divider />
 
             <Row gutter={24} style={{ marginBottom: 24 }}>
                 <Col xs={24} lg={12}>
-                    <Card title="Simulador de Margen de Ganancia" bordered={false} className="card-shadow">
+                    <Card title="Simulador de Margen de Ganancia" variant="borderless" className="card-shadow">
                         <Space direction="vertical" style={{ width: '100%' }}>
-                            <Text>Define tu margen objetivo (%) para ver los precios sugeridos:</Text>
+                            <Typography.Text>Define tu margen objetivo (%) para ver los precios sugeridos:</Typography.Text>
                             <InputNumber
                                 min={1}
                                 max={99}
@@ -91,16 +91,16 @@ const CosteoProductos = () => {
                     </Card>
                 </Col>
                 <Col xs={24} lg={12}>
-                    <Card bordered={false} className="card-shadow" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffd60a' }}>
+                    <Card variant="borderless" className="card-shadow" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffd60a' }}>
                         <div style={{ textAlign: 'center' }}>
-                            <Text strong style={{ fontSize: '1.5em', display: 'block' }}>MÁRGENES ACTUALIZADOS</Text>
-                            <Text>Si el precio de la Mayonesa sube en Insumos, estos costos se actualizan solos.</Text>
+                            <Typography.Text strong style={{ fontSize: '1.5em', display: 'block' }}>MÁRGENES ACTUALIZADOS</Typography.Text>
+                            <Typography.Text>Si el precio de la Mayonesa sube en Insumos, estos costos se actualizan solos.</Typography.Text>
                         </div>
                     </Card>
                 </Col>
             </Row>
 
-            <Card bordered={false} className="card-shadow">
+            <Card variant="borderless" className="card-shadow">
                 <Table
                     columns={columns}
                     dataSource={costeos}

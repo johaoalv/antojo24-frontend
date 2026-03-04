@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { enviarPedido } from "../../../api/pos/axios_pedidos";
 import { getPanamaTime } from "../utils/get_time";
 import { imprimirTicket } from "../utils/print";
@@ -19,11 +19,14 @@ const usePedidoActions = ({
   resetPagoState,
   priceMap,
 }) => {
+  const [loading, setLoading] = useState(false);
+
   const confirmarPedido = useCallback(async () => {
-    if (!metodoPago || Object.keys(pedido).length === 0) {
+    if (loading || !metodoPago || Object.keys(pedido).length === 0) {
       return;
     }
 
+    setLoading(true);
     const pedido_id = generateUUID();
     const fecha = getPanamaTime();
     const total = calcularTotal();
@@ -47,7 +50,6 @@ const usePedidoActions = ({
       sucursal_id,
     };
 
-    // Solo incluir nombre_cliente si tiene valor
     if (nombreCliente && nombreCliente.trim()) {
       datos.nombre_cliente = nombreCliente;
     }
@@ -58,6 +60,18 @@ const usePedidoActions = ({
 
     try {
       const response = await enviarPedido(datos);
+
+      console.log("-----------------------------------------");
+      console.log(`✅ Venta exitosa: ${pedido_id}`);
+      console.log("⚠️ Limpiando estado de memoria para evitar duplicados...");
+
+      // Limpiar estado inmediatamente después del éxito para evitar doble envío
+      resetPedido();
+      resetPagoState();
+
+      console.log("✅ Estado de carrito y pago reiniciado.");
+      console.log("-----------------------------------------");
+
       await imprimirTicket(datos);
 
       notifySuccess({
@@ -68,8 +82,6 @@ const usePedidoActions = ({
         placement: "bottom",
       });
 
-      resetPedido();
-      resetPagoState();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         notifyError({
@@ -85,8 +97,11 @@ const usePedidoActions = ({
         });
       }
       console.error("Error en confirmarPedido:", error);
+    } finally {
+      setLoading(false);
     }
   }, [
+    loading,
     calcularTotal,
     metodoPago,
     montoRecibido,
@@ -94,9 +109,10 @@ const usePedidoActions = ({
     pedido,
     resetPagoState,
     resetPedido,
+    nombreCliente,
   ]);
 
-  return { confirmarPedido };
+  return { confirmarPedido, loading };
 };
 
 export default usePedidoActions;

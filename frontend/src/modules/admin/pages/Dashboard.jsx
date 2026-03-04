@@ -13,17 +13,8 @@ function Dashboard() {
   const { selectedStoreId } = useStore();
 
   const columns = [
-    { title: 'Fecha', dataIndex: 'fecha', key: 'fecha' },
-    { title: 'Total Ventas', dataIndex: 'total_ventas', key: 'total_ventas', render: (val) => `$${val.toFixed(2)}` },
-    { title: 'Efectivo', dataIndex: 'efectivo', key: 'efectivo', render: (val) => `$${val.toFixed(2)}` },
-    { title: 'Tarjeta', dataIndex: 'tarjeta', key: 'tarjeta', render: (val) => `$${val.toFixed(2)}` },
-    { title: 'Yappy', dataIndex: 'yappy', key: 'yappy', render: (val) => `$${val.toFixed(2)}` },
-    {
-      title: 'Total Cierre',
-      dataIndex: 'total_cierre',
-      key: 'total_cierre',
-      render: (val) => val > 0 ? `$${val.toFixed(2)}` : <span style={{ color: '#999' }}>No cerrado</span>
-    },
+    { title: 'Fecha', dataIndex: 'dia', key: 'dia' },
+    { title: 'Total Ventas', dataIndex: 'total_ventas', key: 'total_ventas', render: (val) => `$${Number(val || 0).toFixed(2)}` },
   ];
 
   const cargarDatos = async () => {
@@ -66,7 +57,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="responsive-container">
+    <div className="responsive-container" style={{ padding: '20px' }}>
       <Title
         level={1}
         style={{
@@ -80,33 +71,62 @@ function Dashboard() {
         {selectedStoreId === "global" ? "Resumen General del Negocio" : `Panel: ${datos.nombre_sucursal || "Sucursal"}`}
       </Title>
 
-      <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
-        <Col xs={24} sm={12} md={6}>
-          <CardInfo title="Ventas Totales" value={datos.total_ventas} />
+      <div style={{ marginBottom: '20px' }}>
+        <Title level={3} style={{ marginBottom: '20px' }}>Métricas del Mes Actual</Title>
+        <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
+          <Col xs={24} sm={12} md={8} lg={4}>
+            <CardInfo title="Ventas Mes" value={datos.mes_actual.ventas} />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={4}>
+            <CardInfo title="Gastos Op." value={datos.mes_actual.gastos_operativos} />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={4}>
+            <CardInfo title="Inversiones" value={datos.mes_actual.inversiones} />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={4}>
+            <CardInfo title="Mermas" value={datos.mes_actual.mermas} color="#ff4d4f" />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={4}>
+            <CardInfo title="Inyecciones" value={datos.mes_actual.inyecciones} color="#52c41a" />
+          </Col>
+          <Col xs={24} sm={12} md={8} lg={4}>
+            <CardInfo title="Ganancia Neta" value={datos.mes_actual.ganancia_neta} color="#1890ff" />
+          </Col>
+        </Row>
+      </div>
+
+      <Row gutter={[24, 24]}>
+        <Col xs={24} lg={16}>
+          <Card
+            title={<span style={{ fontSize: '1.2em', fontWeight: 600 }}>Historial de Ventas Diario (Últimos 15 días)</span>}
+            style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+          >
+            <Table
+              columns={columns}
+              dataSource={datos.historial_diario}
+              rowKey="dia"
+              pagination={{ pageSize: 7 }}
+              scroll={{ x: 'max-content' }}
+            />
+          </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <CardInfo title="Inversión / Facturas" value={datos.total_invertido} />
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <CardInfo title="Mermas (Pérdidas)" value={datos.total_merma || 0} />
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <CardInfo title="Ganancia Neta" value={datos.ganancia_bruta} />
+        <Col xs={24} lg={8}>
+          <Card
+            title={<span style={{ fontSize: '1.2em', fontWeight: 600 }}>Ventas por Mes</span>}
+            style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+          >
+            <Table
+              columns={[
+                { title: 'Mes', dataIndex: 'mes', key: 'mes' },
+                { title: 'Total', dataIndex: 'total_ventas', key: 'total_ventas', align: 'right', render: (val) => <Typography.Text strong>${Number(val || 0).toFixed(2)}</Typography.Text> }
+              ]}
+              dataSource={datos.historial_mensual}
+              rowKey="mes"
+              pagination={false}
+            />
+          </Card>
         </Col>
       </Row>
-
-      <Card
-        title={<span style={{ fontSize: '1.2em', fontWeight: 600 }}>Historial de Ventas Diario</span>}
-        style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
-      >
-        <Table
-          columns={columns}
-          dataSource={datos.historial}
-          rowKey="fecha"
-          pagination={{ pageSize: 7 }}
-          scroll={{ x: 'max-content' }}
-        />
-      </Card>
     </div>
   );
 }

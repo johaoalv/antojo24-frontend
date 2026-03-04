@@ -8,7 +8,8 @@ import {
   FileTextOutlined,
   MenuOutlined,
   ExperimentOutlined,
-  PieChartOutlined
+  PieChartOutlined,
+  PlusOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -59,9 +60,14 @@ const AdminLayoutContent = () => {
       label: <span style={{ fontSize: '1.3em' }}>Ventas</span>,
     },
     {
-      key: "inversiones",
+      key: "gastos",
       icon: <FileTextOutlined style={{ fontSize: '1.5em' }} />,
-      label: <span style={{ fontSize: '1.3em' }}>Inversiones</span>,
+      label: <span style={{ fontSize: '1.3em' }}>Gastos</span>,
+    },
+    {
+      key: "inyecciones",
+      icon: <PlusOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Inyecciones</span>,
     },
     {
       key: "insumos",

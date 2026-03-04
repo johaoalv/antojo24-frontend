@@ -3,7 +3,7 @@ import { Table, Card, Typography, Space, Divider, Tag, Button, Modal, Form, Sele
 import { BookOutlined, PlusOutlined, DeleteOutlined, ExperimentOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Option } = Select;
 
 const ConfiguradorRecetas = () => {
@@ -169,7 +169,7 @@ const ConfiguradorRecetas = () => {
                         }}
                         style={{ width: 100 }}
                     />
-                    <Text type="secondary">{record.unidad_medida}</Text>
+                    <Typography.Text type="secondary">{record.unidad_medida}</Typography.Text>
                 </Space>
             )
         },
@@ -199,7 +199,7 @@ const ConfiguradorRecetas = () => {
             render: (val, record) => (
                 <Space>
                     <Tag color="blue" style={{ fontSize: '1.1em', padding: '4px 12px' }}>{parseFloat(val)}</Tag>
-                    <Text type="secondary">{record.unidad_medida}</Text>
+                    <Typography.Text type="secondary">{record.unidad_medida}</Typography.Text>
                 </Space>
             )
         },
@@ -290,7 +290,7 @@ const ConfiguradorRecetas = () => {
             <Row justify="space-between" align="middle">
                 <Col>
                     <Title level={2}><BookOutlined /> Configurador de Recetas</Title>
-                    <Text type="secondary">Gestiona qué ingredientes lleva cada producto y cada salsa. Estos datos afectan directamente al Costeo e Inventario.</Text>
+                    <Typography.Text type="secondary">Gestiona qué ingredientes lleva cada producto y cada salsa. Estos datos afectan directamente al Costeo e Inventario.</Typography.Text>
                 </Col>
                 <Col>
                     <Button
@@ -364,8 +364,8 @@ const ConfiguradorRecetas = () => {
                                             onClick={() => fetchDetalleComposicion(salsa.id)}
                                         >
                                             <Space direction="vertical" size={0}>
-                                                <Text strong style={{ textTransform: 'capitalize', fontSize: '1.1em' }}>{salsa.nombre}</Text>
-                                                <Text type="secondary">Stock: {parseFloat(salsa.stock)} {salsa.unidad_medida}</Text>
+                                                <Typography.Text strong style={{ textTransform: 'capitalize', fontSize: '1.1em' }}>{salsa.nombre}</Typography.Text>
+                                                <Typography.Text type="secondary">Stock: {parseFloat(salsa.stock)} {salsa.unidad_medida}</Typography.Text>
                                             </Space>
                                         </Card.Grid>
                                     ))}
@@ -407,9 +407,9 @@ const ConfiguradorRecetas = () => {
                                     <Card className="card-shadow" style={{ textAlign: 'center', padding: 40 }}>
                                         <ExperimentOutlined style={{ fontSize: 48, color: '#bfbfbf' }} />
                                         <br /><br />
-                                        <Text type="secondary" style={{ fontSize: '1.2em' }}>
+                                        <Typography.Text type="secondary" style={{ fontSize: '1.2em' }}>
                                             Selecciona una salsa de la lista para ver y editar su composición
-                                        </Text>
+                                        </Typography.Text>
                                     </Card>
                                 )}
                             </Col>
