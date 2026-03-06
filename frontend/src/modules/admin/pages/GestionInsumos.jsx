@@ -1,6 +1,9 @@
 
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Space, Typography, Card, Tag, Select } from "antd";
+import {
+    Table, Button, Modal, Form, Input, InputNumber, Space, Typography,
+    Card, Tag, Select, Alert
+} from "antd";
 import { EditOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { notifySuccess, notifyError } from "../../common/components/notifications";
@@ -14,6 +17,8 @@ const GestionInsumos = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [editingInsumo, setEditingInsumo] = useState(null);
     const [form] = Form.useForm();
+    const porcionEstandar = Form.useWatch('porcion_estandar', form);
+    const unidadMedida = Form.useWatch('unidad_medida', form);
     const { selectedStoreId, stores } = useStore();
 
     const fetchInsumos = async () => {
@@ -33,13 +38,36 @@ const GestionInsumos = () => {
         fetchInsumos();
     }, [selectedStoreId]);
 
-    const handleValuesChange = (_, allValues) => {
-        const { stock, costo_total } = allValues;
-        if (stock && costo_total) {
-            const calculatedCostoUnidad = (costo_total / stock).toFixed(4); // Aumentado a 4 decimales
-            form.setFieldsValue({ costo_unidad: parseFloat(calculatedCostoUnidad) });
-        } else {
-            form.setFieldsValue({ costo_unidad: 0 });
+    const handleValuesChange = (changedValues, allValues) => {
+        const { stock, costo_total, costo_unidad, porcion_estandar } = allValues;
+        const perPortion = porcion_estandar > 0;
+
+        // Si cambió el stock, la porción o el costo, actualizamos el total
+        if (changedValues.hasOwnProperty('stock') || changedValues.hasOwnProperty('costo_unidad') || changedValues.hasOwnProperty('porcion_estandar')) {
+            if (stock !== undefined && costo_unidad !== undefined) {
+                // Si hay porción, el costo_unidad en el form representa el costo por porción
+                if (perPortion && porcion_estandar > 0) {
+                    const numPortions = stock / porcion_estandar;
+                    const calculatedTotal = (numPortions * costo_unidad).toFixed(2);
+                    form.setFieldsValue({ costo_total: parseFloat(calculatedTotal) });
+                } else {
+                    const calculatedTotal = (stock * costo_unidad).toFixed(2);
+                    form.setFieldsValue({ costo_total: parseFloat(calculatedTotal) });
+                }
+            }
+        }
+        // Si el usuario edita el total de compra directamente, recalculamos el costo (unidad o porción)
+        else if (changedValues.hasOwnProperty('costo_total')) {
+            if (stock && stock > 0 && costo_total !== undefined) {
+                if (perPortion && porcion_estandar > 0) {
+                    const numPortions = stock / porcion_estandar;
+                    const calculatedPortionCost = (costo_total / numPortions).toFixed(4);
+                    form.setFieldsValue({ costo_unidad: parseFloat(calculatedPortionCost) });
+                } else {
+                    const calculatedUnidad = (costo_total / stock).toFixed(4);
+                    form.setFieldsValue({ costo_unidad: parseFloat(calculatedUnidad) });
+                }
+            }
         }
     };
 
@@ -52,9 +80,21 @@ const GestionInsumos = () => {
 
     const handleEdit = (record) => {
         setEditingInsumo(record);
-        // Calculamos un costo total aproximado para que el usuario pueda editar desde ahí
-        const costo_total = record.stock * record.costo_unidad;
-        form.setFieldsValue({ ...record, costo_total: parseFloat(costo_total.toFixed(2)) });
+        const stock = parseFloat(record.stock || 0);
+        const dbCosto = parseFloat(record.costo_unidad || 0);
+        const porcion = parseFloat(record.porcion_estandar || 0);
+
+        let displayCosto = dbCosto;
+        if (porcion > 0) {
+            displayCosto = dbCosto * porcion;
+        }
+
+        const costo_total = stock * dbCosto;
+        form.setFieldsValue({
+            ...record,
+            costo_unidad: parseFloat(displayCosto.toFixed(4)),
+            costo_total: parseFloat(costo_total.toFixed(2))
+        });
         setModalVisible(true);
     };
 
@@ -71,8 +111,13 @@ const GestionInsumos = () => {
     const handleSave = async () => {
         try {
             const values = await form.validateFields();
-            // Eliminamos costo_total antes de enviar al backend ya que no existe en la tabla
             const { costo_total, ...dataToSave } = values;
+
+            // Si hay porción estándar, convertimos el "costo por porción" del form 
+            // al "costo por gramo/ml" que espera el backend
+            if (dataToSave.porcion_estandar > 0) {
+                dataToSave.costo_unidad = dataToSave.costo_unidad / dataToSave.porcion_estandar;
+            }
 
             if (editingInsumo) {
                 await axiosInstance.put(`/insumos/${editingInsumo.id}`, dataToSave);
@@ -105,17 +150,37 @@ const GestionInsumos = () => {
             title: "Stock Actual",
             dataIndex: "stock",
             key: "stock",
-            render: (stock) => (
-                <Tag color={stock < 10 ? "red" : stock < 25 ? "orange" : "green"} style={{ fontSize: '1.2em', padding: '5px 10px' }}>
-                    {stock}
-                </Tag>
+            render: (stock, record) => (
+                <Space direction="vertical" size={0}>
+                    <Tag color={stock < 10 ? "red" : stock < 25 ? "orange" : "green"} style={{ fontSize: '1.2em', padding: '5px 10px' }}>
+                        {record.porcion_estandar && record.porcion_estandar > 0
+                            ? `${Math.floor(stock / record.porcion_estandar)} unid.`
+                            : `${stock} ${record.unidad_medida}`}
+                    </Tag>
+                    {record.porcion_estandar && record.porcion_estandar > 0 && (
+                        <Typography.Text type="secondary" style={{ fontSize: '0.85em' }}>
+                            ({stock} {record.unidad_medida})
+                        </Typography.Text>
+                    )}
+                </Space>
             ),
         },
         {
-            title: "Costo x Unidad",
+            title: "Costo por Medida",
             dataIndex: "costo_unidad",
             key: "costo_unidad",
-            render: (costo) => `$${parseFloat(costo).toFixed(4)}`, // Aumentado a 4 decimales
+            render: (costo, record) => {
+                const c = parseFloat(costo);
+                if (record.porcion_estandar > 0) {
+                    return (
+                        <Space direction="vertical" size={0}>
+                            <Typography.Text strong>${(c * record.porcion_estandar).toFixed(2)} / porción</Typography.Text>
+                            <Typography.Text type="secondary" style={{ fontSize: '0.85em' }}>($${c.toFixed(4)} / {record.unidad_medida})</Typography.Text>
+                        </Space>
+                    );
+                }
+                return `$${c.toFixed(4)}`;
+            }
         },
         {
             title: "Medida",
@@ -181,18 +246,35 @@ const GestionInsumos = () => {
                         </Form.Item>
                     </div>
 
-                    <Form.Item name="costo_unidad" label="Costo por Unidad calculado ($)" rules={[{ required: true }]}>
+                    <Form.Item
+                        name="costo_unidad"
+                        label={porcionEstandar > 0 ? "Costo por Porción ($)" : "Costo por Unidad de Medida ($)"}
+                        rules={[{ required: true }]}
+                    >
                         <InputNumber
-                            style={{ width: "100%", backgroundColor: '#f5f5f5' }}
-                            readOnly
+                            style={{ width: "100%" }}
                             prefix="$"
                             precision={4}
+                            placeholder={porcionEstandar > 0 ? "Costo de una ración" : "Costo de 1g/1ml/1u"}
                         />
                     </Form.Item>
 
-                    <Form.Item name="unidad_medida" label="Unidad de Medida" rules={[{ required: true }]}>
-                        <Input placeholder="Ej: unidad, kg, litro" />
-                    </Form.Item>
+                    <div style={{ display: 'flex', gap: '20px' }}>
+                        <Form.Item name="unidad_medida" label="U. Medida (g, ml, unid)" rules={[{ required: true }]} style={{ flex: 1 }}>
+                            <Input placeholder="Ej: g" />
+                        </Form.Item>
+                        <Form.Item name="porcion_estandar" label="Porción Estándar (opcional)" style={{ flex: 1 }}>
+                            <InputNumber style={{ width: "100%" }} min={0} placeholder="Ej: 30" />
+                        </Form.Item>
+                    </div>
+                    {porcionEstandar > 0 && (
+                        <Alert
+                            type="info"
+                            showIcon
+                            message={`Se mostrará el stock en unidades de ${porcionEstandar} ${unidadMedida || ''}`}
+                            style={{ marginBottom: 20 }}
+                        />
+                    )}
 
                     <Form.Item name="sucursal_id" label="Sucursal" rules={[{ required: true }]}>
                         <Select placeholder="Selecciona una sucursal">

@@ -9,7 +9,7 @@ const { Title } = Typography;
 const CosteoProductos = () => {
     const [costeos, setCosteos] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [targetMargin, setTargetMargin] = useState(60); // 60% margen por defecto
+    const [targetMargin, setTargetMargin] = useState(60);
 
     const fetchCosteos = async () => {
         setLoading(true);
@@ -39,6 +39,24 @@ const CosteoProductos = () => {
             dataIndex: 'costo_total',
             key: 'costo_total',
             render: (val) => <Tag color="blue" style={{ fontSize: '1.1em' }}>${Number(val || 0).toFixed(2)}</Tag>
+        },
+        {
+            title: 'Disp. Venta (unid)',
+            key: 'disponibilidad',
+            render: (_, record) => {
+                // Cálculo de inteligencia: ¿Cuántas unidades podemos vender según el ingrediente limitante?
+                const disponibilidad = record.ingredientes.map(ing => {
+                    const req = parseFloat(ing.cantidad);
+                    const stock = parseFloat(ing.stock || 0);
+                    return req > 0 ? Math.floor(stock / req) : Infinity;
+                });
+                const minDisp = Math.min(...disponibilidad);
+                return (
+                    <Tag color={minDisp <= 5 ? 'red' : minDisp <= 15 ? 'orange' : 'green'} style={{ fontSize: '1.2em' }}>
+                        {minDisp === Infinity ? '?' : minDisp} unid.
+                    </Tag>
+                );
+            }
         },
         {
             title: `Precio Sugerido (${targetMargin}% Margen)`,
