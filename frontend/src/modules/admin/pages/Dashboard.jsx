@@ -78,7 +78,7 @@ function Dashboard() {
             <CardInfo title="Ventas Mes" value={datos.mes_actual.ventas} />
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Gastos Op." value={datos.mes_actual.gastos_operativos} />
+            <CardInfo title="Gastos" value={datos.mes_actual.gastos_operativos} />
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>
             <CardInfo title="Inversiones" value={datos.mes_actual.inversiones} />
@@ -90,7 +90,7 @@ function Dashboard() {
             <CardInfo title="Inyecciones" value={datos.mes_actual.inyecciones} color="#52c41a" />
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Ganancia Neta" value={datos.mes_actual.ganancia_neta} color="#1890ff" />
+            <CardInfo title="Ganancia" value={datos.mes_actual.ganancia_neta} color="#1890ff" />
           </Col>
         </Row>
       </div>
