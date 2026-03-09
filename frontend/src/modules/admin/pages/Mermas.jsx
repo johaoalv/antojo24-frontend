@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Space, Divider, Tag, Button, Modal, Form, Select, InputNumber, Input, Row, Col, Statistic, message } from "antd";
-import { WarningOutlined, PlusOutlined, DollarOutlined, FireOutlined, DropboxOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Space, Divider, Tag, Button, Modal, Form, Select, InputNumber, Input, Row, Col, Statistic, message, Popconfirm } from "antd";
+import { WarningOutlined, PlusOutlined, DollarOutlined, FireOutlined, DropboxOutlined, DeleteOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { useStore } from "../../../context/StoreContext";
 
@@ -66,6 +66,16 @@ const Mermas = () => {
         }
     };
 
+    const handleDelete = async (id) => {
+        try {
+            await axiosInstance.delete(`/mermas/${id}`);
+            message.success("Merma eliminada y stock restaurado");
+            fetchData();
+        } catch (error) {
+            message.error(error.response?.data?.error || "Error al eliminar merma");
+        }
+    };
+
     const totalPerdido = resumen.reduce((acc, r) => acc + parseFloat(r.total_perdido || 0), 0);
     const totalRegistros = resumen.reduce((acc, r) => acc + parseInt(r.total_registros || 0), 0);
 
@@ -109,6 +119,22 @@ const Mermas = () => {
             dataIndex: "fecha",
             key: "fecha",
             render: (fecha) => new Date(fecha).toLocaleDateString("es-VE", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+        },
+        {
+            title: "Acciones",
+            key: "acciones",
+            render: (_, record) => (
+                <Popconfirm
+                    title="¿Eliminar esta merma?"
+                    description="El stock descontado será devuelto al insumo."
+                    onConfirm={() => handleDelete(record.id)}
+                    okText="Sí, eliminar"
+                    cancelText="Cancelar"
+                    okButtonProps={{ danger: true }}
+                >
+                    <Button type="text" danger icon={<DeleteOutlined />} />
+                </Popconfirm>
+            )
         }
     ];
 
