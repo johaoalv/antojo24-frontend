@@ -13,7 +13,9 @@ const CardInfo = ({ title, value }) => {
     >
       <p style={{ color: "#666", fontSize: "1.2em", marginBottom: "10px" }}>{title}</p>
       <h2 style={{ fontSize: "36px", fontWeight: "bold" }}>
-        {typeof value === "number" ? `$${value.toFixed(2)}` : value}
+        {typeof value === "number" && !isNaN(value) 
+          ? `$${value.toFixed(2)}` 
+          : (value !== null && value !== undefined && !isNaN(Number(value)) ? `$${Number(value).toFixed(2)}` : "$0.00")}
       </h2>
     </Card>
   );
