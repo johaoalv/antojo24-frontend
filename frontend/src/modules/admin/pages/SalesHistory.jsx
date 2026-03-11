@@ -41,7 +41,8 @@ function SalesHistory() {
                     detalles: []
                 };
             }
-            meses[mesKey].total_ventas += dia.total_ventas;
+            const v = Number(dia.total_ventas);
+            meses[mesKey].total_ventas += isNaN(v) ? 0 : v;
             meses[mesKey].detalles.push({
                 ...dia,
                 key: dia.dia
