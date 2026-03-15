@@ -1,0 +1,208 @@
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Switch,
+  Space,
+  Popconfirm,
+  Select,
+} from "antd";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { fetchProductos } from "../../../api/pos/axios_productos";
+import axiosInstance from "../../../api/core/axios_base";
+import { notifySuccess, notifyError } from "../../common/components/notifications";
+
+const GestionProductos = () => {
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [editingId, setEditingId] = useState(null);
+  const [isCombo, setIsCombo] = useState(false);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchProductos();
+      setProductos(Array.isArray(data) ? data : []);
+    } catch (error) {
+      notifyError({ message: "Error al cargar productos" });
+      setProductos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleAdd = () => {
+    setEditingId(null);
+    form.resetFields();
+    setIsCombo(false);
+    setIsModalVisible(true);
+  };
+
+  const handleEdit = (record) => {
+    setEditingId(record.id);
+    setIsCombo(record.es_combo);
+    
+    let combo_items = [];
+    if (record.combo_items) {
+      if (typeof record.combo_items === "string") {
+        try { combo_items = JSON.parse(record.combo_items); } catch(e){}
+      } else {
+        combo_items = record.combo_items;
+      }
+    }
+    
+    form.setFieldsValue({
+      nombre: record.nombre,
+      precio: record.precio,
+      imagen: record.imagen,
+      es_combo: record.es_combo,
+      combo_items: combo_items,
+    });
+    setIsModalVisible(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosInstance.delete(`/productos/${id}`);
+      notifySuccess({ message: "Producto eliminado" });
+      loadData();
+    } catch (error) {
+      notifyError({ message: "Error al eliminar producto" });
+    }
+  };
+
+  const handleSave = async (values) => {
+    try {
+      const payload = {
+        ...values,
+        combo_items: values.es_combo ? (values.combo_items || []) : []
+      };
+
+      if (editingId) {
+        await axiosInstance.put(`/productos/${editingId}`, payload);
+        notifySuccess({ message: "Producto actualizado" });
+      } else {
+        await axiosInstance.post(`/productos/`, payload);
+        notifySuccess({ message: "Producto creado" });
+      }
+      setIsModalVisible(false);
+      loadData();
+    } catch (error) {
+      notifyError({ message: "Error al guardar producto" });
+    }
+  };
+
+  const columns = [
+    { title: "ID", dataIndex: "id", key: "id", width: 50 },
+    {
+      title: "Imagen",
+      dataIndex: "imagen",
+      key: "imagen",
+      width: 100,
+      render: (img) =>
+        img ? <img src={img} alt="prod" style={{ width: 50, height: 50, objectFit: "cover" }} /> : "N/A",
+    },
+    { title: "Nombre", dataIndex: "nombre", key: "nombre" },
+    {
+      title: "Precio",
+      dataIndex: "precio",
+      key: "precio",
+      render: (val) => `$${Number(val).toFixed(2)}`,
+    },
+    {
+      title: "Tipo",
+      dataIndex: "es_combo",
+      key: "es_combo",
+      render: (isCombo) => (isCombo ? "Combo / Caja" : "Producto Individual"),
+    },
+    {
+      title: "Acciones",
+      key: "acciones",
+      render: (_, record) => (
+        <Space>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Popconfirm title="¿Eliminar producto?" onConfirm={() => handleDelete(record.id)}>
+            <Button danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{ padding: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+        <h2>Gestión de Productos y Combos</h2>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+          Nuevo Producto
+        </Button>
+      </div>
+
+      <Table
+        dataSource={productos}
+        columns={columns}
+        rowKey="id"
+        loading={loading}
+        pagination={{ pageSize: 10 }}
+      />
+
+      <Modal
+        title={editingId ? "Editar Producto" : "Nuevo Producto"}
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical" onFinish={handleSave} initialValues={{ es_combo: false }}>
+          <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          
+          <Form.Item name="precio" label="Precio Final" rules={[{ required: true }]}>
+            <InputNumber style={{ width: "100%" }} min={0} step={0.01} precision={2} />
+          </Form.Item>
+
+          <Form.Item name="imagen" label="Ruta de Imagen (ej. /assets/soda.png)">
+            <Input />
+          </Form.Item>
+
+          <Form.Item name="es_combo" label="¿Es un Combo o Caja?" valuePropName="checked">
+            <Switch onChange={setIsCombo} />
+          </Form.Item>
+
+          {isCombo && (
+            <Form.Item name="combo_items" label="Productos que incluye">
+              <Select
+                mode="multiple"
+                placeholder="Seleccione los productos"
+                options={productos.filter(p => !p.es_combo).map(p => ({
+                  label: p.nombre,
+                  value: p.id
+                }))}
+              />
+            </Form.Item>
+          )}
+
+          <div style={{ textAlign: "right", marginTop: 24 }}>
+            <Space>
+              <Button onClick={() => setIsModalVisible(false)}>Cancelar</Button>
+              <Button type="primary" htmlType="submit">Guardar</Button>
+            </Space>
+          </div>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default GestionProductos;

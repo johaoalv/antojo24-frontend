@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Typography, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
-import productosData from "../../../api/productos.json";
 import ProductsGrid from "../components/ProductsGrid";
 import Cart from "../components/Cart";
 import CashModal from "../components/CashModal";
@@ -17,10 +16,33 @@ const { Text } = Typography;
 
 const Index = () => {
   const navigate = useNavigate();
-  const priceMap = useMemo(() => buildPriceMap(productosData), []);
+  const [productosData, setProductosData] = useState([]);
+  const [loadingProductos, setLoadingProductos] = useState(true);
+
+  useEffect(() => {
+    const loadProductos = async () => {
+      try {
+        const { fetchProductos } = await import("../../../api/pos/axios_productos");
+        const data = await fetchProductos();
+        if (Array.isArray(data)) {
+          setProductosData(data);
+        } else {
+          console.error("La respuesta de productos no es un arreglo válido", data);
+          setProductosData([]);
+        }
+      } catch (error) {
+        console.error("Error cargando productos", error);
+      } finally {
+        setLoadingProductos(false);
+      }
+    };
+    loadProductos();
+  }, []);
+
+  const priceMap = useMemo(() => buildPriceMap(productosData), [productosData]);
   const buscarProducto = useMemo(
     () => createProductoFinder(productosData),
-    []
+    [productosData]
   );
 
   const {
@@ -66,6 +88,7 @@ const Index = () => {
             <ProductsGrid
               productos={productosData}
               onAddProduct={agregarAlPedido}
+              loading={loadingProductos}
             />
           </Col>
           <Col xs={24} lg={10} xl={8}>
