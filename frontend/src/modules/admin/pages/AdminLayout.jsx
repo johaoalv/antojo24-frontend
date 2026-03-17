@@ -75,6 +75,11 @@ const AdminLayoutContent = () => {
       label: <span style={{ fontSize: '1.3em' }}>Insumos</span>,
     },
     {
+      key: "productos",
+      icon: <FileTextOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Productos y Cajas</span>,
+    },
+    {
       key: "produccion",
       icon: <ExperimentOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Producción</span>,

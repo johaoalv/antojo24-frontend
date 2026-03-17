@@ -81,9 +81,6 @@ function Dashboard() {
             <CardInfo title="Gastos" value={datos.mes_actual.gastos_operativos} />
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Inversiones" value={datos.mes_actual.inversiones} />
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={4}>
             <CardInfo title="Mermas" value={datos.mes_actual.mermas} color="#ff4d4f" />
           </Col>
           <Col xs={24} sm={12} md={8} lg={4}>

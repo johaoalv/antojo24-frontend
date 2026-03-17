@@ -13,8 +13,9 @@ import Gastos from "../modules/admin/pages/Gastos";
 import Inyecciones from "../modules/admin/pages/Inyecciones";
 import ProduccionSalsas from "../modules/admin/pages/ProduccionSalsas";
 import CosteoProductos from "../modules/admin/pages/CosteoProductos";
-import ConfiguradorRecetas from "../modules/admin/pages/ConfiguradorRecetas";
+import ConfigurarRecetas from "../modules/admin/pages/ConfiguradorRecetas";
 import Mermas from "../modules/admin/pages/Mermas";
+import GestionProductos from "../modules/admin/pages/GestionProductos";
 
 const AppRouter = () => {
   // ...
@@ -35,9 +36,10 @@ const AppRouter = () => {
             <Route path="inyecciones" element={<Inyecciones />} />
             <Route path="produccion" element={<ProduccionSalsas />} />
             <Route path="costeo" element={<CosteoProductos />} />
-            <Route path="recetas" element={<ConfiguradorRecetas />} />
+            <Route path="recetas" element={<ConfigurarRecetas />} />
             <Route path="mermas" element={<Mermas />} />
             <Route path="insumos" element={<GestionInsumos />} />
+            <Route path="productos" element={<GestionProductos />} />
           </Route>
         </Route>
       </Routes>
