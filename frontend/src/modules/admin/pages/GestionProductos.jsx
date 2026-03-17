@@ -181,16 +181,46 @@ const GestionProductos = () => {
           </Form.Item>
 
           {isCombo && (
-            <Form.Item name="combo_items" label="Productos que incluye">
-              <Select
-                mode="multiple"
-                placeholder="Seleccione los productos"
-                options={productos.filter(p => !p.es_combo).map(p => ({
-                  label: p.nombre,
-                  value: p.id
-                }))}
-              />
-            </Form.Item>
+            <Form.List name="combo_items">
+              {(fields, { add, remove }) => (
+                <div style={{ padding: 10, border: '1px dashed #d9d9d9', borderRadius: 8, marginBottom: 24 }}>
+                  <div style={{ marginBottom: 16, fontWeight: 'bold' }}>Productos que conforman esta caja:</div>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+                      <Form.Item
+                        {...restField}
+                        name={[name, "id"]}
+                        rules={[{ required: true, message: "Falta producto" }]}
+                        style={{ margin: 0 }}
+                      >
+                        <Select
+                          placeholder="Seleccionar producto"
+                          style={{ width: 220 }}
+                          options={productos.filter(p => !p.es_combo).map(p => ({
+                            label: p.nombre,
+                            value: p.id
+                          }))}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, "cantidad"]}
+                        rules={[{ required: true, message: "Falta cantidad" }]}
+                        style={{ margin: 0 }}
+                      >
+                        <InputNumber placeholder="Cantidad" min={1} />
+                      </Form.Item>
+                      <Button onClick={() => remove(name)} icon={<DeleteOutlined />} danger type="text" />
+                    </Space>
+                  ))}
+                  <Form.Item style={{ margin: 0, marginTop: 10 }}>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                      Añadir Producto a la Caja
+                    </Button>
+                  </Form.Item>
+                </div>
+              )}
+            </Form.List>
           )}
 
           <div style={{ textAlign: "right", marginTop: 24 }}>
