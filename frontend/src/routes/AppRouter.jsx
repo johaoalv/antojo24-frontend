@@ -10,6 +10,7 @@ import Dashboard from "../modules/admin/pages/Dashboard";
 import GestionInsumos from "../modules/admin/pages/GestionInsumos";
 import SalesHistory from "../modules/admin/pages/SalesHistory";
 import Gastos from "../modules/admin/pages/Gastos";
+import Finanzas from "../modules/admin/pages/Finanzas";
 import Inyecciones from "../modules/admin/pages/Inyecciones";
 import ProduccionSalsas from "../modules/admin/pages/ProduccionSalsas";
 import CosteoProductos from "../modules/admin/pages/CosteoProductos";
@@ -33,6 +34,7 @@ const AppRouter = () => {
             <Route path="inicio" element={<Dashboard />} />
             <Route path="ventas" element={<SalesHistory />} />
             <Route path="gastos" element={<Gastos />} />
+            <Route path="finanzas" element={<Finanzas />} />
             <Route path="inyecciones" element={<Inyecciones />} />
             <Route path="produccion" element={<ProduccionSalsas />} />
             <Route path="costeo" element={<CosteoProductos />} />

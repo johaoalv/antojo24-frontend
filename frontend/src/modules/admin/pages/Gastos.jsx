@@ -7,10 +7,11 @@ import { useStore } from "../../../context/StoreContext";
 const { Title } = Typography;
 
 const CATEGORIAS_GASTO = [
-    { label: "Operativo (Luz, Agua, etc.)", value: "operativo" },
+    { label: "Operativo (Luz, Agua, internet)", value: "operativo" },
+    { label: "Inventario (Compra de Insumos/Materia Prima)", value: "inventario" },
     { label: "Personal (Salarios, Bonos)", value: "personal" },
-    { label: "Publicidad / Marketing", value: "publicidad" },
     { label: "Inversión (Equipos, Mobiliario)", value: "inversion" },
+    { label: "Publicidad / Marketing", value: "publicidad" },
     { label: "Otro", value: "otro" },
 ];
 
@@ -68,6 +69,7 @@ function Gastos() {
             render: (cat) => {
                 const colors = {
                     operativo: 'blue',
+                    inventario: 'green',
                     personal: 'orange',
                     publicidad: 'magenta',
                     inversion: 'purple',
