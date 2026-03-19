@@ -9,7 +9,8 @@ import {
   MenuOutlined,
   ExperimentOutlined,
   PieChartOutlined,
-  PlusOutlined
+  PlusOutlined,
+  WalletOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -65,9 +66,9 @@ const AdminLayoutContent = () => {
       label: <span style={{ fontSize: '1.3em' }}>Gastos</span>,
     },
     {
-      key: "inyecciones",
-      icon: <PlusOutlined style={{ fontSize: '1.5em' }} />,
-      label: <span style={{ fontSize: '1.3em' }}>Inyecciones</span>,
+      key: "finanzas",
+      icon: <WalletOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Finanzas (Caja)</span>,
     },
     {
       key: "insumos",

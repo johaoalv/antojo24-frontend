@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Card, Typography, Table } from "antd";
+import { Row, Col, Card, Typography, Table, Statistic, Space } from "antd";
 import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
 import CardInfo from "../components/Cards";
 import { io } from "socket.io-client";
 import { useStore } from "../../../context/StoreContext";
+import { ShoppingOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
@@ -56,43 +57,83 @@ function Dashboard() {
     );
   }
 
-  return (
-    <div className="responsive-container" style={{ padding: '20px' }}>
-      <Title
-        level={1}
-        style={{
-          textAlign: 'center',
-          marginBottom: '40px',
-          color: '#1a1a1a',
-          fontSize: 'clamp(1.5em, 5vw, 2.5em)',
-          fontWeight: 800
-        }}
-      >
-        {selectedStoreId === "global" ? "Resumen General del Negocio" : `Panel: ${datos.nombre_sucursal || "Sucursal"}`}
-      </Title>
+    const { Title, Text } = Typography;
 
-      <div style={{ marginBottom: '20px' }}>
-        <Title level={3} style={{ marginBottom: '20px' }}>Métricas del Mes Actual</Title>
-        <Row gutter={[24, 24]} style={{ marginBottom: '40px' }}>
-          <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Ventas Mes" value={datos.mes_actual.ventas} />
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Gastos" value={datos.mes_actual.gastos_operativos} />
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Mermas" value={datos.mes_actual.mermas} color="#ff4d4f" />
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Inyecciones" value={datos.mes_actual.inyecciones} color="#52c41a" />
-          </Col>
-          <Col xs={24} sm={12} md={8} lg={4}>
-            <CardInfo title="Ganancia" value={datos.mes_actual.ganancia_neta} color="#1890ff" />
-          </Col>
-        </Row>
-      </div>
+    return (
+        <div style={{ padding: '30px' }}>
+            <div style={{ marginBottom: '30px' }}>
+                <Title level={2} style={{ margin: 0 }}>Dashboard - {datos.nombre_sucursal}</Title>
+            </div>
 
-      <Row gutter={[24, 24]}>
+            {/* SECCIÓN 1: SALDO TOTAL (PLATA REAL ACUMULADA) */}
+            <div style={{ marginBottom: '40px' }}>
+                <Title level={3} style={{ marginBottom: '20px', color: '#001529' }}>Estado General de Caja (Acumulado)</Title>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} md={12}>
+                        <Card 
+                            style={{ 
+                                borderRadius: '15px', 
+                                background: 'linear-gradient(135deg, #722ed1 0%, #391085 100%)',
+                                color: 'white',
+                                boxShadow: '0 4px 20px rgba(114, 46, 209, 0.3)'
+                            }}
+                            bordered={false}
+                        >
+                            <Statistic 
+                                title={<Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Plata Real en Mano (Total)</Text>}
+                                value={datos.mes_actual.saldo_caja}
+                                precision={2}
+                                prefix="$"
+                                valueStyle={{ color: 'white', fontSize: '2.5em', fontWeight: 'bold' }}
+                            />
+                            <Text style={{ color: 'rgba(255,255,255,0.65)' }}>
+                                Todo el efectivo histórico acumulado (Entradas - Salidas)
+                            </Text>
+                        </Card>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Card style={{ borderRadius: '15px', height: '100%', display: 'flex', alignItems: 'center' }} bordered={false}>
+                            <div>
+                                <Text strong style={{ fontSize: '1.1em' }}>¿Qué significa este número?</Text>
+                                <p style={{ margin: 0, color: '#666' }}>Es el fondo total de tu negocio. Si abres el cajón y cuentas cada moneda, el total debería ser este monto. Incluye tus ventas y tus aportes propios, menos todo lo que has gastado.</p>
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+
+            {/* SECCIÓN 2: MÉTRICAS DEL MES */}
+            <div style={{ marginBottom: '40px' }}>
+                <Title level={3} style={{ marginBottom: '20px' }}>Rendimiento del Mes Actual</Title>
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Ventas del Mes" value={datos.mes_actual.ventas} icon={<ShoppingOutlined />} />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Utilidad neta (Mes)" value={datos.mes_actual.ganancia_neta} color="#52c41a" info="Rentabilidad operativa real de este mes" />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Costo Insumos" value={datos.mes_actual.cogs} color="#fa8c16" info="Lo que costó la materia prima de las ventas del mes" />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Gastos Operativos" value={datos.mes_actual.gastos_operativos} color="#1890ff" info="Luz, agua, sueldos, alquiler pagados en el mes" />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Mermas (Mes)" value={datos.mes_actual.mermas} color="#f5222d" info="Pérdida por desperdicios este mes" />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Aporte Capital (Mes)" value={datos.mes_actual.inyecciones} color="#eb2f96" info="Dinero extra que pusiste este mes" />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Compras Inventario" value={datos.mes_actual.compras_inventario} color="#13c2c2" info="Gasto en materia prima acumulada este mes" />
+                    </Col>
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <CardInfo title="Flujo Caja del Mes" value={datos.mes_actual.saldo_caja_mes} color="#d48d68" info="Balance neto de dinero solo de este mes" />
+                    </Col>
+                </Row>
+            </div>
+
+            <Row gutter={[24, 24]}>
         <Col xs={24} lg={16}>
           <Card
             title={<span style={{ fontSize: '1.2em', fontWeight: 600 }}>Historial de Ventas Diario (Últimos 15 días)</span>}
