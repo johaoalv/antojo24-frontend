@@ -4,12 +4,12 @@ import ErrorPage from "../modules/common/pages/ErrorPage";
 
 const rolePermissions = {
   admin: ["/admin"],
-  tienda: ["/", "/cierre"],
+  tienda: ["/pos", "/cierre"],
 };
 
 const roleDefaults = {
   admin: "/admin",
-  tienda: "/",
+  tienda: "/pos",
 };
 
 const PrivateRoute = () => {

@@ -145,11 +145,11 @@ const LandingPage = () => {
                             <div style={{ marginTop: '30px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
                                     <EnvironmentOutlined style={{ fontSize: '24px', color: '#FFD60A', marginRight: '15px' }} />
-                                    <Text style={{ color: '#fff', fontSize: '1.1rem' }}>Plaza Santa María, Nivel 1</Text>
+                                    <Text style={{ color: '#fff', fontSize: '1.1rem' }}>Santa Maria, Betania</Text>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <PhoneOutlined style={{ fontSize: '24px', color: '#FFD60A', marginRight: '15px' }} />
-                                    <Text style={{ color: '#fff', fontSize: '1.1rem' }}>Llámanos o escribe para agilizar tu retiro</Text>
+                                    <Text style={{ color: '#fff', fontSize: '1.1rem' }}>+507 6482-9340</Text>
                                 </div>
                             </div>
                         </Col>
