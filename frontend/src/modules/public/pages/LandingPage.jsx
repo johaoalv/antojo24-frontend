@@ -47,7 +47,7 @@ const LandingPage = () => {
                             <Title style={{ color: '#fff', fontSize: 'clamp(3rem, 7vw, 5rem)', marginBottom: '16px', lineHeight: 1, fontWeight: 900, textTransform: 'uppercase' }}>
                                 Calidad <br />
                                 <span style={{
-                                    background: '#ffd666',
+                                    background: '#FFD60A',
                                     color: '#000',
                                     padding: '0 15px',
                                     display: 'inline-block',
@@ -56,14 +56,14 @@ const LandingPage = () => {
                                 }}>Irresistible.</span>
                             </Title>
                             <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.4rem', marginBottom: '40px', maxWidth: '550px', fontWeight: 300, letterSpacing: '0.5px' }}>
-                                Street food artesanal de verdad. En Antojo24 no solo matas el hambre, sacias el antojo con el mejor sabor de la ciudad.
+                                Street Food para llevar. Nuestra cocina está diseñada para que recibas el mejor sabor, recién hecho y listo para retirar. No esperes más, pide ahora.
                             </Paragraph>
                             <Space size="large" wrap>
                                 <Button
                                     type="primary"
                                     size="large"
                                     onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })}
-                                    style={{ height: '64px', padding: '0 45px', background: '#ffd666', borderColor: '#ffd666', color: '#000', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}
+                                    style={{ height: '64px', padding: '0 45px', background: '#FFD60A', borderColor: '#FFD60A', color: '#000', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}
                                 >
                                     VER MENÚ
                                 </Button>
@@ -105,8 +105,8 @@ const LandingPage = () => {
                 <div id="menu-section" style={{ padding: '100px 10%', background: '#fff', borderRadius: '40px 40px 0 0', marginTop: '-60px', zIndex: 10, position: 'relative' }}>
                     <div style={{ textAlign: 'center', marginBottom: '60px' }}>
                         <Title level={2} style={{ textTransform: 'uppercase', letterSpacing: '3px', fontWeight: 800, marginBottom: 0 }}>Nuestro Menú</Title>
-                        <div style={{ width: '80px', height: '6px', background: '#ffd666', margin: '20px auto', borderRadius: '3px' }}></div>
-                        <Title level={4} type="secondary" style={{ fontWeight: 400 }}>LO MÁS PEDIDO DE LA SEDE</Title>
+                        <div style={{ width: '80px', height: '6px', background: '#FFD60A', margin: '20px auto', borderRadius: '3px' }}></div>
+                        <Title level={4} type="secondary" style={{ fontWeight: 400 }}>LO MÁS PEDIDO - PIDE Y RETIRA</Title>
                     </div>
 
                     <Row gutter={[30, 30]}>
@@ -135,21 +135,21 @@ const LandingPage = () => {
                 </div>
 
                 {/* Final CTA / Location */}
-                <div style={{ padding: '100px 10%', background: '#000', color: '#fff', textAlign: 'center' }}>
+                <div id="ubicacion-section" style={{ padding: '100px 10%', background: '#000', color: '#fff', textAlign: 'center' }}>
                     <Row gutter={[48, 48]} align="middle">
                         <Col xs={24} md={12} style={{ textAlign: 'left' }}>
-                            <Title style={{ color: '#fff', fontWeight: 800 }}>¿QUÉ ESPERAS?</Title>
-                            <Paragraph style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.2rem' }}>
-                                Estamos listos para preparar tu orden. Pasa por nuestra sucursal y vive la experiencia Antojo.
+                            <Title style={{ color: '#fff', fontWeight: 800 }}>PIDE, RETIRA Y DISFRUTA</Title>
+                            <Paragraph id="contacto-section" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.2rem' }}>
+                                Somos una cocina especializada en despacho rápido. Haz tu pedido por WhatsApp y pasa a retirarlo en pocos minutos.
                             </Paragraph>
                             <div style={{ marginTop: '30px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                                    <EnvironmentOutlined style={{ fontSize: '24px', color: '#ffd666', marginRight: '15px' }} />
+                                    <EnvironmentOutlined style={{ fontSize: '24px', color: '#FFD60A', marginRight: '15px' }} />
                                     <Text style={{ color: '#fff', fontSize: '1.1rem' }}>Plaza Santa María, Nivel 1</Text>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <PhoneOutlined style={{ fontSize: '24px', color: '#ffd666', marginRight: '15px' }} />
-                                    <Text style={{ color: '#fff', fontSize: '1.1rem' }}>Llámanos y pide antes de llegar</Text>
+                                    <PhoneOutlined style={{ fontSize: '24px', color: '#FFD60A', marginRight: '15px' }} />
+                                    <Text style={{ color: '#fff', fontSize: '1.1rem' }}>Llámanos o escribe para agilizar tu retiro</Text>
                                 </div>
                             </div>
                         </Col>
