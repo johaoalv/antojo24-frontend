@@ -25,7 +25,7 @@ const renderLogin = () =>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/admin/inicio" element={<div>Admin Landing</div>} />
-        <Route path="/" element={<div>POS Landing</div>} />
+        <Route path="/pos" element={<div>POS Landing</div>} />
       </Routes>
     </MemoryRouter>
   );

@@ -13,7 +13,7 @@ const renderWithRoute = (initialPath) => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<PosPage />} />
+          <Route path="/pos" element={<PosPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/admin/inicio" element={<AdminPage />} />
         </Route>
@@ -45,19 +45,19 @@ describe('PrivateRoute role restrictions', () => {
     localStorage.setItem('app_token', 'token');
     localStorage.setItem('user_role', 'admin');
 
-    renderWithRoute('/');
+    renderWithRoute('/pos');
 
-    // El admin no tiene permiso para "/", debería ser redirigido a "/admin"
+    // El admin no tiene permiso para "/pos", debería ser redirigido a "/admin"
     expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
   });
 
-  it('redirige a un usuario tienda a la raíz si intenta entrar a admin', () => {
+  it('redirige a un usuario tienda a su página por defecto (/pos) si intenta entrar a admin', () => {
     localStorage.setItem('app_token', 'token');
     localStorage.setItem('user_role', 'tienda');
 
     renderWithRoute('/admin/inicio');
 
-    // Debería ser redirigido a "/"
+    // Debería ser redirigido a "/pos"
     expect(screen.getByText('POS Home')).toBeInTheDocument();
   });
 });
