@@ -4,14 +4,18 @@ import { ShopOutlined, PhoneOutlined, EnvironmentOutlined, ArrowRightOutlined } 
 import { useNavigate } from "react-router-dom";
 import PublicNavbar from "../components/PublicNavbar";
 import dinaLogo from "../../../../public/assets/menu/Dina.png";
+import heroImg from "../../../../public/assets/menu/Photoroom_20260309_233038.jpeg";
 import burgerClasica from "../../../../public/assets/menu/hamburguesa clasica.png";
 import chiliBurger from "../../../../public/assets/menu/chili burger.jpeg";
 import hawaiBurger from "../../../../public/assets/menu/hawai burger.jpeg";
 import chiliDog from "../../../../public/assets/menu/chili dog.jpeg";
 import hawaiDog from "../../../../public/assets/menu/hot dog hawaiano.jpeg";
+import { WhatsAppOutlined } from "@ant-design/icons";
 
 const { Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
+
+const WHATSAPP_URL = "https://wa.me/c/50764829340";
 
 const MENU_HIGHLIGHTS = [
     { title: "Hamburguesa Clásica", img: burgerClasica, price: "$3" },
@@ -54,12 +58,24 @@ const LandingPage = () => {
                             <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.4rem', marginBottom: '40px', maxWidth: '550px', fontWeight: 300, letterSpacing: '0.5px' }}>
                                 Street food artesanal de verdad. En Antojo24 no solo matas el hambre, sacias el antojo con el mejor sabor de la ciudad.
                             </Paragraph>
-                            <Space size="large">
-                                <Button type="primary" size="large" onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })} style={{ height: '64px', padding: '0 45px', background: '#ffd666', borderColor: '#ffd666', color: '#000', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}>
+                            <Space size="large" wrap>
+                                <Button
+                                    type="primary"
+                                    size="large"
+                                    onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })}
+                                    style={{ height: '64px', padding: '0 45px', background: '#ffd666', borderColor: '#ffd666', color: '#000', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}
+                                >
                                     VER MENÚ
                                 </Button>
-                                <Button ghost size="large" style={{ height: '64px', padding: '0 45px', color: '#ffd666', borderColor: '#ffd666', borderRadius: '15px', fontWeight: 700 }} onClick={() => navigate("/login")}>
-                                    STAFF
+                                <Button
+                                    href={WHATSAPP_URL}
+                                    target="_blank"
+                                    type="primary"
+                                    size="large"
+                                    icon={<WhatsAppOutlined />}
+                                    style={{ height: '64px', padding: '0 45px', background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}
+                                >
+                                    PEDIR POR WHATSAPP
                                 </Button>
                             </Space>
                         </Col>
@@ -74,12 +90,12 @@ const LandingPage = () => {
                                     height: '120%',
                                     top: '-10%',
                                     left: '-10%',
-                                    background: 'rgba(255, 214, 102, 0.1)',
+                                    background: 'rgba(255, 214, 102, 0.15)',
                                     borderRadius: '50%',
-                                    filter: 'blur(60px)',
+                                    filter: 'blur(80px)',
                                     zIndex: 1
                                 }}></div>
-                                <img src={dinaLogo} alt="Dina Logo" style={{ width: '100%', maxWidth: '500px', filter: 'drop-shadow(0 0 30px rgba(255,214,102,0.4))', position: 'relative', zIndex: 2 }} />
+                                <img src={heroImg} alt="Hero Product" style={{ width: '100%', maxWidth: '600px', filter: 'drop-shadow(0 0 30px rgba(255,214,102,0.3))', position: 'relative', zIndex: 2, borderRadius: '20px' }} />
                             </div>
                         </Col>
                     </Row>
@@ -138,8 +154,16 @@ const LandingPage = () => {
                             </div>
                         </Col>
                         <Col xs={24} md={12}>
-                            <div style={{ width: '100%', height: '300px', background: '#333', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ color: '#ffd666' }}>[ MAPA DE UBICACIÓN ]</Text>
+                            <div style={{ width: '100%', height: '400px', borderRadius: '30px', overflow: 'hidden', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.4739674119!2d-79.53259052417299!3d9.020454389121031!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8faca974fb5049cb%3A0xf768df2c1ed785c8!2sAntojo%2024!5e0!3m2!1ses-419!2sus!4v1774047769548!5m2!1ses-419!2sus"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen=""
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                ></iframe>
                             </div>
                         </Col>
                     </Row>
