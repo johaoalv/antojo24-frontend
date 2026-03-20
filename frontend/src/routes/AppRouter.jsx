@@ -17,16 +17,18 @@ import CosteoProductos from "../modules/admin/pages/CosteoProductos";
 import ConfigurarRecetas from "../modules/admin/pages/ConfiguradorRecetas";
 import Mermas from "../modules/admin/pages/Mermas";
 import GestionProductos from "../modules/admin/pages/GestionProductos";
+import LandingPage from "../modules/public/pages/LandingPage";
 
 const AppRouter = () => {
   // ...
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Index />} />
+          <Route path="/pos" element={<Index />} />
           <Route path="/cierre" element={<CierreCaja />} />
 
           <Route path="/admin" element={<AdminLayout />}>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Input, Typography, message } from "antd";
 import axios from "axios";
 import { autenticarPin } from "../../../api/auth/axios_auth";
-import a24logo from "../../../../public/assets/A_24_LOGO_OFICIAL.png"
+import dinaLogo from "../../../../public/assets/menu/Dina.png"
 import { notifySuccess } from "../components/notifications.jsx";
 import PrimaryButton from "../components/PrimaryButton";
 
@@ -74,7 +74,7 @@ const PinLogin = () => {
       if (rol === "admin") {
         navigate("/admin/inicio");
       } else {
-        navigate("/");
+        navigate("/pos");
       }
 
     } catch (error) {
@@ -94,7 +94,7 @@ const PinLogin = () => {
 
   return (
     <div className="pin-container responsive-container" style={{ textAlign: "center", padding: "clamp(15px, 5vw, 30px)", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      <img src={a24logo} style={{ width: "clamp(150px, 40vw, 250px)", marginBottom: 20 }} />
+      <img src={dinaLogo} style={{ width: "clamp(150px, 40vw, 250px)", marginBottom: 20 }} />
       <Typography.Title level={2} style={{ marginBottom: 30, fontSize: 'clamp(1.5em, 5vw, 2.5em)' }}>
         Enter the code
       </Typography.Title>
@@ -125,8 +125,8 @@ const PinLogin = () => {
               textAlign: "center",
               fontSize: "clamp(20px, 6vw, 32px)",
               borderRadius: 8,
-              borderColor: idx === inputs.findIndex(i => i === "") ? "#91caff" : "#d9d9d9",
-              boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px #bae7ff" : "none",
+              borderColor: idx === inputs.findIndex(i => i === "") ? "#ffd666" : "#d9d9d9",
+              boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px rgba(255, 214, 102, 0.3)" : "none",
             }}
           />
         ))}
