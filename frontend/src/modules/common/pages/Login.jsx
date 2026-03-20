@@ -74,7 +74,7 @@ const PinLogin = () => {
       if (rol === "admin") {
         navigate("/admin/inicio");
       } else {
-        navigate("/");
+        navigate("/pos");
       }
 
     } catch (error) {
@@ -125,8 +125,8 @@ const PinLogin = () => {
               textAlign: "center",
               fontSize: "clamp(20px, 6vw, 32px)",
               borderRadius: 8,
-              borderColor: idx === inputs.findIndex(i => i === "") ? "#91caff" : "#d9d9d9",
-              boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px #bae7ff" : "none",
+              borderColor: idx === inputs.findIndex(i => i === "") ? "#ffd666" : "#d9d9d9",
+              boxShadow: idx === inputs.findIndex(i => i === "") ? "0 0 0 2px rgba(255, 214, 102, 0.3)" : "none",
             }}
           />
         ))}
