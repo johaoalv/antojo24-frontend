@@ -16,22 +16,31 @@ const PublicNavbar = () => {
       display: 'flex', 
       justifyContent: 'space-between', 
       alignItems: 'center',
-      background: 'rgba(0, 0, 0, 0.9)',
+      background: 'rgba(0, 0, 0, 0.95)',
       backdropFilter: 'blur(10px)',
-      borderBottom: '1px solid rgba(255, 214, 10, 0.2)', // Bordecito amarillo sutil
-      padding: '0 5%',
-      height: '70px'
+      borderBottom: '1px solid rgba(255, 214, 10, 0.2)',
+      padding: '0 20px',
+      height: '70px',
+      margin: 0
     }}>
-      <div className="logo" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', height: '100%' }} onClick={() => navigate("/")}>
+      <div className="logo" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => navigate("/")}>
         <img src={dinaLogo} alt="Antojo24 Logo" style={{ height: '45px', objectFit: 'contain' }} />
       </div>
+      
+      {/* Menu - Hidden on mobile via inline style for simplicity since we don't have a separate CSS file for this component */}
       <Menu
         mode="horizontal"
         disabledOverflow
         theme="dark"
-        style={{ border: 'none', background: 'transparent', flex: 1, justifyContent: 'center' }}
+        className="desktop-menu"
+        style={{ 
+          border: 'none', 
+          background: 'transparent', 
+          flex: 1, 
+          justifyContent: 'center',
+          display: window.innerWidth < 768 ? 'none' : 'flex' 
+        }}
         onClick={({ key }) => {
-          if (key === 'login') return navigate("/login");
           const el = document.getElementById(key + '-section');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
         }}
@@ -41,11 +50,19 @@ const PublicNavbar = () => {
           { key: 'contacto', label: 'Contacto' },
         ]}
       />
+
       <Button 
         type="primary" 
         shape="round" 
         onClick={() => navigate("/login")}
-        style={{ background: '#FFD60A', borderColor: '#FFD60A', color: '#000', fontWeight: 'bold' }}
+        style={{ 
+            background: '#FFD60A', 
+            borderColor: '#FFD60A', 
+            color: '#000', 
+            fontWeight: 'bold',
+            fontSize: window.innerWidth < 768 ? '12px' : '14px',
+            padding: window.innerWidth < 768 ? '0 15px' : '0 20px'
+        }}
       >
         Staff Login
       </Button>
