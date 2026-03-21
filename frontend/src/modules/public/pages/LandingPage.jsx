@@ -29,73 +29,110 @@ const LandingPage = () => {
     const navigate = useNavigate();
 
     return (
-        <Layout className="layout" style={{ minHeight: '100vh', background: '#000' }}>
+        <Layout className="layout" style={{ 
+            minHeight: '100vh', 
+            background: '#000', 
+            margin: 0, 
+            padding: 0,
+            overflowX: 'hidden' 
+        }}>
+            <style>
+                {`
+                    body { margin: 0 !important; padding: 0 !important; background: #000 !important; }
+                    .ant-layout { background: #000 !important; }
+                    .ant-layout-content { margin: 0 !important; padding: 0 !important; }
+                `}
+            </style>
             <PublicNavbar />
-
-            <Content style={{ paddingTop: '64px' }}>
+            
+            <Content style={{ margin: 0, padding: 0 }}>
                 {/* Hero Section */}
                 <div style={{
-                    padding: '120px 10% 160px',
+                    padding: '120px 5% 100px',
                     background: 'radial-gradient(circle at top right, #333 0%, #000 100%)',
                     color: '#fff',
                     textAlign: 'center',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    margin: 0
                 }}>
                     <Row gutter={[48, 48]} align="middle">
-                        <Col xs={24} md={12} style={{ textAlign: 'left', zIndex: 2 }}>
-                            <Title style={{ color: '#fff', fontSize: 'clamp(3rem, 7vw, 5rem)', marginBottom: '16px', lineHeight: 1, fontWeight: 900, textTransform: 'uppercase' }}>
+                        <Col xs={24} md={12} style={{ textAlign: window.innerWidth < 768 ? 'center' : 'left', zIndex: 2 }}>
+                            <Title style={{ 
+                                color: '#fff', 
+                                fontSize: 'clamp(2.5rem, 10vw, 5rem)', 
+                                marginBottom: '16px', 
+                                lineHeight: 1, 
+                                fontWeight: 900, 
+                                textTransform: 'uppercase' 
+                            }}>
                                 Calidad <br />
-                                <span style={{
-                                    background: '#FFD60A',
-                                    color: '#000',
-                                    padding: '0 15px',
+                                <span style={{ 
+                                    background: '#FFD60A', 
+                                    color: '#000', 
+                                    padding: '5px 15px', 
                                     display: 'inline-block',
                                     transform: 'skewX(-10deg)',
-                                    borderRadius: '5px'
+                                    borderRadius: '5px',
+                                    marginTop: '10px'
                                 }}>Irresistible.</span>
                             </Title>
-                            <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.4rem', marginBottom: '40px', maxWidth: '550px', fontWeight: 300, letterSpacing: '0.5px' }}>
-                                Street Food para llevar. Nuestra cocina está diseñada para que recibas el mejor sabor, recién hecho y listo para retirar. No esperes más, pide ahora.
+                            <Paragraph style={{ 
+                                color: 'rgba(255,255,255,0.7)', 
+                                fontSize: 'clamp(1rem, 4vw, 1.4rem)', 
+                                marginBottom: '40px', 
+                                maxWidth: window.innerWidth < 768 ? '100%' : '550px', 
+                                fontWeight: 300, 
+                                letterSpacing: '0.5px' 
+                            }}>
+                                Street Food para llevar. Nuestra cocina está diseñada para que recibas el mejor sabor, recién hecho y listo para retirar.
                             </Paragraph>
-                            <Space size="large" wrap>
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })}
-                                    style={{ height: '64px', padding: '0 45px', background: '#FFD60A', borderColor: '#FFD60A', color: '#000', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}
+                            <Space size="large" wrap style={{ justifyContent: window.innerWidth < 768 ? 'center' : 'flex-start' }}>
+                                <Button 
+                                    type="primary" 
+                                    size="large" 
+                                    onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })} 
+                                    style={{ height: '60px', padding: '0 30px', background: '#FFD60A', borderColor: '#FFD60A', color: '#000', fontWeight: 900, fontSize: '1.1rem', borderRadius: '15px' }}
                                 >
                                     VER MENÚ
                                 </Button>
-                                <Button
+                                <Button 
                                     href={WHATSAPP_URL}
                                     target="_blank"
                                     type="primary"
                                     size="large"
                                     icon={<WhatsAppOutlined />}
-                                    style={{ height: '64px', padding: '0 45px', background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 900, fontSize: '1.2rem', borderRadius: '15px' }}
+                                    style={{ height: '60px', padding: '0 30px', background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 900, fontSize: '1.1rem', borderRadius: '15px' }}
                                 >
-                                    PEDIR POR WHATSAPP
+                                    WhatsApp
                                 </Button>
                             </Space>
                         </Col>
                         <Col xs={24} md={12}>
                             <div style={{
                                 position: 'relative',
-                                display: 'inline-block'
+                                display: 'inline-block',
+                                width: '100%'
                             }}>
                                 <div style={{
                                     position: 'absolute',
-                                    width: '120%',
-                                    height: '120%',
-                                    top: '-10%',
-                                    left: '-10%',
+                                    width: '100%',
+                                    height: '100%',
+                                    top: 0,
+                                    left: 0,
                                     background: 'rgba(255, 214, 102, 0.15)',
                                     borderRadius: '50%',
                                     filter: 'blur(80px)',
                                     zIndex: 1
                                 }}></div>
-                                <img src={heroImg} alt="Hero Product" style={{ width: '100%', maxWidth: '600px', filter: 'drop-shadow(0 0 30px rgba(255,214,102,0.3))', position: 'relative', zIndex: 2, borderRadius: '20px' }} />
+                                <img src={heroImg} alt="Hero Product" style={{ 
+                                    width: '100%', 
+                                    maxWidth: '550px', 
+                                    filter: 'drop-shadow(0 0 30px rgba(255,214,102,0.3))', 
+                                    position: 'relative', 
+                                    zIndex: 2, 
+                                    borderRadius: '20px' 
+                                }} />
                             </div>
                         </Col>
                     </Row>
