@@ -1,8 +1,15 @@
 //recorrer productos
-export const buildPriceMap = (productos) => {
+export const buildPriceMap = (productos, tipoPedido = "local") => {
   if (!Array.isArray(productos)) return {};
   return productos.reduce((acc, item) => {
-    acc[item.producto || item.nombre] = item.precio;
+    const nombre = item.producto || item.nombre;
+    if (tipoPedido === "delivery") {
+      if (item.precio_delivery != null) {
+        acc[nombre] = item.precio_delivery;
+      }
+    } else {
+      acc[nombre] = item.precio;
+    }
     return acc;
   }, {});
 };
