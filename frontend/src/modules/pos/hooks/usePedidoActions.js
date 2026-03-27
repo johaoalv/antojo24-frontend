@@ -18,6 +18,7 @@ const usePedidoActions = ({
   resetPedido,
   resetPagoState,
   priceMap,
+  tipoPedido = "local",
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +47,7 @@ const usePedidoActions = ({
       pedido: pedidoFormateado,
       total_pedido: total,
       metodo_pago: metodoPago,
+      tipo_pedido: tipoPedido,
       fecha,
       sucursal_id,
     };
@@ -110,6 +112,7 @@ const usePedidoActions = ({
     resetPagoState,
     resetPedido,
     nombreCliente,
+    tipoPedido,
   ]);
 
   return { confirmarPedido, loading };

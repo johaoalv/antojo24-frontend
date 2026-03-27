@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarCircleOutlined } from "@ant-design/icons";
-import { Input } from "antd";
+import { Input, Switch } from "antd";
 import CartItem from "./CartItem";
 import PaymentsSelect from "./PaymentsSelect";
 import { formatCurrency } from "../utils/formatters";
@@ -22,6 +22,8 @@ const Cart = ({
   nombreCliente,
   onNombreClienteChange,
   loading,
+  tipoPedido,
+  onTipoPedidoChange,
 }) => (
   <div
     style={{
@@ -34,9 +36,18 @@ const Cart = ({
       backgroundColor: "#fff"
     }}
   >
-    <h3 style={{ fontSize: "clamp(1.5em, 5vw, 2.5em)", textAlign: "center", marginBottom: 20 }}>
+    <h3 style={{ fontSize: "clamp(1.5em, 5vw, 2.5em)", textAlign: "center", marginBottom: 10 }}>
       Carrito
     </h3>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 20 }}>
+      <span style={{ fontWeight: tipoPedido === "local" ? "bold" : "normal", fontSize: "1.1em" }}>Local</span>
+      <Switch
+        checked={tipoPedido === "delivery"}
+        onChange={onTipoPedidoChange}
+        style={{ backgroundColor: tipoPedido === "delivery" ? "#722ed1" : undefined }}
+      />
+      <span style={{ fontWeight: tipoPedido === "delivery" ? "bold" : "normal", fontSize: "1.1em", color: tipoPedido === "delivery" ? "#722ed1" : undefined }}>Delivery</span>
+    </div>
     {Object.entries(pedido).map(([producto, cantidad]) => {
       const productoInfo = buscarProducto(producto);
       const precio = priceMap[producto] || 0;

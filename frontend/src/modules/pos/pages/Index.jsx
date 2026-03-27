@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Typography, Row, Col } from "antd";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Typography, Row, Col, Switch } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
 import ProductsGrid from "../components/ProductsGrid";
@@ -18,6 +18,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [productosData, setProductosData] = useState([]);
   const [loadingProductos, setLoadingProductos] = useState(true);
+  const [tipoPedido, setTipoPedido] = useState("local");
 
   useEffect(() => {
     const loadProductos = async () => {
@@ -39,7 +40,7 @@ const Index = () => {
     loadProductos();
   }, []);
 
-  const priceMap = useMemo(() => buildPriceMap(productosData), [productosData]);
+  const priceMap = useMemo(() => buildPriceMap(productosData, tipoPedido), [productosData, tipoPedido]);
   const buscarProducto = useMemo(
     () => createProductoFinder(productosData),
     [productosData]
@@ -66,7 +67,22 @@ const Index = () => {
     resetPedido,
     resetPagoState: metodoPagoState.resetPagoState,
     priceMap,
+    tipoPedido,
   });
+
+  const productosFiltrados = useMemo(() => {
+    if (tipoPedido === "delivery") {
+      return productosData.filter((p) => p.precio_delivery != null);
+    }
+    return productosData;
+  }, [productosData, tipoPedido]);
+
+  const handleTipoPedidoChange = useCallback((checked) => {
+    const nuevoTipo = checked ? "delivery" : "local";
+    setTipoPedido(nuevoTipo);
+    resetPedido();
+    metodoPagoState.resetPagoState();
+  }, [resetPedido, metodoPagoState]);
 
   const total = calcularTotal();
   const isPedidoVacio = Object.keys(pedido).length === 0;
@@ -86,7 +102,7 @@ const Index = () => {
         <Row gutter={[24, 24]}>
           <Col xs={24} lg={14} xl={16}>
             <ProductsGrid
-              productos={productosData}
+              productos={productosFiltrados}
               onAddProduct={agregarAlPedido}
               loading={loadingProductos}
             />
@@ -107,6 +123,8 @@ const Index = () => {
               onNavigateToCierre={() => navigate("/cierre")}
               nombreCliente={nombreCliente}
               onNombreClienteChange={setNombreCliente}
+              tipoPedido={tipoPedido}
+              onTipoPedidoChange={handleTipoPedidoChange}
             />
           </Col>
         </Row>

@@ -59,11 +59,44 @@ const CosteoProductos = () => {
             }
         },
         {
+            title: 'Precio Local',
+            dataIndex: 'precio',
+            key: 'precio',
+            render: (val) => val != null ? <Tag style={{ fontSize: '1.1em' }}>${Number(val).toFixed(2)}</Tag> : '—'
+        },
+        {
+            title: 'Margen Local',
+            key: 'margen_local',
+            render: (_, record) => {
+                const costo = parseFloat(record.costo_total || 0);
+                const precio = parseFloat(record.precio || 0);
+                if (precio <= 0) return '—';
+                const margen = ((precio - costo) / precio * 100);
+                return <Tag color={margen >= 50 ? 'green' : margen >= 30 ? 'orange' : 'red'} style={{ fontSize: '1.1em' }}>{margen.toFixed(1)}%</Tag>;
+            }
+        },
+        {
+            title: 'Precio Delivery',
+            dataIndex: 'precio_delivery',
+            key: 'precio_delivery',
+            render: (val) => val != null ? <Tag color="purple" style={{ fontSize: '1.1em' }}>${Number(val).toFixed(2)}</Tag> : '—'
+        },
+        {
+            title: 'Margen Delivery',
+            key: 'margen_delivery',
+            render: (_, record) => {
+                const costo = parseFloat(record.costo_total || 0);
+                const precio = parseFloat(record.precio_delivery || 0);
+                if (precio <= 0) return '—';
+                const margen = ((precio - costo) / precio * 100);
+                return <Tag color={margen >= 50 ? 'green' : margen >= 30 ? 'orange' : 'red'} style={{ fontSize: '1.1em' }}>{margen.toFixed(1)}%</Tag>;
+            }
+        },
+        {
             title: `Precio Sugerido (${targetMargin}% Margen)`,
             key: 'sugerido',
             render: (_, record) => {
                 const costo = parseFloat(record.costo_total);
-                // Fórmula: Precio = Costo / (1 - Margen/100)
                 const sugerido = costo / (1 - targetMargin / 100);
                 return <strong style={{ color: '#52c41a', fontSize: '1.2em' }}>${Number(sugerido || 0).toFixed(2)}</strong>;
             }

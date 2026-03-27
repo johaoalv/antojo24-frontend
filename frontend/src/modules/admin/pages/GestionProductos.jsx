@@ -64,6 +64,7 @@ const GestionProductos = () => {
     form.setFieldsValue({
       nombre: record.nombre,
       precio: record.precio,
+      precio_delivery: record.precio_delivery,
       imagen: record.imagen,
       es_combo: record.es_combo,
       combo_items: combo_items,
@@ -85,6 +86,7 @@ const GestionProductos = () => {
     try {
       const payload = {
         ...values,
+        precio_delivery: values.precio_delivery || null,
         combo_items: values.es_combo ? (values.combo_items || []) : []
       };
 
@@ -114,10 +116,16 @@ const GestionProductos = () => {
     },
     { title: "Nombre", dataIndex: "nombre", key: "nombre" },
     {
-      title: "Precio",
+      title: "Precio Local",
       dataIndex: "precio",
       key: "precio",
       render: (val) => `$${Number(val).toFixed(2)}`,
+    },
+    {
+      title: "Precio Delivery",
+      dataIndex: "precio_delivery",
+      key: "precio_delivery",
+      render: (val) => val != null ? `$${Number(val).toFixed(2)}` : "—",
     },
     {
       title: "Tipo",
@@ -168,8 +176,12 @@ const GestionProductos = () => {
             <Input />
           </Form.Item>
           
-          <Form.Item name="precio" label="Precio Final" rules={[{ required: true }]}>
+          <Form.Item name="precio" label="Precio Local" rules={[{ required: true }]}>
             <InputNumber style={{ width: "100%" }} min={0} step={0.01} precision={2} />
+          </Form.Item>
+
+          <Form.Item name="precio_delivery" label="Precio Delivery (PedidosYa)">
+            <InputNumber style={{ width: "100%" }} min={0} step={0.01} precision={2} placeholder="Dejar vacío si no aplica" />
           </Form.Item>
 
           <Form.Item name="imagen" label="Ruta de Imagen (ej. /assets/soda.png)">
