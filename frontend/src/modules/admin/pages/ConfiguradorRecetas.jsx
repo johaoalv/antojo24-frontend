@@ -144,6 +144,36 @@ const ConfiguradorRecetas = () => {
         }
     };
 
+    const handleDeleteComposicion = async (insumoId) => {
+        try {
+            await axiosInstance.delete(`/produccion/receta/${insumoId}`);
+            message.success("Composición eliminada completamente");
+            setSelectedSalsa(null);
+            setDetalleComposicion([]);
+            fetchData();
+        } catch (error) {
+            message.error("Error al eliminar composición");
+        }
+    };
+
+    const handleUpdateComposicionQuantity = async (insumoBaseId, newCantidad) => {
+        try {
+            const updatedIngredients = detalleComposicion.map(d => ({
+                insumo_base_id: d.insumo_base_id,
+                cantidad_proporcional: d.insumo_base_id === insumoBaseId ? newCantidad : d.cantidad_proporcional
+            }));
+
+            await axiosInstance.post("/produccion/receta", {
+                insumo_compuesto_id: selectedSalsa,
+                ingredientes: updatedIngredients
+            });
+            message.success("Cantidad actualizada");
+            fetchDetalleComposicion(selectedSalsa);
+        } catch (error) {
+            message.error("Error al actualizar cantidad");
+        }
+    };
+
     // ===================== COLUMNAS =====================
     const recetaColumns = [
         {
@@ -193,12 +223,35 @@ const ConfiguradorRecetas = () => {
             render: (text) => <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{text}</span>
         },
         {
-            title: 'Cantidad por Tanda',
+            title: 'Cantidad Ideal',
+            dataIndex: 'cantidad_ideal',
+            key: 'cantidad_ideal',
+            render: (val, record) => (
+                <Space>
+                    <Tag color="purple" style={{ fontSize: '1em', padding: '2px 8px' }}>
+                        {val ? parseFloat(val) : parseFloat(record.cantidad_proporcional)}
+                    </Tag>
+                    <Typography.Text type="secondary" style={{ fontSize: '0.85em' }}>{record.unidad_medida}</Typography.Text>
+                </Space>
+            )
+        },
+        {
+            title: 'Cantidad Actual',
             dataIndex: 'cantidad_proporcional',
             key: 'cantidad',
             render: (val, record) => (
                 <Space>
-                    <Tag color="blue" style={{ fontSize: '1.1em', padding: '4px 12px' }}>{parseFloat(val)}</Tag>
+                    <InputNumber
+                        min={0}
+                        defaultValue={parseFloat(val)}
+                        onBlur={(e) => {
+                            const newVal = parseFloat(e.target.value);
+                            if (!isNaN(newVal) && newVal !== parseFloat(val)) {
+                                handleUpdateComposicionQuantity(record.insumo_base_id, newVal);
+                            }
+                        }}
+                        style={{ width: 100 }}
+                    />
                     <Typography.Text type="secondary">{record.unidad_medida}</Typography.Text>
                 </Space>
             )
@@ -380,17 +433,31 @@ const ConfiguradorRecetas = () => {
                                             </span>
                                         }
                                         extra={
-                                            <Button
-                                                type="primary"
-                                                icon={<PlusOutlined />}
-                                                size="small"
-                                                onClick={() => {
-                                                    setEditingComposicion(selectedSalsa);
-                                                    setModalComposicionVisible(true);
-                                                }}
-                                            >
-                                                Añadir Ingrediente
-                                            </Button>
+                                            <Space>
+                                                <Button
+                                                    type="primary"
+                                                    icon={<PlusOutlined />}
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setEditingComposicion(selectedSalsa);
+                                                        setModalComposicionVisible(true);
+                                                    }}
+                                                >
+                                                    Añadir Ingrediente
+                                                </Button>
+                                                <Popconfirm
+                                                    title="¿Eliminar esta composición completa?"
+                                                    description="Se borrarán todos los ingredientes de esta salsa"
+                                                    onConfirm={() => handleDeleteComposicion(selectedSalsa)}
+                                                    okText="Sí, eliminar"
+                                                    cancelText="Cancelar"
+                                                    okButtonProps={{ danger: true }}
+                                                >
+                                                    <Button danger icon={<DeleteOutlined />} size="small">
+                                                        Eliminar Salsa
+                                                    </Button>
+                                                </Popconfirm>
+                                            </Space>
                                         }
                                         className="card-shadow"
                                     >
