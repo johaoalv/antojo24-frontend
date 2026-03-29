@@ -93,6 +93,30 @@ const CosteoProductos = () => {
             }
         },
         {
+            title: 'Ganancia PedidosYa (24%)',
+            key: 'ganancia_pedidosya',
+            render: (_, record) => {
+                const costo = parseFloat(record.costo_total || 0);
+                const precio = parseFloat(record.precio_delivery || 0);
+                if (precio <= 0) return '—';
+                const comision = precio * 0.24;
+                const ganancia = precio - comision - costo;
+                return <Tag color={ganancia > 0 ? 'green' : 'red'} style={{ fontSize: '1.1em' }}>${ganancia.toFixed(2)}</Tag>;
+            }
+        },
+        {
+            title: 'Ganancia Uber Eats (23%)',
+            key: 'ganancia_ubereats',
+            render: (_, record) => {
+                const costo = parseFloat(record.costo_total || 0);
+                const precio = parseFloat(record.precio_delivery || 0);
+                if (precio <= 0) return '—';
+                const comision = precio * 0.23;
+                const ganancia = precio - comision - costo;
+                return <Tag color={ganancia > 0 ? 'green' : 'red'} style={{ fontSize: '1.1em' }}>${ganancia.toFixed(2)}</Tag>;
+            }
+        },
+        {
             title: `Precio Sugerido (${targetMargin}% Margen)`,
             key: 'sugerido',
             render: (_, record) => {
