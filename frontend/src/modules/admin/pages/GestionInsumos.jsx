@@ -188,6 +188,22 @@ const GestionInsumos = () => {
             key: "unidad_medida",
         },
         {
+            title: "Stock Mínimo",
+            dataIndex: "stock_minimo",
+            key: "stock_minimo",
+            render: (val, record) => {
+                const minimo = parseFloat(val || 0);
+                if (minimo <= 0) return <Tag color="default">Sin alerta</Tag>;
+                const stock = parseFloat(record.stock || 0);
+                const enAlerta = stock <= minimo;
+                return (
+                    <Tag color={enAlerta ? "red" : "green"} style={{ fontSize: '1em', padding: '3px 8px' }}>
+                        {minimo} {record.unidad_medida}
+                    </Tag>
+                );
+            }
+        },
+        {
             title: "Acciones",
             key: "acciones",
             render: (_, record) => (
@@ -275,6 +291,10 @@ const GestionInsumos = () => {
                             style={{ marginBottom: 20 }}
                         />
                     )}
+
+                    <Form.Item name="stock_minimo" label="Stock Mínimo (para alerta)">
+                        <InputNumber style={{ width: "100%" }} min={0} placeholder="Ej: 5 (se alerta cuando baje de este valor)" />
+                    </Form.Item>
 
                     <Form.Item name="sucursal_id" label="Sucursal" rules={[{ required: true }]}>
                         <Select placeholder="Selecciona una sucursal">
