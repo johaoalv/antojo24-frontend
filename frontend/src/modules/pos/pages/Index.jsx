@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Typography, Row, Col, Switch } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
+
 import ProductsGrid from "../components/ProductsGrid";
 import Cart from "../components/Cart";
 import CashModal from "../components/CashModal";

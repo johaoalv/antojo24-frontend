@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Dropdown, Menu, Space } from "antd";
 import { DownOutlined, ShopOutlined } from "@ant-design/icons";
+import AlertasStock from "./AlertasStock";
 
 const cerrarSesion = () => {
   localStorage.clear();
@@ -48,11 +49,14 @@ const Navbar = () => {
         </a>
       </div>
 
-      <Dropdown menu={menu} placement="bottomRight">
-        <Button style={{ height: "clamp(40px, 5vw, 50px)", fontSize: 'clamp(0.9em, 2vw, 1.3em)', padding: '0 15px' }}>
-          Options <DownOutlined />
-        </Button>
-      </Dropdown>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <AlertasStock />
+        <Dropdown menu={menu} placement="bottomRight">
+          <Button style={{ height: "clamp(40px, 5vw, 50px)", fontSize: 'clamp(0.9em, 2vw, 1.3em)', padding: '0 15px' }}>
+            Options <DownOutlined />
+          </Button>
+        </Dropdown>
+      </div>
     </div>
   );
 };
