@@ -24,6 +24,8 @@ const Cart = ({
   loading,
   tipoPedido,
   onTipoPedidoChange,
+  bolsas,
+  onBolsasChange,
 }) => (
   <div
     style={{
@@ -64,7 +66,40 @@ const Cart = ({
       );
     })}
 
-    <div style={{ marginTop: 30 }}>
+    <div style={{
+      marginTop: 20,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "12px 16px",
+      backgroundColor: "#f5f5f5",
+      borderRadius: 10,
+      border: "1px dashed #d9d9d9"
+    }}>
+      <span style={{ fontSize: "1.1em", fontWeight: 500 }}>Bolsas de entrega</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button
+          onClick={() => onBolsasChange(Math.max(0, bolsas - 1))}
+          style={{
+            width: 32, height: 32, borderRadius: 6, border: "1px solid #d9d9d9",
+            backgroundColor: bolsas === 0 ? "#f5f5f5" : "#fff", cursor: bolsas === 0 ? "default" : "pointer",
+            fontSize: "1.2em", display: "flex", alignItems: "center", justifyContent: "center"
+          }}
+          disabled={bolsas === 0}
+        >-</button>
+        <span style={{ fontSize: "1.3em", fontWeight: "bold", minWidth: 24, textAlign: "center" }}>{bolsas}</span>
+        <button
+          onClick={() => onBolsasChange(bolsas + 1)}
+          style={{
+            width: 32, height: 32, borderRadius: 6, border: "1px solid #d9d9d9",
+            backgroundColor: "#fff", cursor: "pointer", fontSize: "1.2em",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}
+        >+</button>
+      </div>
+    </div>
+
+    <div style={{ marginTop: 20 }}>
       <Input
         placeholder="Nombre del cliente (opcional)"
         value={nombreCliente}

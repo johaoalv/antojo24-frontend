@@ -19,6 +19,8 @@ const usePedidoActions = ({
   resetPagoState,
   priceMap,
   tipoPedido = "local",
+  bolsas = 0,
+  resetBolsas,
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +50,7 @@ const usePedidoActions = ({
       total_pedido: total,
       metodo_pago: metodoPago,
       tipo_pedido: tipoPedido,
+      bolsas,
       fecha,
       sucursal_id,
     };
@@ -70,6 +73,7 @@ const usePedidoActions = ({
       // Limpiar estado inmediatamente después del éxito para evitar doble envío
       resetPedido();
       resetPagoState();
+      if (resetBolsas) resetBolsas();
 
       console.log("✅ Estado de carrito y pago reiniciado.");
       console.log("-----------------------------------------");
@@ -113,6 +117,8 @@ const usePedidoActions = ({
     resetPedido,
     nombreCliente,
     tipoPedido,
+    bolsas,
+    resetBolsas,
   ]);
 
   return { confirmarPedido, loading };
