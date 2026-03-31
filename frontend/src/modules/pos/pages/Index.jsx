@@ -20,6 +20,7 @@ const Index = () => {
   const [productosData, setProductosData] = useState([]);
   const [loadingProductos, setLoadingProductos] = useState(true);
   const [tipoPedido, setTipoPedido] = useState("local");
+  const [bolsas, setBolsas] = useState(0);
 
   useEffect(() => {
     const loadProductos = async () => {
@@ -69,6 +70,8 @@ const Index = () => {
     resetPagoState: metodoPagoState.resetPagoState,
     priceMap,
     tipoPedido,
+    bolsas,
+    resetBolsas: () => setBolsas(0),
   });
 
   const productosFiltrados = useMemo(() => {
@@ -82,6 +85,7 @@ const Index = () => {
     const nuevoTipo = checked ? "delivery" : "local";
     setTipoPedido(nuevoTipo);
     resetPedido();
+    setBolsas(0);
     metodoPagoState.resetPagoState();
   }, [resetPedido, metodoPagoState]);
 
@@ -126,6 +130,8 @@ const Index = () => {
               onNombreClienteChange={setNombreCliente}
               tipoPedido={tipoPedido}
               onTipoPedidoChange={handleTipoPedidoChange}
+              bolsas={bolsas}
+              onBolsasChange={setBolsas}
             />
           </Col>
         </Row>
