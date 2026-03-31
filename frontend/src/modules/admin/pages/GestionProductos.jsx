@@ -11,9 +11,10 @@ import {
   Popconfirm,
   Select,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined, CloudUploadOutlined } from "@ant-design/icons";
 import { fetchProductos } from "../../../api/pos/axios_productos";
 import axiosInstance from "../../../api/core/axios_base";
+import { uploadImage } from "../../../api/admin/axios_upload";
 import { notifySuccess, notifyError } from "../../common/components/notifications";
 
 const GestionProductos = () => {
@@ -23,6 +24,20 @@ const GestionProductos = () => {
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState(null);
   const [isCombo, setIsCombo] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (file) => {
+    setUploadingImage(true);
+    try {
+      const result = await uploadImage(file);
+      form.setFieldsValue({ imagen: result.path });
+      notifySuccess({ message: "Imagen subida correctamente" });
+    } catch (error) {
+      notifyError({ message: "Error al subir imagen", description: error.message });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -184,9 +199,31 @@ const GestionProductos = () => {
             <InputNumber style={{ width: "100%" }} min={0} step={0.01} precision={2} placeholder="Dejar vacío si no aplica" />
           </Form.Item>
 
-          <Form.Item name="imagen" label="Ruta de Imagen (ej. /assets/soda.png)">
-            <Input />
+          <Form.Item name="imagen" label="Imagen del Producto">
+            <Input placeholder="Ruta de imagen (se completa automáticamente)" />
           </Form.Item>
+          <div style={{ marginBottom: 24 }}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleImageUpload(e.target.files[0]);
+                }
+                e.target.value = '';
+              }}
+              disabled={uploadingImage}
+              style={{
+                padding: '8px 12px',
+                border: '1px dashed #d9d9d9',
+                borderRadius: '6px',
+                cursor: uploadingImage ? 'not-allowed' : 'pointer',
+                width: '100%',
+                marginBottom: 8
+              }}
+            />
+            {uploadingImage && <span style={{ color: '#1890ff' }}>Subiendo imagen...</span>}
+          </div>
 
           <Form.Item name="es_combo" label="¿Es un Combo o Caja?" valuePropName="checked">
             <Switch onChange={setIsCombo} />
