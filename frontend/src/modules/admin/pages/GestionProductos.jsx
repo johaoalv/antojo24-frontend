@@ -11,10 +11,9 @@ import {
   Popconfirm,
   Select,
 } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined, CloudUploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { fetchProductos } from "../../../api/pos/axios_productos";
 import axiosInstance from "../../../api/core/axios_base";
-import { uploadImage } from "../../../api/admin/axios_upload";
 import { notifySuccess, notifyError } from "../../common/components/notifications";
 
 const GestionProductos = () => {
@@ -24,20 +23,6 @@ const GestionProductos = () => {
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState(null);
   const [isCombo, setIsCombo] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-
-  const handleImageUpload = async (file) => {
-    setUploadingImage(true);
-    try {
-      const result = await uploadImage(file);
-      form.setFieldsValue({ imagen: result.path });
-      notifySuccess({ message: "Imagen subida correctamente" });
-    } catch (error) {
-      notifyError({ message: "Error al subir imagen", description: error.message });
-    } finally {
-      setUploadingImage(false);
-    }
-  };
 
   const loadData = async () => {
     setLoading(true);
@@ -199,31 +184,9 @@ const GestionProductos = () => {
             <InputNumber style={{ width: "100%" }} min={0} step={0.01} precision={2} placeholder="Dejar vacío si no aplica" />
           </Form.Item>
 
-          <Form.Item name="imagen" label="Imagen del Producto">
-            <Input placeholder="Ruta de imagen (se completa automáticamente)" />
+          <Form.Item name="imagen" label="Ruta de Imagen (ej. /assets/soda.png)">
+            <Input />
           </Form.Item>
-          <div style={{ marginBottom: 24 }}>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleImageUpload(e.target.files[0]);
-                }
-                e.target.value = '';
-              }}
-              disabled={uploadingImage}
-              style={{
-                padding: '8px 12px',
-                border: '1px dashed #d9d9d9',
-                borderRadius: '6px',
-                cursor: uploadingImage ? 'not-allowed' : 'pointer',
-                width: '100%',
-                marginBottom: 8
-              }}
-            />
-            {uploadingImage && <span style={{ color: '#1890ff' }}>Subiendo imagen...</span>}
-          </div>
 
           <Form.Item name="es_combo" label="¿Es un Combo o Caja?" valuePropName="checked">
             <Switch onChange={setIsCombo} />
@@ -235,32 +198,34 @@ const GestionProductos = () => {
                 <div style={{ padding: 10, border: '1px dashed #d9d9d9', borderRadius: 8, marginBottom: 24 }}>
                   <div style={{ marginBottom: 16, fontWeight: 'bold' }}>Productos que conforman esta caja:</div>
                   {fields.map(({ key, name, ...restField }) => (
-                    <Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
-                      <Form.Item
-                        {...restField}
-                        name={[name, "id"]}
-                        rules={[{ required: true, message: "Falta producto" }]}
-                        style={{ margin: 0 }}
-                      >
-                        <Select
-                          placeholder="Seleccionar producto"
-                          style={{ width: 220 }}
-                          options={productos.filter(p => !p.es_combo).map(p => ({
-                            label: p.nombre,
-                            value: p.id
-                          }))}
-                        />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, "cantidad"]}
-                        rules={[{ required: true, message: "Falta cantidad" }]}
-                        style={{ margin: 0 }}
-                      >
-                        <InputNumber placeholder="Cantidad" min={1} />
-                      </Form.Item>
-                      <Button onClick={() => remove(name)} icon={<DeleteOutlined />} danger type="text" />
-                    </Space>
+                    <div key={key} style={{ marginBottom: 12, padding: 10, backgroundColor: '#f5f5f5', borderRadius: 8 }}>
+                      <Space style={{ display: "flex", marginBottom: 4 }} align="baseline">
+                        <Form.Item
+                          {...restField}
+                          name={[name, "id"]}
+                          rules={[{ required: true, message: "Falta producto" }]}
+                          style={{ margin: 0 }}
+                        >
+                          <Select
+                            placeholder="Seleccionar producto"
+                            style={{ width: 250 }}
+                            options={productos.filter(p => !p.es_combo).map(p => ({
+                              label: p.nombre,
+                              value: p.id
+                            }))}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          {...restField}
+                          name={[name, "cantidad"]}
+                          rules={[{ required: true, message: "Falta cantidad" }]}
+                          style={{ margin: 0 }}
+                        >
+                          <InputNumber placeholder="Cant." min={1} max={10} />
+                        </Form.Item>
+                        <Button onClick={() => remove(name)} icon={<DeleteOutlined />} danger type="text" />
+                      </Space>
+                    </div>
                   ))}
                   <Form.Item style={{ margin: 0, marginTop: 10 }}>
                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
