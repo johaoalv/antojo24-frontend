@@ -145,27 +145,6 @@ const Index = () => {
         onOk={metodoPagoState.handleModalOk}
         onCancel={metodoPagoState.handleModalCancel}
       />
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          backgroundColor: "#000",
-          color: "#FFD60A",
-          textAlign: "center",
-          padding: "14px 0",
-          fontSize: "1.6em",
-          fontWeight: 600,
-          letterSpacing: "0.05em",
-          zIndex: 1000,
-          marginTop: 20,
-        }}
-      >
-        <Text style={{ color: "#FFD60A", fontSize: "1em" }}>
-          Hora Panamá · {panamaClock}
-        </Text>
-      </div>
     </>
   );
 };
