@@ -75,15 +75,14 @@ const Index = () => {
   });
 
   const productosFiltrados = useMemo(() => {
-    if (tipoPedido === "delivery") {
+    if (tipoPedido !== "local") {
       return productosData.filter((p) => p.precio_delivery != null);
     }
     return productosData;
   }, [productosData, tipoPedido]);
 
-  const handleTipoPedidoChange = useCallback((checked) => {
-    const nuevoTipo = checked ? "delivery" : "local";
-    setTipoPedido(nuevoTipo);
+  const handleTipoPedidoChange = useCallback((valor) => {
+    setTipoPedido(valor);
     resetPedido();
     setBolsas(0);
     metodoPagoState.resetPagoState();
