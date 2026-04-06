@@ -51,6 +51,7 @@ const VentasHoy = ({ selectedStoreId }) => {
             monto: parseFloat(item.total_pedido || item.total_item || 0),
             metodo_pago: item.metodo_pago,
             tipo_pedido: item.tipo_pedido || "local",
+            estado_pago: item.estado_pago || "pagado",
             productos: []
           };
         }
@@ -93,6 +94,10 @@ const VentasHoy = ({ selectedStoreId }) => {
     {
       title: "Origen", dataIndex: "tipo_pedido", key: "tipo_pedido", width: 110,
       render: t => ORIGEN_LABELS[t] || t
+    },
+    {
+      title: "Estado", dataIndex: "estado_pago", key: "estado_pago", width: 100,
+      render: e => e ? e.charAt(0).toUpperCase() + e.slice(1) : "-"
     },
     {
       title: "Productos", dataIndex: "productos", key: "productos",
