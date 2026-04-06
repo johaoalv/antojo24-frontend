@@ -8,7 +8,7 @@ import PrivateRoute from "./PrivateRoute";
 import AdminLayout from "../modules/admin/pages/AdminLayout";
 import Dashboard from "../modules/admin/pages/Dashboard";
 import GestionInsumos from "../modules/admin/pages/GestionInsumos";
-import SalesHistory from "../modules/admin/pages/SalesHistory";
+import VentasDelDia from "../modules/admin/pages/VentasDelDia";
 import Gastos from "../modules/admin/pages/Gastos";
 import Finanzas from "../modules/admin/pages/Finanzas";
 import Inyecciones from "../modules/admin/pages/Inyecciones";
@@ -34,7 +34,7 @@ const AppRouter = () => {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="inicio" element={<Dashboard />} />
-            <Route path="ventas" element={<SalesHistory />} />
+            <Route path="ventas" element={<VentasDelDia />} />
             <Route path="gastos" element={<Gastos />} />
             <Route path="finanzas" element={<Finanzas />} />
             <Route path="inyecciones" element={<Inyecciones />} />

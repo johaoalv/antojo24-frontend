@@ -3,7 +3,7 @@ export const buildPriceMap = (productos, tipoPedido = "local") => {
   if (!Array.isArray(productos)) return {};
   return productos.reduce((acc, item) => {
     const nombre = item.producto || item.nombre;
-    if (tipoPedido === "delivery") {
+    if (tipoPedido !== "local") {
       if (item.precio_delivery != null) {
         acc[nombre] = item.precio_delivery;
       }

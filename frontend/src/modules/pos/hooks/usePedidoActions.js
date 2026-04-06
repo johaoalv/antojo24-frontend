@@ -44,12 +44,15 @@ const usePedidoActions = ({
       })
     );
 
+    const estado_pago = tipoPedido === "local" ? "pagado" : "pendiente";
+
     const datos = {
       pedido_id,
       pedido: pedidoFormateado,
       total_pedido: total,
       metodo_pago: metodoPago,
       tipo_pedido: tipoPedido,
+      estado_pago,
       bolsas,
       fecha,
       sucursal_id,

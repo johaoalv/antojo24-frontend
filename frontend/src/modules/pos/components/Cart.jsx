@@ -1,6 +1,6 @@
 import React from "react";
 import { DollarCircleOutlined } from "@ant-design/icons";
-import { Input, Switch } from "antd";
+import { Input, Select } from "antd";
 import CartItem from "./CartItem";
 import PaymentsSelect from "./PaymentsSelect";
 import { formatCurrency } from "../utils/formatters";
@@ -42,13 +42,16 @@ const Cart = ({
       Carrito
     </h3>
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 20 }}>
-      <span style={{ fontWeight: tipoPedido === "local" ? "bold" : "normal", fontSize: "1.1em" }}>Local</span>
-      <Switch
-        checked={tipoPedido === "delivery"}
+      <Select
+        value={tipoPedido}
         onChange={onTipoPedidoChange}
-        style={{ backgroundColor: tipoPedido === "delivery" ? "#722ed1" : undefined }}
+        style={{ width: 200 }}
+        options={[
+          { label: "Local", value: "local" },
+          { label: "PedidosYa", value: "pedidosya" },
+          { label: "Uber", value: "uber" }
+        ]}
       />
-      <span style={{ fontWeight: tipoPedido === "delivery" ? "bold" : "normal", fontSize: "1.1em", color: tipoPedido === "delivery" ? "#722ed1" : undefined }}>Delivery</span>
     </div>
     {Object.entries(pedido).map(([producto, cantidad]) => {
       const productoInfo = buscarProducto(producto);
