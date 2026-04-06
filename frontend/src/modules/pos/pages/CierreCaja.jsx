@@ -40,6 +40,14 @@ const CierreCaja = () => {
     }, {});
   }, [pedidos]);
 
+  const subtotalesPorOrigen = useMemo(() => {
+    return pedidos.reduce((acc, current) => {
+      const origen = current.tipo_pedido || "local";
+      acc[origen] = (acc[origen] || 0) + parseFloat(current.total_item || 0);
+      return acc;
+    }, {});
+  }, [pedidos]);
+
   const cargarPedidos = async () => {
     setCargando(true);
     try {
@@ -218,6 +226,29 @@ const CierreCaja = () => {
                     <Table.Summary.Cell index={3}></Table.Summary.Cell>
                   </Table.Summary.Row>
                 ))}
+                <Table.Summary.Row style={{ backgroundColor: '#f0f0f0', borderTop: '2px solid #d9d9d9' }}>
+                  <Table.Summary.Cell index={0}>
+                    <strong style={{ fontSize: "1.2em" }}>Por Origen</strong>
+                  </Table.Summary.Cell>
+                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                  <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                </Table.Summary.Row>
+                {Object.entries(subtotalesPorOrigen).map(([origen, total]) => {
+                  const origenes = { local: "Local", pedidosya: "PedidosYa", uber: "Uber" };
+                  return (
+                    <Table.Summary.Row key={`origen-${origen}`} style={{ backgroundColor: '#f9f9f9' }}>
+                      <Table.Summary.Cell index={0}>
+                        <span style={{ fontSize: "1.1em" }}>{origenes[origen] || origen}</span>
+                      </Table.Summary.Cell>
+                      <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                      <Table.Summary.Cell index={2} align="right">
+                        <span style={{ fontSize: "1.1em" }}>${total.toFixed(2)}</span>
+                      </Table.Summary.Cell>
+                      <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                    </Table.Summary.Row>
+                  );
+                })}
                 <Table.Summary.Row>
                   <Table.Summary.Cell index={0}>
                     <strong style={{ fontSize: "1.4em" }}>Total General</strong>
