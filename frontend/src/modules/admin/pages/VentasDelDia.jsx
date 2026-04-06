@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Row, Col, Statistic, Spin, Tabs } from "antd";
-import { DollarOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography } from "antd";
+import { DollarOutlined, ShoppingCartOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { formatCurrency } from "../../pos/utils/formatters";
 import { useStore } from "../../../context/StoreContext";
 
+const { Text } = Typography;
 const ORIGEN_LABELS = { local: "Local", pedidosya: "PedidosYa", uber: "Uber" };
 
 const MetodoPagoCards = ({ porMetodo }) => (
@@ -224,14 +225,141 @@ const VentasMes = ({ selectedStoreId }) => {
 };
 
 // ────────────────────────────────────────────────────────────
+// TAB: PAGOS PENDIENTES
+// ────────────────────────────────────────────────────────────
+const PagosPendientes = ({ selectedStoreId }) => {
+  const [pedidos, setPedidos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { cargar(); }, [selectedStoreId]);
+
+  const cargar = async () => {
+    try {
+      setLoading(true);
+      const params = selectedStoreId !== "global" ? `?sucursal_id=${selectedStoreId}` : "";
+      const res = await axiosInstance.get(`/pedidos/pendientes${params}`);
+      setPedidos(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setPedidos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const marcarPagado = async (pedidoId) => {
+    try {
+      await axiosInstance.patch(`/pedido/${pedidoId}/pagar`);
+      message.success("Pedido marcado como pagado. Plata en Mano actualizada.");
+      cargar();
+    } catch (err) {
+      message.error(err.response?.data?.error || "Error al marcar como pagado");
+    }
+  };
+
+  const totalPendiente = pedidos.reduce((acc, p) => acc + parseFloat(p.total_pedido || 0), 0);
+
+  const columns = [
+    {
+      title: "Fecha", dataIndex: "fecha", key: "fecha", width: 140,
+      render: f => f ? new Date(f).toLocaleString("es-PA", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-"
+    },
+    {
+      title: "Monto", dataIndex: "total_pedido", key: "total_pedido", width: 110, align: "right",
+      render: m => <Text strong>${Number(m || 0).toFixed(2)}</Text>
+    },
+    {
+      title: "Origen", dataIndex: "tipo_pedido", key: "tipo_pedido", width: 120,
+      render: t => <Tag color="blue">{ORIGEN_LABELS[t] || t}</Tag>
+    },
+    {
+      title: "Método", dataIndex: "metodo_pago", key: "metodo_pago", width: 110,
+      render: m => m ? m.charAt(0).toUpperCase() + m.slice(1) : "-"
+    },
+    {
+      title: "Estado", key: "estado", width: 120,
+      render: () => <Tag icon={<ClockCircleOutlined />} color="warning">Pendiente</Tag>
+    },
+    {
+      title: "Acción", key: "accion", width: 160,
+      render: (_, record) => (
+        <Popconfirm
+          title="¿Confirmar pago recibido?"
+          description="Esto sumará el monto a tu Plata en Mano."
+          onConfirm={() => marcarPagado(record.pedido_id)}
+          okText="Sí, ya me pagaron"
+          cancelText="Cancelar"
+        >
+          <Button type="primary" icon={<CheckCircleOutlined />} size="small">
+            Marcar Pagado
+          </Button>
+        </Popconfirm>
+      )
+    }
+  ];
+
+  if (loading) return <div style={{ textAlign: "center", padding: 40 }}><Spin /></div>;
+
+  return (
+    <>
+      <Row gutter={16} style={{ marginBottom: 20 }}>
+        <Col xs={12} md={6}>
+          <Card size="small" style={{ borderLeft: '4px solid #faad14' }}>
+            <Statistic
+              title="Total Pendiente de Cobro"
+              value={totalPendiente}
+              prefix={<DollarOutlined />}
+              precision={2}
+              valueStyle={{ color: '#faad14', fontWeight: 'bold' }}
+            />
+          </Card>
+        </Col>
+        <Col xs={12} md={6}>
+          <Card size="small">
+            <Statistic title="Pedidos Pendientes" value={pedidos.length} prefix={<ClockCircleOutlined />} />
+          </Card>
+        </Col>
+      </Row>
+
+      <Card title="Pedidos por Cobrar (Delivery)" size="small">
+        <Table
+          columns={columns}
+          dataSource={pedidos.map((p, i) => ({ ...p, key: p.pedido_id || i }))}
+          pagination={{ pageSize: 20 }}
+          size="small"
+          bordered
+          locale={{ emptyText: "🎉 No hay pagos pendientes. ¡Todo cobrado!" }}
+        />
+      </Card>
+    </>
+  );
+};
+
+// ────────────────────────────────────────────────────────────
 // PÁGINA PRINCIPAL
 // ────────────────────────────────────────────────────────────
 const VentasDelDia = () => {
   const { selectedStoreId } = useStore();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const params = selectedStoreId !== "global" ? `?sucursal_id=${selectedStoreId}` : "";
+        const res = await axiosInstance.get(`/pedidos/pendientes${params}`);
+        setPendingCount(Array.isArray(res.data) ? res.data.length : 0);
+      } catch { setPendingCount(0); }
+    };
+    fetchCount();
+  }, [selectedStoreId]);
 
   const items = [
     { key: "hoy", label: "Hoy", children: <VentasHoy selectedStoreId={selectedStoreId} /> },
-    { key: "mes", label: "Este Mes", children: <VentasMes selectedStoreId={selectedStoreId} /> }
+    { key: "mes", label: "Este Mes", children: <VentasMes selectedStoreId={selectedStoreId} /> },
+    {
+      key: "pendientes",
+      label: <Badge count={pendingCount} offset={[10, 0]} size="small">Pagos Pendientes</Badge>,
+      children: <PagosPendientes selectedStoreId={selectedStoreId} />
+    }
   ];
 
   return (
