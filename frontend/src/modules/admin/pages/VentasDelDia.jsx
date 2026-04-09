@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography } from "antd";
+import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography, InputNumber } from "antd";
 import { DollarOutlined, ShoppingCartOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { formatCurrency } from "../../pos/utils/formatters";
@@ -230,6 +230,7 @@ const VentasMes = ({ selectedStoreId }) => {
 const PagosPendientes = ({ selectedStoreId }) => {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [montosEditados, setMontosEditados] = useState({});
 
   useEffect(() => { cargar(); }, [selectedStoreId]);
 
@@ -248,8 +249,10 @@ const PagosPendientes = ({ selectedStoreId }) => {
 
   const marcarPagado = async (pedidoId) => {
     try {
-      await axiosInstance.patch(`/pedido/${pedidoId}/pagar`);
+      const body = montosEditados[pedidoId] !== undefined ? { monto: montosEditados[pedidoId] } : {};
+      await axiosInstance.patch(`/pedido/${pedidoId}/pagar`, body);
       message.success("Pedido marcado como pagado. Plata en Mano actualizada.");
+      setMontosEditados(prev => { const n = {...prev}; delete n[pedidoId]; return n; });
       cargar();
     } catch (err) {
       message.error(err.response?.data?.error || "Error al marcar como pagado");
@@ -264,8 +267,18 @@ const PagosPendientes = ({ selectedStoreId }) => {
       render: f => f ? new Date(f).toLocaleString("es-PA", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-"
     },
     {
-      title: "Monto", dataIndex: "total_pedido", key: "total_pedido", width: 110, align: "right",
-      render: m => <Text strong>${Number(m || 0).toFixed(2)}</Text>
+      title: "Monto", dataIndex: "total_pedido", key: "total_pedido", width: 130, align: "right",
+      render: (m, record) => record.tipo_pedido === "uber" ? (
+        <InputNumber
+          size="small"
+          value={montosEditados[record.pedido_id] ?? Number(m || 0)}
+          onChange={val => setMontosEditados(prev => ({ ...prev, [record.pedido_id]: val }))}
+          prefix="$"
+          min={0}
+          precision={2}
+          style={{ width: 100 }}
+        />
+      ) : <Text strong>${Number(m || 0).toFixed(2)}</Text>
     },
     {
       title: "Origen", dataIndex: "tipo_pedido", key: "tipo_pedido", width: 120,
