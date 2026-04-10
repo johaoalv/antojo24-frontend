@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography, InputNumber } from "antd";
+import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography, InputNumber, Modal } from "antd";
 import { DollarOutlined, ShoppingCartOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { formatCurrency } from "../../pos/utils/formatters";
@@ -231,6 +231,10 @@ const PagosPendientes = ({ selectedStoreId }) => {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [montosEditados, setMontosEditados] = useState({});
+  const [modalPY, setModalPY] = useState(false);
+  const [selPY, setSelPY] = useState([]);
+  const [montoPY, setMontoPY] = useState("");
+  const [confirmandoPY, setConfirmandoPY] = useState(false);
 
   useEffect(() => { cargar(); }, [selectedStoreId]);
 
@@ -260,6 +264,30 @@ const PagosPendientes = ({ selectedStoreId }) => {
   };
 
   const totalPendiente = pedidos.reduce((acc, p) => acc + parseFloat(p.total_pedido || 0), 0);
+
+  const totalSelPY = selPY.reduce((acc, id) => {
+    const p = pedidos.find(x => x.pedido_id === id);
+    return acc + parseFloat(p?.total_pedido || 0);
+  }, 0);
+
+  const handleLiquidarPY = async () => {
+    if (!selPY.length || !parseFloat(montoPY)) return message.warning("Seleccioná pedidos e ingresá el monto depositado");
+    setConfirmandoPY(true);
+    try {
+      const res = await axiosInstance.post("/pedidos/liquidacion-pedidosya", {
+        pedidos: selPY,
+        monto_depositado: parseFloat(montoPY),
+        sucursal_id: selectedStoreId
+      });
+      message.success(`${res.data.pagados} pedidos liquidados. $${parseFloat(montoPY).toFixed(2)} sumados a yappy.`);
+      setModalPY(false); setSelPY([]); setMontoPY("");
+      cargar();
+    } catch (err) {
+      message.error(err.response?.data?.error || "Error al liquidar");
+    } finally {
+      setConfirmandoPY(false);
+    }
+  };
 
   const columns = [
     {
@@ -333,6 +361,19 @@ const PagosPendientes = ({ selectedStoreId }) => {
         </Col>
       </Row>
 
+      {pedidos.some(p => p.tipo_pedido === 'pedidosya') && (
+        <Button
+          type="default"
+          style={{ marginBottom: 12 }}
+          onClick={() => {
+            setSelPY(pedidos.filter(p => p.tipo_pedido === 'pedidosya').map(p => p.pedido_id));
+            setModalPY(true);
+          }}
+        >
+          Liquidar PedidosYa
+        </Button>
+      )}
+
       <Card title="Pedidos por Cobrar (Delivery)" size="small">
         <Table
           columns={columns}
@@ -343,6 +384,54 @@ const PagosPendientes = ({ selectedStoreId }) => {
           locale={{ emptyText: "🎉 No hay pagos pendientes. ¡Todo cobrado!" }}
         />
       </Card>
+
+      <Modal
+        title="Liquidación PedidosYa"
+        open={modalPY}
+        onCancel={() => { setModalPY(false); setSelPY([]); setMontoPY(""); }}
+        onOk={handleLiquidarPY}
+        okText="Confirmar"
+        cancelText="Cancelar"
+        confirmLoading={confirmandoPY}
+        okButtonProps={{ disabled: !selPY.length || !parseFloat(montoPY) }}
+      >
+        <Table
+          size="small"
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: selPY,
+            onChange: keys => setSelPY(keys)
+          }}
+          dataSource={pedidos.filter(p => p.tipo_pedido === 'pedidosya').map(p => ({ ...p, key: p.pedido_id }))}
+          columns={[
+            {
+              title: "Fecha", dataIndex: "fecha", key: "fecha",
+              render: f => f ? new Date(f).toLocaleString("es-PA", { day: "2-digit", month: "2-digit" }) : "-"
+            },
+            {
+              title: "Monto", dataIndex: "total_pedido", key: "total_pedido", align: "right",
+              render: m => `$${Number(m || 0).toFixed(2)}`
+            }
+          ]}
+          style={{ marginBottom: 16 }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+          <Text type="secondary">Total seleccionado:</Text>
+          <Text strong>${totalSelPY.toFixed(2)}</Text>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Text>Monto depositado por PedidosYa:</Text>
+          <InputNumber
+            value={montoPY}
+            onChange={setMontoPY}
+            prefix="$"
+            min={0}
+            precision={2}
+            style={{ width: 140 }}
+            placeholder="0.00"
+          />
+        </div>
+      </Modal>
     </>
   );
 };
