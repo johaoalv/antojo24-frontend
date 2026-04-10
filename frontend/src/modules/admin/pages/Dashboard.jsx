@@ -107,29 +107,32 @@ function Dashboard() {
             <div style={{ marginBottom: '40px' }}>
                 <Title level={3} style={{ marginBottom: '20px' }}>Rendimiento del Mes Actual</Title>
                 <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={12} md={8} lg={6}>
+                    <Col xs={24} sm={12} md={8}>
                         <CardInfo title="Ventas del Mes" value={datos.mes_actual.ventas} icon={<ShoppingOutlined />} />
                     </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Utilidad neta (Mes)" value={datos.mes_actual.ganancia_neta} color="#52c41a" info="Rentabilidad operativa real de este mes" />
+                    <Col xs={24} sm={12} md={8}>
+                        <CardInfo
+                          title="Gastos del Mes"
+                          value={(datos.mes_actual.compras_inventario || 0) + (datos.mes_actual.gastos_operativos || 0) + (datos.mes_actual.mermas || 0)}
+                          color="#f5222d"
+                          info="Inventario + Operativos + Mermas"
+                          subItems={datos.mes_actual.gastos_por_metodo ? [
+                            { label: "yappy", value: datos.mes_actual.gastos_por_metodo.yappy || 0 },
+                            { label: "efectivo", value: datos.mes_actual.gastos_por_metodo.efectivo || 0 }
+                          ] : null}
+                        />
                     </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Costo Insumos" value={datos.mes_actual.cogs} color="#fa8c16" info="Lo que costó la materia prima de las ventas del mes" />
-                    </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Gastos Operativos" value={datos.mes_actual.gastos_operativos} color="#1890ff" info="Luz, agua, sueldos, alquiler pagados en el mes" />
-                    </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Mermas (Mes)" value={datos.mes_actual.mermas} color="#f5222d" info="Pérdida por desperdicios este mes" />
-                    </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Aporte Capital (Mes)" value={datos.mes_actual.inyecciones} color="#eb2f96" info="Dinero extra que pusiste este mes" />
-                    </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Compras Inventario" value={datos.mes_actual.compras_inventario} color="#13c2c2" info="Gasto en materia prima acumulada este mes" />
-                    </Col>
-                    <Col xs={24} sm={12} md={8} lg={6}>
-                        <CardInfo title="Flujo Caja del Mes" value={datos.mes_actual.saldo_caja_mes} color="#d48d68" info="Balance neto de dinero solo de este mes" />
+                    <Col xs={24} sm={12} md={8}>
+                        <CardInfo
+                          title="Flujo Caja del Mes"
+                          value={datos.mes_actual.saldo_caja_mes}
+                          color="#d48d68"
+                          info="Balance neto de dinero solo de este mes"
+                          subItems={datos.mes_actual.flujo_por_metodo ? [
+                            { label: "yappy", value: datos.mes_actual.flujo_por_metodo.yappy || 0 },
+                            { label: "efectivo", value: datos.mes_actual.flujo_por_metodo.efectivo || 0 }
+                          ] : null}
+                        />
                     </Col>
                 </Row>
             </div>
