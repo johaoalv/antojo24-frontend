@@ -230,11 +230,14 @@ const VentasMes = ({ selectedStoreId }) => {
 const PagosPendientes = ({ selectedStoreId }) => {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [montosEditados, setMontosEditados] = useState({});
   const [modalPY, setModalPY] = useState(false);
   const [selPY, setSelPY] = useState([]);
   const [montoPY, setMontoPY] = useState("");
   const [confirmandoPY, setConfirmandoPY] = useState(false);
+  const [modalUber, setModalUber] = useState(false);
+  const [selUber, setSelUber] = useState([]);
+  const [montoUber, setMontoUber] = useState("");
+  const [confirmandoUber, setConfirmandoUber] = useState(false);
 
   useEffect(() => { cargar(); }, [selectedStoreId]);
 
@@ -251,21 +254,33 @@ const PagosPendientes = ({ selectedStoreId }) => {
     }
   };
 
-  const marcarPagado = async (pedidoId) => {
+  const handleLiquidarUber = async () => {
+    if (!selUber.length || !parseFloat(montoUber)) return message.warning("Seleccioná pedidos e ingresá el monto depositado");
+    setConfirmandoUber(true);
     try {
-      const body = montosEditados[pedidoId] !== undefined ? { monto: montosEditados[pedidoId] } : {};
-      await axiosInstance.patch(`/pedido/${pedidoId}/pagar`, body);
-      message.success("Pedido marcado como pagado. Plata en Mano actualizada.");
-      setMontosEditados(prev => { const n = {...prev}; delete n[pedidoId]; return n; });
+      const res = await axiosInstance.post("/pedidos/liquidacion-uber", {
+        pedidos: selUber,
+        monto_depositado: parseFloat(montoUber),
+        sucursal_id: selectedStoreId
+      });
+      message.success(`${res.data.pagados} pedidos liquidados. $${parseFloat(montoUber).toFixed(2)} sumados a yappy.`);
+      setModalUber(false); setSelUber([]); setMontoUber("");
       cargar();
     } catch (err) {
-      message.error(err.response?.data?.error || "Error al marcar como pagado");
+      message.error(err.response?.data?.error || "Error al liquidar");
+    } finally {
+      setConfirmandoUber(false);
     }
   };
 
   const totalPendiente = pedidos.reduce((acc, p) => acc + parseFloat(p.total_pedido || 0), 0);
 
   const totalSelPY = selPY.reduce((acc, id) => {
+    const p = pedidos.find(x => x.pedido_id === id);
+    return acc + parseFloat(p?.total_pedido || 0);
+  }, 0);
+
+  const totalSelUber = selUber.reduce((acc, id) => {
     const p = pedidos.find(x => x.pedido_id === id);
     return acc + parseFloat(p?.total_pedido || 0);
   }, 0);
@@ -295,18 +310,8 @@ const PagosPendientes = ({ selectedStoreId }) => {
       render: f => f ? new Date(f).toLocaleString("es-PA", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-"
     },
     {
-      title: "Monto", dataIndex: "total_pedido", key: "total_pedido", width: 130, align: "right",
-      render: (m, record) => record.tipo_pedido === "uber" ? (
-        <InputNumber
-          size="small"
-          value={montosEditados[record.pedido_id] ?? Number(m || 0)}
-          onChange={val => setMontosEditados(prev => ({ ...prev, [record.pedido_id]: val }))}
-          prefix="$"
-          min={0}
-          precision={2}
-          style={{ width: 100 }}
-        />
-      ) : <Text strong>${Number(m || 0).toFixed(2)}</Text>
+      title: "Monto", dataIndex: "total_pedido", key: "total_pedido", width: 110, align: "right",
+      render: m => <Text strong>${Number(m || 0).toFixed(2)}</Text>
     },
     {
       title: "Origen", dataIndex: "tipo_pedido", key: "tipo_pedido", width: 120,
@@ -319,22 +324,6 @@ const PagosPendientes = ({ selectedStoreId }) => {
     {
       title: "Estado", key: "estado", width: 120,
       render: () => <Tag icon={<ClockCircleOutlined />} color="warning">Pendiente</Tag>
-    },
-    {
-      title: "Acción", key: "accion", width: 160,
-      render: (_, record) => (
-        <Popconfirm
-          title="¿Confirmar pago recibido?"
-          description="Esto sumará el monto a tu Plata en Mano."
-          onConfirm={() => marcarPagado(record.pedido_id)}
-          okText="Sí, ya me pagaron"
-          cancelText="Cancelar"
-        >
-          <Button type="primary" icon={<CheckCircleOutlined />} size="small">
-            Marcar Pagado
-          </Button>
-        </Popconfirm>
-      )
     }
   ];
 
@@ -361,18 +350,30 @@ const PagosPendientes = ({ selectedStoreId }) => {
         </Col>
       </Row>
 
-      {pedidos.some(p => p.tipo_pedido === 'pedidosya') && (
-        <Button
-          type="default"
-          style={{ marginBottom: 12 }}
-          onClick={() => {
-            setSelPY(pedidos.filter(p => p.tipo_pedido === 'pedidosya').map(p => p.pedido_id));
-            setModalPY(true);
-          }}
-        >
-          Liquidar PedidosYa
-        </Button>
-      )}
+      <div style={{ marginBottom: 12, display: "flex", gap: 8 }}>
+        {pedidos.some(p => p.tipo_pedido === 'pedidosya') && (
+          <Button
+            type="default"
+            onClick={() => {
+              setSelPY(pedidos.filter(p => p.tipo_pedido === 'pedidosya').map(p => p.pedido_id));
+              setModalPY(true);
+            }}
+          >
+            Liquidar PedidosYa
+          </Button>
+        )}
+        {pedidos.some(p => p.tipo_pedido === 'uber') && (
+          <Button
+            type="default"
+            onClick={() => {
+              setSelUber(pedidos.filter(p => p.tipo_pedido === 'uber').map(p => p.pedido_id));
+              setModalUber(true);
+            }}
+          >
+            Liquidar Uber
+          </Button>
+        )}
+      </div>
 
       <Card title="Pedidos por Cobrar (Delivery)" size="small">
         <Table
@@ -424,6 +425,54 @@ const PagosPendientes = ({ selectedStoreId }) => {
           <InputNumber
             value={montoPY}
             onChange={setMontoPY}
+            prefix="$"
+            min={0}
+            precision={2}
+            style={{ width: 140 }}
+            placeholder="0.00"
+          />
+        </div>
+      </Modal>
+
+      <Modal
+        title="Liquidación Uber"
+        open={modalUber}
+        onCancel={() => { setModalUber(false); setSelUber([]); setMontoUber(""); }}
+        onOk={handleLiquidarUber}
+        okText="Confirmar"
+        cancelText="Cancelar"
+        confirmLoading={confirmandoUber}
+        okButtonProps={{ disabled: !selUber.length || !parseFloat(montoUber) }}
+      >
+        <Table
+          size="small"
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: selUber,
+            onChange: keys => setSelUber(keys)
+          }}
+          dataSource={pedidos.filter(p => p.tipo_pedido === 'uber').map(p => ({ ...p, key: p.pedido_id }))}
+          columns={[
+            {
+              title: "Fecha", dataIndex: "fecha", key: "fecha",
+              render: f => f ? new Date(f).toLocaleString("es-PA", { day: "2-digit", month: "2-digit" }) : "-"
+            },
+            {
+              title: "Monto", dataIndex: "total_pedido", key: "total_pedido", align: "right",
+              render: m => `$${Number(m || 0).toFixed(2)}`
+            }
+          ]}
+          style={{ marginBottom: 16 }}
+        />
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+          <Text type="secondary">Total seleccionado:</Text>
+          <Text strong>${totalSelUber.toFixed(2)}</Text>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Text>Monto depositado por Uber:</Text>
+          <InputNumber
+            value={montoUber}
+            onChange={setMontoUber}
             prefix="$"
             min={0}
             precision={2}
