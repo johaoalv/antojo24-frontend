@@ -10,7 +10,8 @@ import {
   ExperimentOutlined,
   PieChartOutlined,
   PlusOutlined,
-  WalletOutlined
+  WalletOutlined,
+  BankOutlined
 } from "@ant-design/icons";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
@@ -99,6 +100,11 @@ const AdminLayoutContent = () => {
       key: "mermas",
       icon: <BlockOutlined style={{ fontSize: '1.5em' }} />,
       label: <span style={{ fontSize: '1.3em' }}>Mermas</span>,
+    },
+    {
+      key: "inyecciones",
+      icon: <BankOutlined style={{ fontSize: '1.5em' }} />,
+      label: <span style={{ fontSize: '1.3em' }}>Aporte Capital</span>,
     },
     {
       key: "logout",

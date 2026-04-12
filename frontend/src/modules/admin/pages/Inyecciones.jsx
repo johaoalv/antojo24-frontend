@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Button, Modal, Form, Input, InputNumber, message, Popconfirm, Select } from "antd";
+import { Table, Card, Typography, Button, Modal, Form, Input, InputNumber, message, Popconfirm, Select, Tag } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { obtenerInyecciones, agregarInyeccion, eliminarInyeccion } from "../../../api/admin/axios_inyecciones";
 import { useStore } from "../../../context/StoreContext";
@@ -61,6 +61,12 @@ function Inyecciones() {
             render: (id) => stores.find(t => t.sucursal_id === id)?.nombre || "Global / Central"
         },
         {
+            title: 'Método',
+            dataIndex: 'metodo_pago',
+            key: 'metodo_pago',
+            render: (metodo) => <Tag color={metodo === 'yappy' ? 'purple' : 'green'}>{metodo?.toUpperCase() || 'EFECTIVO'}</Tag>
+        },
+        {
             title: 'Monto',
             dataIndex: 'monto',
             key: 'monto',
@@ -85,7 +91,7 @@ function Inyecciones() {
                 </Title>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => {
                     setIsModalOpen(true);
-                    form.setFieldsValue({ sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId });
+                    form.setFieldsValue({ sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId, metodo_pago: 'efectivo' });
                 }}>
                     Registrar Aporte
                 </Button>
@@ -124,6 +130,12 @@ function Inyecciones() {
                                 <Select.Option key={t.sucursal_id} value={t.sucursal_id}>{t.nombre}</Select.Option>
                             ))}
                         </Select>
+                    </Form.Item>
+                    <Form.Item name="metodo_pago" label="Método de Pago" rules={[{ required: true }]}>
+                        <Select options={[
+                            { label: "Efectivo", value: "efectivo" },
+                            { label: "Yappy", value: "yappy" }
+                        ]} />
                     </Form.Item>
                     <Form.Item name="fecha" label="Fecha (Opcional)">
                         <Input type="date" />

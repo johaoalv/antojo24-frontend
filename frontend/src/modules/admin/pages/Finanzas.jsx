@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Row, Col, Tag, Space, Input, Select, Button, Modal, Form, InputNumber, message } from "antd";
+import { Table, Card, Typography, Row, Col, Tag } from "antd";
 import { obtenerMovimientos } from "../../../api/admin/axios_finanzas";
-import { agregarInyeccion } from "../../../api/admin/axios_inyecciones";
 import { useStore } from "../../../context/StoreContext";
-import { ArrowUpOutlined, ArrowDownOutlined, WalletOutlined, PlusOutlined } from "@ant-design/icons";
+import { ArrowUpOutlined, ArrowDownOutlined, WalletOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -28,9 +27,7 @@ const CATEGORIA_LABELS = {
 function Finanzas() {
     const [movimientos, setMovimientos] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm();
-    const { selectedStoreId, stores } = useStore();
+    const { selectedStoreId } = useStore();
 
     const cargarDatos = async () => {
         setLoading(true);
@@ -41,18 +38,6 @@ function Finanzas() {
             console.error("Error al cargar movimientos:", error);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleAdd = async (values) => {
-        try {
-            await agregarInyeccion(values);
-            message.success("Aporte de capital registrado correctamente");
-            setIsModalOpen(false);
-            form.resetFields();
-            cargarDatos();
-        } catch (error) {
-            message.error("Error al registrar aporte");
         }
     };
 
@@ -107,22 +92,9 @@ function Finanzas() {
 
     return (
         <div style={{ padding: '30px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <Title level={2} style={{ margin: 0 }}>
-                    <WalletOutlined /> Libro de Caja Centralizado
-                </Title>
-                <Button 
-                    type="primary" 
-                    icon={<PlusOutlined />} 
-                    size="large"
-                    onClick={() => {
-                        setIsModalOpen(true);
-                        form.setFieldsValue({ sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId });
-                    }}
-                >
-                    Registrar Aporte (Capital)
-                </Button>
-            </div>
+            <Title level={2} style={{ marginBottom: '24px' }}>
+                <WalletOutlined /> Libro de Caja
+            </Title>
 
             <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
                 <Col xs={24} md={8}>
@@ -135,10 +107,9 @@ function Finanzas() {
                 </Col>
                 <Col xs={24} md={16}>
                     <Card style={{ borderRadius: '12px' }} bordered={false}>
-                        <Text strong>¿Cómo registrar tu base?</Text>
+                        <Text strong>Registro de todos los movimientos de caja</Text>
                         <p style={{ margin: 0, color: '#666' }}>
-                            Usa el botón de arriba para registrar tu base diaria para cambios (ej. $20) como un **Aporte**. 
-                            También úsalo para registrar dinero que entra al negocio y NO es por una venta.
+                            Aquí puedes ver todas las entradas y salidas de dinero. Para registrar aportes de capital, usa la sección "Aporte Capital" en el menú lateral.
                         </p>
                     </Card>
                 </Col>
@@ -153,35 +124,9 @@ function Finanzas() {
                     pagination={{ pageSize: 15 }}
                 />
             </Card>
-
-            <Modal
-                title="Nuevo Aporte de Capital"
-                open={isModalOpen}
-                onCancel={() => setIsModalOpen(false)}
-                onOk={() => form.submit()}
-                destroyOnClose
-            >
-                <Form form={form} layout="vertical" onFinish={handleAdd}>
-                    <Form.Item name="descripcion" label="Descripción (Ej: Base para cambios)" rules={[{ required: true }]}>
-                        <Input placeholder="Ej: Aporte inicial para el día" />
-                    </Form.Item>
-                    <Form.Item name="monto" label="Monto ($)" rules={[{ required: true }]}>
-                        <InputNumber style={{ width: '100%' }} precision={2} min={0} />
-                    </Form.Item>
-                    <Form.Item name="sucursal_id" label="Sucursal Destino (Opcional)">
-                        <Select placeholder="Selecciona una sucursal" allowClear>
-                            {stores.map(t => (
-                                <Select.Option key={t.sucursal_id} value={t.sucursal_id}>{t.nombre}</Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-                    <Form.Item name="fecha" label="Fecha (Opcional)">
-                        <Input type="date" />
-                    </Form.Item>
-                </Form>
-            </Modal>
         </div>
     );
 }
 
 export default Finanzas;
+
