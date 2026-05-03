@@ -125,12 +125,12 @@ function Dashboard() {
                     <Col xs={24} sm={12} md={8}>
                         <CardInfo
                           title="Flujo Caja del Mes"
-                          value={datos.mes_actual.saldo_caja_mes}
+                          value={100 + (datos.mes_actual.saldo_caja_mes || 0)}
                           color="#d48d68"
-                          info="Balance neto de dinero solo de este mes"
+                          info="Inicia con $50 yappy + $50 efectivo. Se mueve con entradas y salidas reales del mes."
                           subItems={datos.mes_actual.flujo_por_metodo ? [
-                            { label: "yappy", value: datos.mes_actual.flujo_por_metodo.yappy || 0 },
-                            { label: "efectivo", value: datos.mes_actual.flujo_por_metodo.efectivo || 0 }
+                            { label: "yappy", value: 50 + (datos.mes_actual.flujo_por_metodo.yappy || 0) },
+                            { label: "efectivo", value: 50 + (datos.mes_actual.flujo_por_metodo.efectivo || 0) }
                           ] : null}
                         />
                     </Col>

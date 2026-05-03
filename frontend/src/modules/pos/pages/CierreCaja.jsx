@@ -1,114 +1,146 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Popconfirm, Table, Typography, Button, Space } from "antd";
-import { DollarCircleOutlined, DeleteOutlined } from "@ant-design/icons";
-import { hacerCierreCaja, getResumenVentas } from "../../../api/pos/axios_cierre";
+import { Table, Typography, Button, Tag, Space, Popconfirm } from "antd";
+import { DollarCircleOutlined, DeleteOutlined, ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import { hacerCierreCaja, getMovimientosHoy, getPedidoDetalle } from "../../../api/pos/axios_cierre";
 import { eliminarPedido } from "../../../api/pos/axios_pedidos";
 import Navbar from "../../common/components/Navbar";
 import SecondaryButton from "../../common/components/SecondaryButton";
 import Loader from "../../common/components/Loader";
 import ClosingSummaryModal from "../components/ClosingSummaryModal";
-import {
-  notifyError,
-  notifySuccess,
-  notifyWarning,
-} from "../../common/components/notifications.jsx";
+import { notifyError, notifySuccess, notifyWarning } from "../../common/components/notifications.jsx";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
+
+const SALDO_INICIAL_DEFAULT = { yappy: 50, efectivo: 50 };
+
+const METODO_LABEL = {
+  yappy: "Yappy",
+  efectivo: "Efectivo",
+  tarjeta: "Tarjeta",
+  transferencia: "Transferencia",
+};
+
+const CATEGORIA_LABEL = {
+  venta: "Venta",
+  operativo: "Gasto Operativo",
+  inventario: "Inventario",
+  inversion: "Capital",
+};
+
+function formatHora(fechaStr) {
+  if (!fechaStr) return "-";
+  const d = new Date(fechaStr);
+  return d.toLocaleTimeString("es-PA", { hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
+function buildFilas(movimientos, saldoInicial = SALDO_INICIAL_DEFAULT) {
+  let saldoYappy = saldoInicial.yappy;
+  let saldoEfectivo = saldoInicial.efectivo;
+
+  const filas = [
+    {
+      key: "inicio",
+      hora: "12:00 AM",
+      descripcion: "Inicio del día",
+      metodo: "ambos",
+      tipo: "inicio",
+      monto: null,
+      saldo_yappy: saldoYappy,
+      saldo_efectivo: saldoEfectivo,
+      referencia_id: null,
+    },
+  ];
+
+  for (const m of movimientos) {
+    const monto = parseFloat(m.monto || 0);
+    const esEntrada = m.tipo === "entrada";
+
+    if (m.metodo_pago === "yappy") {
+      saldoYappy = esEntrada ? saldoYappy + monto : saldoYappy - monto;
+    } else if (m.metodo_pago === "efectivo") {
+      saldoEfectivo = esEntrada ? saldoEfectivo + monto : saldoEfectivo - monto;
+    }
+
+    filas.push({
+      key: m.id,
+      hora: formatHora(m.fecha),
+      descripcion: m.descripcion || CATEGORIA_LABEL[m.categoria] || m.categoria,
+      metodo: m.metodo_pago,
+      tipo: m.tipo,
+      categoria: m.categoria,
+      monto,
+      saldo_yappy: saldoYappy,
+      saldo_efectivo: saldoEfectivo,
+      referencia_id: m.referencia_id || null,
+    });
+  }
+
+  return { filas, saldoYappy, saldoEfectivo };
+}
 
 const CierreCaja = () => {
-  const [pedidos, setPedidos] = useState([]);
+  const [movimientos, setMovimientos] = useState([]);
+  const [saldoInicial, setSaldoInicial] = useState(SALDO_INICIAL_DEFAULT);
+  const [detalles, setDetalles] = useState({});
   const [cargando, setCargando] = useState(true);
   const [loadingCierre, setLoadingCierre] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [totalReal, setTotalReal] = useState(0);
   const nombreSucursal = JSON.parse(localStorage.getItem("user"))?.nombre_tienda;
 
-  const totalCalculado = useMemo(
-    () =>
-      pedidos.reduce(
-        (acc, current) => acc + parseFloat(current.total_item || 0),
-        0
-      ),
-    [pedidos]
-  );
-
-  const subtotales = useMemo(() => {
-    return pedidos.reduce((acc, current) => {
-      const metodo = current.metodo_pago || "otro";
-      acc[metodo] = (acc[metodo] || 0) + parseFloat(current.total_item || 0);
-      return acc;
-    }, {});
-  }, [pedidos]);
-
-  const subtotalesPorOrigen = useMemo(() => {
-    return pedidos.reduce((acc, current) => {
-      const origen = current.tipo_pedido || "local";
-      acc[origen] = (acc[origen] || 0) + parseFloat(current.total_item || 0);
-      return acc;
-    }, {});
-  }, [pedidos]);
-
-  const cargarPedidos = async () => {
+  const cargarMovimientos = async () => {
     setCargando(true);
     try {
-      const datos = await getResumenVentas();
-      setPedidos(datos);
-    } catch (error) {
-      console.error("Error al cargar:", error);
-      notifyError({
-        message: "Error al cargar los pedidos",
-        description: "Intenta nuevamente en unos momentos.",
-        placement: "topRight",
+      const data = await getMovimientosHoy();
+      setMovimientos(data.movimientos || []);
+      setSaldoInicial({
+        yappy: data.saldo_inicial_yappy ?? 50,
+        efectivo: data.saldo_inicial_efectivo ?? 50,
       });
+    } catch (error) {
+      console.error("Error al cargar movimientos:", error);
+      notifyError({ message: "Error al cargar los movimientos del día", placement: "topRight" });
     } finally {
       setCargando(false);
     }
   };
 
   useEffect(() => {
-    cargarPedidos();
+    cargarMovimientos();
   }, []);
 
-  const handleDeletePedido = async (pedido_id) => {
+  const { filas, saldoYappy, saldoEfectivo } = useMemo(
+    () => buildFilas(movimientos, saldoInicial),
+    [movimientos, saldoInicial]
+  );
+
+  const handleExpand = async (expanded, record) => {
+    if (!expanded || !record.referencia_id || detalles[record.referencia_id]) return;
     try {
-      const response = await eliminarPedido(pedido_id);
+      const items = await getPedidoDetalle(record.referencia_id);
+      setDetalles((prev) => ({ ...prev, [record.referencia_id]: items }));
+    } catch {
+      setDetalles((prev) => ({ ...prev, [record.referencia_id]: [] }));
+    }
+  };
 
-      console.log("-----------------------------------------");
-      console.log(`🗑️ Venta eliminada: ${pedido_id}`);
-      if (response.restored_items && response.restored_items.length > 0) {
-        console.log("♻️ Insumos retornados al stock:");
-        response.restored_items.forEach(item => {
-          console.log(`   - ${item.insumo}: +${item.cantidad} (de producto: ${item.producto})`);
-        });
-      } else {
-        console.log("⚠️ No se encontraron insumos para restaurar en este pedido.");
-      }
-      console.log("-----------------------------------------");
-
-      notifySuccess({
-        message: "Pedido eliminado",
-        description: "El pedido ha sido eliminado y el stock restaurado.",
-        placement: "bottomRight",
-      });
-      cargarPedidos(); // Recargar la lista
+  const handleDeleteVenta = async (referencia_id) => {
+    try {
+      await eliminarPedido(referencia_id);
+      notifySuccess({ message: "Venta eliminada y stock restaurado", placement: "bottomRight" });
+      cargarMovimientos();
     } catch (error) {
       notifyError({
         message: "Error al eliminar",
-        description: error.response?.data?.error || "No se pudo eliminar el pedido.",
+        description: error.response?.data?.error || "No se pudo eliminar la venta.",
         placement: "topRight",
       });
     }
   };
 
   const handleOpenModal = () => {
-    setTotalReal(totalCalculado);
+    setTotalReal(saldoEfectivo);
     setModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    if (!loadingCierre) {
-      setModalVisible(false);
-    }
   };
 
   const handleCierre = async () => {
@@ -117,25 +149,16 @@ const CierreCaja = () => {
       const resultado = await hacerCierreCaja(totalReal);
       notifySuccess({
         message: "Cierre exitoso",
-        description: `Total reportado: $${resultado.resumen.total_general}`,
+        description: `Efectivo: $${resultado.resumen?.total_efectivo?.toFixed(2) ?? "0.00"}`,
         placement: "bottomRight",
       });
       setModalVisible(false);
     } catch (error) {
       if (error.response?.status === 409) {
-        notifyWarning({
-          message: "Cierre existente",
-          description: "Ya registraste un cierre hoy.",
-          placement: "topRight",
-        });
+        notifyWarning({ message: "Ya registraste un cierre hoy.", placement: "topRight" });
       } else {
-        notifyError({
-          message: "Error al cerrar caja",
-          description: error.message,
-          placement: "topRight",
-        });
+        notifyError({ message: "Error al cerrar caja", description: error.message, placement: "topRight" });
       }
-      console.error("Detalle error:", error.response?.data || error);
     } finally {
       setLoadingCierre(false);
     }
@@ -143,59 +166,125 @@ const CierreCaja = () => {
 
   const columnas = [
     {
-      title: <strong style={{ fontSize: '1.2em' }}>Producto</strong>,
-      dataIndex: "producto",
-      key: "producto",
-      render: text => <span style={{ fontSize: '1.1em' }}>{text}</span>
-    },
-    {
-      title: <strong style={{ fontSize: '1.2em' }}>Cantidad</strong>,
-      dataIndex: "cantidad",
-      key: "cantidad",
-      align: "center",
-      render: text => <span style={{ fontSize: '1.1em' }}>{text}</span>
-    },
-    {
-      title: <strong style={{ fontSize: '1.2em' }}>Precio</strong>,
-      dataIndex: "total_item",
-      key: "precio",
-      align: "right",
-      render: (precio) => <span style={{ fontSize: '1.1em' }}>{`$${parseFloat(precio).toFixed(2)}`}</span>,
-    },
-    {
-      title: <strong style={{ fontSize: '1.2em' }}>Método de Pago</strong>,
-      dataIndex: "metodo_pago",
-      key: "metodo_pago",
-      render: text => <span style={{ fontSize: '1.1em', textTransform: 'capitalize' }}>{text}</span>
-    },
-    {
-      title: <strong style={{ fontSize: '1.2em' }}>Acciones</strong>,
-      key: "acciones",
-      align: "center",
-      render: (_, record) => (
-        <Popconfirm
-          title="¿Estás seguro de eliminar esta venta?"
-          description="Se restaurará el inventario automáticamente."
-          onConfirm={() => handleDeletePedido(record.pedido_id)}
-          okText="Sí, eliminar"
-          cancelText="No"
-          okButtonProps={{ danger: true }}
-        >
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined style={{ fontSize: '1.2em' }} />}
-          />
-        </Popconfirm>
+      title: "Hora",
+      dataIndex: "hora",
+      key: "hora",
+      width: 90,
+      render: (v, r) => (
+        <Text style={{ fontSize: 13, color: r.tipo === "inicio" ? "#722ed1" : undefined }}>
+          {v}
+        </Text>
       ),
     },
+    {
+      title: "Descripción",
+      dataIndex: "descripcion",
+      key: "descripcion",
+      render: (v, r) => (
+        <Text strong={r.tipo === "inicio"} style={{ color: r.tipo === "inicio" ? "#722ed1" : undefined }}>
+          {v}
+        </Text>
+      ),
+    },
+    {
+      title: "Método",
+      dataIndex: "metodo",
+      key: "metodo",
+      width: 130,
+      render: (v) =>
+        v === "ambos" ? (
+          <Space size={4}>
+            <Tag color="blue" style={{ margin: 0 }}>Yappy</Tag>
+            <Tag color="green" style={{ margin: 0 }}>Efectivo</Tag>
+          </Space>
+        ) : (
+          <Tag color={v === "yappy" ? "blue" : v === "efectivo" ? "green" : "default"}>
+            {METODO_LABEL[v] || v}
+          </Tag>
+        ),
+    },
+    {
+      title: "Monto",
+      dataIndex: "monto",
+      key: "monto",
+      align: "right",
+      width: 120,
+      render: (v, r) => {
+        if (r.tipo === "inicio") return <Text style={{ color: "#52c41a" }}>+$50 / +$50</Text>;
+        const color = r.tipo === "entrada" ? "#52c41a" : "#f5222d";
+        const icon = r.tipo === "entrada" ? <ArrowUpOutlined /> : <ArrowDownOutlined />;
+        return <Text strong style={{ color }}>{icon} ${v.toFixed(2)}</Text>;
+      },
+    },
+    {
+      title: "Saldo Yappy",
+      dataIndex: "saldo_yappy",
+      key: "saldo_yappy",
+      align: "right",
+      width: 110,
+      render: (v) => <Text style={{ color: v < 0 ? "#f5222d" : undefined }}>${v.toFixed(2)}</Text>,
+    },
+    {
+      title: "Saldo Efectivo",
+      dataIndex: "saldo_efectivo",
+      key: "saldo_efectivo",
+      align: "right",
+      width: 120,
+      render: (v) => <Text style={{ color: v < 0 ? "#f5222d" : undefined }}>${v.toFixed(2)}</Text>,
+    },
+    {
+      title: "",
+      key: "acciones",
+      width: 50,
+      render: (_, record) => {
+        if (record.categoria !== "venta" || !record.referencia_id) return null;
+        return (
+          <Popconfirm
+            title="¿Eliminar esta venta?"
+            description="Se restaurará el inventario automáticamente."
+            onConfirm={() => handleDeleteVenta(record.referencia_id)}
+            okText="Sí"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+          </Popconfirm>
+        );
+      },
+    },
   ];
+
+  const hayMovimientos = movimientos.length > 0;
 
   return (
     <>
       <Navbar />
       <div style={{ padding: 40 }}>
-        <Title level={2} style={{ textAlign: 'center', marginBottom: 40 }}>Resumen de Pedidos - {nombreSucursal}</Title>
+        <Title level={2} style={{ textAlign: "center", marginBottom: 32 }}>
+          Cierre de Caja — {nombreSucursal}
+        </Title>
+
+        {/* Cards resumen */}
+        <div style={{ display: "flex", gap: 16, marginBottom: 32, justifyContent: "center" }}>
+          <div style={{ background: "#e6f4ff", borderRadius: 12, padding: "16px 32px", textAlign: "center", minWidth: 140 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>Saldo Yappy</Text>
+            <div style={{ fontSize: "1.6em", fontWeight: "bold", color: saldoYappy < 0 ? "#f5222d" : "#1890ff" }}>
+              ${saldoYappy.toFixed(2)}
+            </div>
+          </div>
+          <div style={{ background: "#f6ffed", borderRadius: 12, padding: "16px 32px", textAlign: "center", minWidth: 140 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>Saldo Efectivo</Text>
+            <div style={{ fontSize: "1.6em", fontWeight: "bold", color: saldoEfectivo < 0 ? "#f5222d" : "#52c41a" }}>
+              ${saldoEfectivo.toFixed(2)}
+            </div>
+          </div>
+          <div style={{ background: "#f9f0ff", borderRadius: 12, padding: "16px 32px", textAlign: "center", minWidth: 140 }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>Total del Día</Text>
+            <div style={{ fontSize: "1.6em", fontWeight: "bold", color: "#722ed1" }}>
+              ${(saldoYappy + saldoEfectivo).toFixed(2)}
+            </div>
+          </div>
+        </div>
 
         {cargando ? (
           <div style={{ textAlign: "center", marginTop: 50 }}>
@@ -203,87 +292,59 @@ const CierreCaja = () => {
           </div>
         ) : (
           <Table
-            dataSource={pedidos}
+            dataSource={filas}
             columns={columnas}
-            rowKey="id"
-            pagination={{
-              pageSize: 15,
-              showSizeChanger: true,
-              showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} items`
+            rowKey="key"
+            pagination={{ pageSize: 20, showSizeChanger: false }}
+            bordered={false}
+            size="middle"
+            rowClassName={(r) => r.tipo === "inicio" ? "fila-inicio" : ""}
+            expandable={{
+              onExpand: handleExpand,
+              rowExpandable: (r) => r.categoria === "venta" && !!r.referencia_id,
+              expandedRowRender: (r) => {
+                const items = detalles[r.referencia_id];
+                if (!items) return <Text type="secondary">Cargando...</Text>;
+                if (items.length === 0) return <Text type="secondary">Sin detalle disponible.</Text>;
+                return (
+                  <Table
+                    dataSource={items}
+                    rowKey={(i) => i.producto + i.cantidad}
+                    size="small"
+                    pagination={false}
+                    style={{ margin: "0 48px" }}
+                    columns={[
+                      { title: "Producto", dataIndex: "producto", key: "producto" },
+                      { title: "Cantidad", dataIndex: "cantidad", key: "cantidad", align: "center", width: 80 },
+                      { title: "Total", dataIndex: "total_item", key: "total_item", align: "right", width: 100,
+                        render: (v) => `$${parseFloat(v).toFixed(2)}` },
+                    ]}
+                  />
+                );
+              },
             }}
-            bordered
-            summary={() => (
-              <Table.Summary fixed="bottom">
-                {Object.entries(subtotales).map(([metodo, total]) => (
-                  <Table.Summary.Row key={metodo} style={{ backgroundColor: '#fafafa' }}>
-                    <Table.Summary.Cell index={0}>
-                      <span style={{ fontSize: "1.1em", textTransform: 'capitalize' }}>Subtotal {metodo}</span>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                    <Table.Summary.Cell index={2} align="right">
-                      <span style={{ fontSize: "1.1em" }}>${total.toFixed(2)}</span>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                  </Table.Summary.Row>
-                ))}
-                <Table.Summary.Row style={{ backgroundColor: '#f0f0f0', borderTop: '2px solid #d9d9d9' }}>
-                  <Table.Summary.Cell index={0}>
-                    <strong style={{ fontSize: "1.2em" }}>Por Origen</strong>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={2}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                </Table.Summary.Row>
-                {Object.entries(subtotalesPorOrigen).map(([origen, total]) => {
-                  const origenes = { local: "Local", pedidosya: "PedidosYa", uber: "Uber" };
-                  return (
-                    <Table.Summary.Row key={`origen-${origen}`} style={{ backgroundColor: '#f9f9f9' }}>
-                      <Table.Summary.Cell index={0}>
-                        <span style={{ fontSize: "1.1em" }}>{origenes[origen] || origen}</span>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                      <Table.Summary.Cell index={2} align="right">
-                        <span style={{ fontSize: "1.1em" }}>${total.toFixed(2)}</span>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                    </Table.Summary.Row>
-                  );
-                })}
-                <Table.Summary.Row>
-                  <Table.Summary.Cell index={0}>
-                    <strong style={{ fontSize: "1.4em" }}>Total General</strong>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                  <Table.Summary.Cell index={2} align="right">
-                    <Typography.Text strong style={{ fontSize: "1.4em" }}>
-                      ${totalCalculado.toFixed(2)}
-                    </Typography.Text>
-                  </Table.Summary.Cell>
-                  <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                </Table.Summary.Row>
-              </Table.Summary>
-            )}
           />
         )}
 
-        <div style={{ textAlign: "right", marginTop: 40 }}>
+        <div style={{ textAlign: "right", marginTop: 32 }}>
           <SecondaryButton
             icon={<DollarCircleOutlined />}
             onClick={handleOpenModal}
-            disabled={cargando || pedidos.length === 0}
+            disabled={cargando || !hayMovimientos}
           >
             Cierre de Caja
           </SecondaryButton>
         </div>
       </div>
+
       <ClosingSummaryModal
         visible={modalVisible}
-        totalCalculado={totalCalculado}
-        subtotales={subtotales}
+        saldoYappy={saldoYappy}
+        saldoEfectivo={saldoEfectivo}
         totalReal={totalReal}
         onTotalRealChange={(value) => setTotalReal(value || 0)}
         onConfirm={handleCierre}
-        onCancel={handleCloseModal}
+        onCancel={() => { if (!loadingCierre) setModalVisible(false); }}
         loading={loadingCierre}
       />
     </>
