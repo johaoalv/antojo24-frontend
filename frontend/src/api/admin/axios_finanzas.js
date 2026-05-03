@@ -10,3 +10,10 @@ export const obtenerMovimientos = async (sucursal_id) => {
         throw error;
     }
 };
+
+export const getLibroCaja = async (sucursal_id, fecha) => {
+    const response = await axiosInstance.get("/finanzas/libro-caja", {
+        params: { sucursal_id, fecha },
+    });
+    return response.data;
+};
