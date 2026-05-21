@@ -326,7 +326,21 @@ const CierreCaja = () => {
           />
         )}
 
-        <div style={{ textAlign: "right", marginTop: 32 }}>
+        <div style={{ marginTop: 32, padding: "16px", background: "#fafafa", borderRadius: 8, marginBottom: 24 }}>
+          <div style={{ fontSize: "14px", fontWeight: "bold", color: "#1a1a1a" }}>
+            Movimiento del día:
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontWeight: "bold", color: "#1890ff" }}>
+              Yappy: ${(saldoYappy - saldoInicial.yappy).toFixed(2)}
+            </div>
+            <div style={{ fontWeight: "bold", color: "#52c41a", marginTop: 4 }}>
+              Efectivo: ${(saldoEfectivo - saldoInicial.efectivo).toFixed(2)}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ textAlign: "right" }}>
           <SecondaryButton
             icon={<DollarCircleOutlined />}
             onClick={handleOpenModal}
