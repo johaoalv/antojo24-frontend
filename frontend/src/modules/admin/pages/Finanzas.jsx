@@ -148,11 +148,7 @@ function Finanzas() {
             width: 120,
             render: (v, r) => {
                 if (r.tipo === "inicio") {
-                    return (
-                        <Text style={{ color: "#52c41a", fontSize: 13 }}>
-                            +$50.00 / +$50.00
-                        </Text>
-                    );
+                    return null;
                 }
                 const color = r.tipo === "entrada" ? "#52c41a" : "#f5222d";
                 const icon = r.tipo === "entrada" ? <ArrowUpOutlined /> : <ArrowDownOutlined />;
