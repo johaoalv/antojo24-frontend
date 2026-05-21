@@ -191,8 +191,9 @@ const CierreCaja = () => {
       dataIndex: "metodo",
       key: "metodo",
       width: 130,
-      render: (v) =>
-        v === "ambos" ? (
+      render: (v, r) => {
+        if (r.tipo === "inicio") return null;
+        return v === "ambos" ? (
           <Space size={4}>
             <Tag color="blue" style={{ margin: 0 }}>Yappy</Tag>
             <Tag color="green" style={{ margin: 0 }}>Efectivo</Tag>
@@ -201,7 +202,8 @@ const CierreCaja = () => {
           <Tag color={v === "yappy" ? "blue" : v === "efectivo" ? "green" : "default"}>
             {METODO_LABEL[v] || v}
           </Tag>
-        ),
+        );
+      }
     },
     {
       title: "Monto",
