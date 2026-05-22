@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Typography, Row, Col, Switch } from "antd";
+import { Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
 
-import ProductsGrid from "../components/ProductsGrid";
+import ProductsList from "../components/ProductsList";
+import CategoryTabs from "../components/CategoryTabs";
 import Cart from "../components/Cart";
 import CashModal from "../components/CashModal";
 import usePedidoState from "../hooks/usePedidoState";
@@ -13,14 +14,14 @@ import { buildPriceMap, createProductoFinder } from "../utils/pedido-utils";
 import { PAYMENT_OPTIONS } from "../constants/payments";
 import { getPanamaTime12h } from "../utils/get_time";
 
-const { Text } = Typography;
-
 const Index = () => {
   const navigate = useNavigate();
   const [productosData, setProductosData] = useState([]);
   const [loadingProductos, setLoadingProductos] = useState(true);
   const [tipoPedido, setTipoPedido] = useState("local");
   const [bolsas, setBolsas] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("todos");
 
   useEffect(() => {
     const loadProductos = async () => {
@@ -75,16 +76,27 @@ const Index = () => {
   });
 
   const productosFiltrados = useMemo(() => {
-    if (tipoPedido !== "local") {
-      return productosData.filter((p) => p.precio_delivery != null);
+    let lista = tipoPedido !== "local"
+      ? productosData.filter((p) => p.precio_delivery != null)
+      : productosData;
+    if (selectedCategory !== "todos") {
+      lista = lista.filter((p) => p.categoria === selectedCategory);
     }
-    return productosData;
-  }, [productosData, tipoPedido]);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      lista = lista.filter((p) =>
+        (p.nombre || p.producto || "").toLowerCase().includes(q)
+      );
+    }
+    return lista;
+  }, [productosData, tipoPedido, selectedCategory, searchQuery]);
 
   const handleTipoPedidoChange = useCallback((valor) => {
     setTipoPedido(valor);
     resetPedido();
     setBolsas(0);
+    setSelectedCategory("todos");
+    setSearchQuery("");
     metodoPagoState.resetPagoState();
   }, [resetPedido, metodoPagoState]);
 
@@ -100,18 +112,51 @@ const Index = () => {
   }, []);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
       <Navbar />
-      <div className="responsive-container" style={{ padding: "clamp(10px, 3vw, 30px)" }}>
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={14} xl={16}>
-            <ProductsGrid
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", gap: 10, padding: 10 }}>
+        {/* Panel izquierdo — productos */}
+        <div style={{
+          flex: 3,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#fff",
+          borderRadius: 12,
+          padding: "16px 12px 0 12px",
+          overflow: "hidden",
+        }}>
+          <Input.Search
+            placeholder="Buscar producto"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ marginBottom: 12, fontSize: 16 }}
+            size="large"
+            allowClear
+          />
+          <CategoryTabs
+            productos={productosData}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            <ProductsList
               productos={productosFiltrados}
               onAddProduct={agregarAlPedido}
               loading={loadingProductos}
             />
-          </Col>
-          <Col xs={24} lg={10} xl={8}>
+          </div>
+        </div>
+
+        {/* Panel derecho — carrito */}
+        <div style={{
+          flex: 2,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#fff",
+          borderRadius: 12,
+          overflow: "hidden",
+        }}>
+          <div style={{ flex: 1, overflowY: "auto" }}>
             <Cart
               pedido={pedido}
               buscarProducto={buscarProducto}
@@ -132,9 +177,10 @@ const Index = () => {
               bolsas={bolsas}
               onBolsasChange={setBolsas}
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
       </div>
+
       <CashModal
         visible={metodoPagoState.isModalVisible}
         total={total}
@@ -144,7 +190,7 @@ const Index = () => {
         onOk={metodoPagoState.handleModalOk}
         onCancel={metodoPagoState.handleModalCancel}
       />
-    </>
+    </div>
   );
 };
 

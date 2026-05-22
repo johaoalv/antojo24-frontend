@@ -16,44 +16,26 @@ const CartItem = ({
       justifyContent: "space-between",
       alignItems: "center",
       borderBottom: "1px solid #eee",
-      padding: "15px 0",
+      padding: "12px 0",
     }}
   >
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div style={{ display: "flex", alignItems: "center", flex: 1, minWidth: 0 }}>
       {imagen && (
-        <img src={imagen} alt={producto} style={{ height: 50, marginRight: 15 }} />
+        <img src={imagen} alt={producto} style={{ height: 44, marginRight: 12, flexShrink: 0 }} />
       )}
-      <div>
-        <strong style={{ fontSize: "1.2em" }}>{producto}</strong>
-        <div style={{ fontSize: "1.1em", color: "#555" }}>
-          {formatCurrency(precio)}
-        </div>
+      <div style={{ minWidth: 0 }}>
+        <strong style={{ fontSize: "1.1em", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {producto}
+        </strong>
+        <div style={{ fontSize: "1em", color: "#555" }}>{formatCurrency(precio)}</div>
       </div>
     </div>
-    <div>
-      <Button
-        style={{ width: 40, height: 40, fontSize: "1.2em" }}
-        onClick={onDecrease}
-      >
-        -
-      </Button>
-      <span
-        style={{
-          margin: "0 15px",
-          fontSize: "1.4em",
-          minWidth: "30px",
-          display: "inline-block",
-          textAlign: "center",
-        }}
-      >
+    <div style={{ display: "flex", alignItems: "center", flexShrink: 0, marginLeft: 8 }}>
+      <Button style={{ width: 48, height: 48, fontSize: "1.3em" }} onClick={onDecrease}>-</Button>
+      <span style={{ margin: "0 12px", fontSize: "1.4em", minWidth: 28, textAlign: "center", fontWeight: 700 }}>
         {cantidad}
       </span>
-      <Button
-        style={{ width: 40, height: 40, fontSize: "1.2em" }}
-        onClick={onIncrease}
-      >
-        +
-      </Button>
+      <Button style={{ width: 48, height: 48, fontSize: "1.3em" }} onClick={onIncrease}>+</Button>
     </div>
   </div>
 );
