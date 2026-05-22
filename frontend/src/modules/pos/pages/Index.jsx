@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Typography, Row, Col, Input } from "antd";
+import { Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
 
@@ -13,8 +13,6 @@ import usePedidoActions from "../hooks/usePedidoActions";
 import { buildPriceMap, createProductoFinder } from "../utils/pedido-utils";
 import { PAYMENT_OPTIONS } from "../constants/payments";
 import { getPanamaTime12h } from "../utils/get_time";
-
-const { Text } = Typography;
 
 const Index = () => {
   const navigate = useNavigate();
@@ -114,30 +112,51 @@ const Index = () => {
   }, []);
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
       <Navbar />
-      <div className="responsive-container" style={{ padding: "clamp(10px, 3vw, 30px)" }}>
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={14} xl={16}>
-            <Input.Search
-              placeholder="Buscar producto"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ marginBottom: 12 }}
-              allowClear
-            />
-            <CategoryTabs
-              productos={productosData}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-            />
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", gap: 10, padding: 10 }}>
+        {/* Panel izquierdo — productos */}
+        <div style={{
+          flex: 3,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#fff",
+          borderRadius: 12,
+          padding: "16px 12px 0 12px",
+          overflow: "hidden",
+        }}>
+          <Input.Search
+            placeholder="Buscar producto"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ marginBottom: 12, fontSize: 16 }}
+            size="large"
+            allowClear
+          />
+          <CategoryTabs
+            productos={productosData}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+          <div style={{ flex: 1, overflowY: "auto" }}>
             <ProductsList
               productos={productosFiltrados}
               onAddProduct={agregarAlPedido}
               loading={loadingProductos}
             />
-          </Col>
-          <Col xs={24} lg={10} xl={8}>
+          </div>
+        </div>
+
+        {/* Panel derecho — carrito */}
+        <div style={{
+          flex: 2,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#fff",
+          borderRadius: 12,
+          overflow: "hidden",
+        }}>
+          <div style={{ flex: 1, overflowY: "auto" }}>
             <Cart
               pedido={pedido}
               buscarProducto={buscarProducto}
@@ -158,9 +177,10 @@ const Index = () => {
               bolsas={bolsas}
               onBolsasChange={setBolsas}
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
       </div>
+
       <CashModal
         visible={metodoPagoState.isModalVisible}
         total={total}
@@ -170,7 +190,7 @@ const Index = () => {
         onOk={metodoPagoState.handleModalOk}
         onCancel={metodoPagoState.handleModalCancel}
       />
-    </>
+    </div>
   );
 };
 

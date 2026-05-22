@@ -30,12 +30,12 @@ const Cart = ({
   <div
     style={{
       width: "100%",
-      border: "1px solid #ddd",
-      borderRadius: 16,
-      padding: "clamp(15px, 4vw, 25px)",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-      marginBottom: 100,
-      backgroundColor: "#fff"
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      padding: "20px 16px",
+      backgroundColor: "#fff",
+      boxSizing: "border-box",
     }}
   >
     <h3 style={{ fontSize: "clamp(1.5em, 5vw, 2.5em)", textAlign: "center", marginBottom: 10 }}>
