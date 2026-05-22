@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Typography, Row, Col, Switch } from "antd";
+import { Typography, Row, Col, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../common/components/Navbar";
 
-import ProductsGrid from "../components/ProductsGrid";
+import ProductsList from "../components/ProductsList";
+import CategoryTabs from "../components/CategoryTabs";
 import Cart from "../components/Cart";
 import CashModal from "../components/CashModal";
 import usePedidoState from "../hooks/usePedidoState";
@@ -21,6 +22,8 @@ const Index = () => {
   const [loadingProductos, setLoadingProductos] = useState(true);
   const [tipoPedido, setTipoPedido] = useState("local");
   const [bolsas, setBolsas] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("todos");
 
   useEffect(() => {
     const loadProductos = async () => {
@@ -75,16 +78,27 @@ const Index = () => {
   });
 
   const productosFiltrados = useMemo(() => {
-    if (tipoPedido !== "local") {
-      return productosData.filter((p) => p.precio_delivery != null);
+    let lista = tipoPedido !== "local"
+      ? productosData.filter((p) => p.precio_delivery != null)
+      : productosData;
+    if (selectedCategory !== "todos") {
+      lista = lista.filter((p) => p.categoria === selectedCategory);
     }
-    return productosData;
-  }, [productosData, tipoPedido]);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      lista = lista.filter((p) =>
+        (p.nombre || p.producto || "").toLowerCase().includes(q)
+      );
+    }
+    return lista;
+  }, [productosData, tipoPedido, selectedCategory, searchQuery]);
 
   const handleTipoPedidoChange = useCallback((valor) => {
     setTipoPedido(valor);
     resetPedido();
     setBolsas(0);
+    setSelectedCategory("todos");
+    setSearchQuery("");
     metodoPagoState.resetPagoState();
   }, [resetPedido, metodoPagoState]);
 
@@ -105,7 +119,19 @@ const Index = () => {
       <div className="responsive-container" style={{ padding: "clamp(10px, 3vw, 30px)" }}>
         <Row gutter={[24, 24]}>
           <Col xs={24} lg={14} xl={16}>
-            <ProductsGrid
+            <Input.Search
+              placeholder="Buscar producto"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ marginBottom: 12 }}
+              allowClear
+            />
+            <CategoryTabs
+              productos={productosData}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
+            <ProductsList
               productos={productosFiltrados}
               onAddProduct={agregarAlPedido}
               loading={loadingProductos}
