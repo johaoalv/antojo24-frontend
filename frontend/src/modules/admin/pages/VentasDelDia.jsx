@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography, InputNumber, Modal } from "antd";
+import { Table, Card, Row, Col, Statistic, Spin, Tabs, Tag, Button, Popconfirm, message, Badge, Typography, InputNumber, Modal, Form, Select } from "antd";
 import { DollarOutlined, ShoppingCartOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import axiosInstance from "../../../api/core/axios_base";
 import { formatCurrency } from "../../pos/utils/formatters";
@@ -233,10 +233,12 @@ const PagosPendientes = ({ selectedStoreId }) => {
   const [modalPY, setModalPY] = useState(false);
   const [selPY, setSelPY] = useState([]);
   const [montoPY, setMontoPY] = useState("");
+  const [sucursalPY, setSucursalPY] = useState("sucursal_santa_maria");
   const [confirmandoPY, setConfirmandoPY] = useState(false);
   const [modalUber, setModalUber] = useState(false);
   const [selUber, setSelUber] = useState([]);
   const [montoUber, setMontoUber] = useState("");
+  const [sucursalUber, setSucursalUber] = useState("sucursal_santa_maria");
   const [confirmandoUber, setConfirmandoUber] = useState(false);
 
   useEffect(() => { cargar(); }, [selectedStoreId]);
@@ -261,10 +263,10 @@ const PagosPendientes = ({ selectedStoreId }) => {
       const res = await axiosInstance.post("/pedidos/liquidacion-uber", {
         pedidos: selUber,
         monto_depositado: parseFloat(montoUber),
-        sucursal_id: selectedStoreId
+        sucursal_id: sucursalUber
       });
       message.success(`${res.data.pagados} pedidos liquidados. $${parseFloat(montoUber).toFixed(2)} sumados a yappy.`);
-      setModalUber(false); setSelUber([]); setMontoUber("");
+      setModalUber(false); setSelUber([]); setMontoUber(""); setSucursalUber("sucursal_santa_maria");
       cargar();
     } catch (err) {
       message.error(err.response?.data?.error || "Error al liquidar");
@@ -292,10 +294,10 @@ const PagosPendientes = ({ selectedStoreId }) => {
       const res = await axiosInstance.post("/pedidos/liquidacion-pedidosya", {
         pedidos: selPY,
         monto_depositado: parseFloat(montoPY),
-        sucursal_id: selectedStoreId
+        sucursal_id: sucursalPY
       });
       message.success(`${res.data.pagados} pedidos liquidados. $${parseFloat(montoPY).toFixed(2)} sumados a yappy.`);
-      setModalPY(false); setSelPY([]); setMontoPY("");
+      setModalPY(false); setSelPY([]); setMontoPY(""); setSucursalPY("sucursal_santa_maria");
       cargar();
     } catch (err) {
       message.error(err.response?.data?.error || "Error al liquidar");
@@ -389,7 +391,7 @@ const PagosPendientes = ({ selectedStoreId }) => {
       <Modal
         title="Liquidación PedidosYa"
         open={modalPY}
-        onCancel={() => { setModalPY(false); setSelPY([]); setMontoPY(""); }}
+        onCancel={() => { setModalPY(false); setSelPY([]); setMontoPY(""); setSucursalPY("sucursal_santa_maria"); }}
         onOk={handleLiquidarPY}
         okText="Confirmar"
         cancelText="Cancelar"
@@ -420,6 +422,18 @@ const PagosPendientes = ({ selectedStoreId }) => {
           <Text type="secondary">Total seleccionado:</Text>
           <Text strong>${totalSelPY.toFixed(2)}</Text>
         </div>
+        <div style={{ marginBottom: 12 }}>
+          <Text>Sucursal:</Text>
+          <Select
+            value={sucursalPY}
+            onChange={setSucursalPY}
+            placeholder="Selecciona la sucursal"
+            style={{ width: "100%", marginTop: 4 }}
+            options={[
+              { label: "Santa María", value: "sucursal_santa_maria" }
+            ]}
+          />
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Text>Monto depositado por PedidosYa:</Text>
           <InputNumber
@@ -437,7 +451,7 @@ const PagosPendientes = ({ selectedStoreId }) => {
       <Modal
         title="Liquidación Uber"
         open={modalUber}
-        onCancel={() => { setModalUber(false); setSelUber([]); setMontoUber(""); }}
+        onCancel={() => { setModalUber(false); setSelUber([]); setMontoUber(""); setSucursalUber("sucursal_santa_maria"); }}
         onOk={handleLiquidarUber}
         okText="Confirmar"
         cancelText="Cancelar"
@@ -467,6 +481,18 @@ const PagosPendientes = ({ selectedStoreId }) => {
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
           <Text type="secondary">Total seleccionado:</Text>
           <Text strong>${totalSelUber.toFixed(2)}</Text>
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <Text>Sucursal:</Text>
+          <Select
+            value={sucursalUber}
+            onChange={setSucursalUber}
+            placeholder="Selecciona la sucursal"
+            style={{ width: "100%", marginTop: 4 }}
+            options={[
+              { label: "Santa María", value: "sucursal_santa_maria" }
+            ]}
+          />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Text>Monto depositado por Uber:</Text>
