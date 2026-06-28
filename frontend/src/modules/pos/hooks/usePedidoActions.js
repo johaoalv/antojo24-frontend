@@ -14,6 +14,7 @@ const usePedidoActions = ({
   nombreCliente,
   metodoPago,
   montoRecibido,
+  metodosPagoDetalles = [],
   calcularTotal,
   resetPedido,
   resetPagoState,
@@ -50,7 +51,6 @@ const usePedidoActions = ({
       pedido_id,
       pedido: pedidoFormateado,
       total_pedido: total,
-      metodo_pago: metodoPago,
       tipo_pedido: tipoPedido,
       estado_pago,
       bolsas,
@@ -58,12 +58,26 @@ const usePedidoActions = ({
       sucursal_id,
     };
 
-    if (nombreCliente && nombreCliente.trim()) {
-      datos.nombre_cliente = nombreCliente;
+    // Agregar detalles de pago según el tipo
+    if (metodoPago === "mixto" && metodosPagoDetalles.length > 0) {
+      datos.metodos_pago_detalles = metodosPagoDetalles;
+      // Si hay efectivo en la mezcla, agregar monto_recibido
+      const metodoEfectivo = metodosPagoDetalles.find(
+        (m) => m.metodo_pago === "efectivo"
+      );
+      if (metodoEfectivo && typeof montoRecibido === "number") {
+        datos.monto_recibido = montoRecibido;
+      }
+    } else {
+      // Pago simple
+      datos.metodo_pago = metodoPago;
+      if (metodoPago === "efectivo" && typeof montoRecibido === "number") {
+        datos.monto_recibido = montoRecibido;
+      }
     }
 
-    if (metodoPago === "efectivo" && typeof montoRecibido === "number") {
-      datos.monto_recibido = montoRecibido;
+    if (nombreCliente && nombreCliente.trim()) {
+      datos.nombre_cliente = nombreCliente;
     }
 
     try {
@@ -114,6 +128,7 @@ const usePedidoActions = ({
     calcularTotal,
     metodoPago,
     montoRecibido,
+    metodosPagoDetalles,
     priceMap,
     pedido,
     resetPagoState,
