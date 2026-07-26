@@ -66,9 +66,9 @@ function Dashboard() {
                 <Title level={2} style={{ margin: 0 }}>Dashboard - {datos.nombre_sucursal}</Title>
             </div>
 
-            {/* SECCIÓN 1: SALDO TOTAL (PLATA REAL ACUMULADA) */}
+            {/* SECCIÓN 1: SALDO TOTAL (TESORERÍA ACUMULADA) */}
             <div style={{ marginBottom: '40px' }}>
-                <Title level={3} style={{ marginBottom: '20px', color: '#001529' }}>Estado General de Caja (Acumulado)</Title>
+                {/* <Title level={3} style={{ marginBottom: '20px', color: '#001529' }}>Estado General Historico</Title> */}
                 <Row gutter={[16, 16]}>
                     <Col xs={24} md={12}>
                         <Card 
@@ -80,8 +80,8 @@ function Dashboard() {
                             }}
                             bordered={false}
                         >
-                            <Statistic 
-                                title={<Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Plata Real en Mano (Total)</Text>}
+                            <Statistic
+                                title={<Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Tesorería</Text>}
                                 value={datos.mes_actual.saldo_caja}
                                 precision={2}
                                 prefix="$"
@@ -96,7 +96,7 @@ function Dashboard() {
                         <Card style={{ borderRadius: '15px', height: '100%', display: 'flex', alignItems: 'center' }} bordered={false}>
                             <div>
                                 <Text strong style={{ fontSize: '1.1em' }}>¿Qué significa este número?</Text>
-                                <p style={{ margin: 0, color: '#666' }}>Es el fondo total de tu negocio. Si abres el cajón y cuentas cada moneda, el total debería ser este monto. Incluye tus ventas y tus aportes propios, menos todo lo que has gastado.</p>
+                                <p style={{ margin: 0, color: '#666' }}>Es el fondo total de tu negocio. Cuentas de banco del mes, fondos y efectivo del mes.</p>
                             </div>
                         </Card>
                     </Col>
