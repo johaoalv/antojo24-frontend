@@ -11,6 +11,7 @@ const PinLogin = () => {
   const navigate = useNavigate();
   const maxLength = 6;
   const [inputs, setInputs] = useState(Array(maxLength).fill(""));
+  const [isLoading, setIsLoading] = useState(false);
   const inputsRef = useRef([]);
 
   const handleChange = (e, idx) => {
@@ -42,6 +43,8 @@ const PinLogin = () => {
     const pin = inputs.join("");
     if (pin.length < maxLength) return;
 
+    setIsLoading(true);
+
     try {
       let ip_cliente = null;
       try {
@@ -50,6 +53,7 @@ const PinLogin = () => {
       } catch (ipError) {
         console.error("Error al obtener la IP pública:", ipError);
         message.error("No se pudo obtener la dirección IP. Revisa tu conexión a internet.");
+        setIsLoading(false);
         return;
       }
 
@@ -88,6 +92,7 @@ const PinLogin = () => {
       message.error(errorMessage);
       setInputs(Array(maxLength).fill(""));
       inputsRef.current[0].focus();
+      setIsLoading(false);
     }
   };
 
@@ -143,9 +148,10 @@ const PinLogin = () => {
         }}
         size="large"
         onClick={handleSubmit}
-        disabled={inputs.join("").length < maxLength}
+        disabled={inputs.join("").length < maxLength || isLoading}
+        loading={isLoading}
       >
-        Confirmar
+        {isLoading ? "Validando..." : "Confirmar"}
       </PrimaryButton>
     </div>
   );
