@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Card, Typography, Table, Statistic, Space } from "antd";
+import { Row, Col, Card, Typography, Table, Statistic, Space, Spin } from "antd";
 import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
 import CardInfo from "../components/Cards";
 import { io } from "socket.io-client";
@@ -52,8 +52,8 @@ function Dashboard() {
 
   if (!datos) {
     return (
-      <div style={{ textAlign: 'center', marginTop: '100px' }}>
-        <p style={{ fontSize: '1.5em', color: '#bfbfbf' }}>Cargando datos del dashboard...</p>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" tip="Cargando datos del dashboard..." />
       </div>
     );
   }
