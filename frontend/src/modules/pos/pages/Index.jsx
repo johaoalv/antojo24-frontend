@@ -7,6 +7,7 @@ import ProductsList from "../components/ProductsList";
 import CategoryTabs from "../components/CategoryTabs";
 import Cart from "../components/Cart";
 import CashModal from "../components/CashModal";
+import MixedPaymentModal from "../components/MixedPaymentModal";
 import usePedidoState from "../hooks/usePedidoState";
 import useMetodoPago from "../hooks/useMetodoPago";
 import usePedidoActions from "../hooks/usePedidoActions";
@@ -66,6 +67,7 @@ const Index = () => {
     nombreCliente,
     metodoPago: metodoPagoState.metodoPago,
     montoRecibido: metodoPagoState.montoRecibido,
+    metodosPagoDetalles: metodoPagoState.metodosPagoDetalles,
     calcularTotal,
     resetPedido,
     resetPagoState: metodoPagoState.resetPagoState,
@@ -182,13 +184,21 @@ const Index = () => {
       </div>
 
       <CashModal
-        visible={metodoPagoState.isModalVisible}
+        visible={metodoPagoState.isCashModalVisible}
         total={total}
         montoRecibido={metodoPagoState.montoRecibido}
         vuelto={metodoPagoState.vuelto}
         onMontoChange={metodoPagoState.handleMontoRecibidoChange}
-        onOk={metodoPagoState.handleModalOk}
-        onCancel={metodoPagoState.handleModalCancel}
+        onOk={metodoPagoState.handleCashModalOk}
+        onCancel={metodoPagoState.handleCashModalCancel}
+      />
+
+      <MixedPaymentModal
+        visible={metodoPagoState.isMixedModalVisible}
+        total={total}
+        onMethodsChange={metodoPagoState.handleMixedPaymentChange}
+        onOk={metodoPagoState.handleMixedModalOk}
+        onCancel={metodoPagoState.handleMixedModalCancel}
       />
     </div>
   );

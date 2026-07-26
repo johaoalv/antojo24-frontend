@@ -14,4 +14,15 @@ export const PAYMENT_OPTIONS = [
     label: "Yappy",
     icon: "/assets/yappy.png",
   },
+  {
+    value: "mixto",
+    label: "Pago Mixto",
+    icon: "/assets/mixto.png",
+  },
+];
+
+export const AVAILABLE_PAYMENT_METHODS = [
+  { value: "efectivo", label: "Efectivo" },
+  { value: "tarjeta", label: "Tarjeta" },
+  { value: "yappy", label: "Yappy" },
 ];
