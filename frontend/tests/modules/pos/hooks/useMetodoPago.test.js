@@ -18,7 +18,7 @@ describe('useMetodoPago', () => {
     });
 
     expect(result.current.metodoPago).toBe('efectivo');
-    expect(result.current.isModalVisible).toBe(true);
+    expect(result.current.isCashModalVisible).toBe(true);
 
     act(() => {
       result.current.handleMontoRecibidoChange(20);
@@ -28,13 +28,13 @@ describe('useMetodoPago', () => {
     expect(result.current.vuelto).toBe(10);
 
     act(() => {
-      result.current.handleModalOk();
+      result.current.handleCashModalOk();
     });
 
-    expect(result.current.isModalVisible).toBe(false);
+    expect(result.current.isCashModalVisible).toBe(false);
 
     act(() => {
-      result.current.handleModalCancel();
+      result.current.handleCashModalCancel();
     });
 
     expect(result.current.metodoPago).toBe('');
@@ -55,10 +55,10 @@ describe('useMetodoPago', () => {
     });
 
     act(() => {
-      result.current.handleModalOk();
+      result.current.handleCashModalOk();
     });
 
-    expect(result.current.isModalVisible).toBe(true);
+    expect(result.current.isCashModalVisible).toBe(true);
     expect(message.error).toHaveBeenCalledWith(
       'El monto recibido no puede ser menor al total del pedido.'
     );
