@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Card, Typography, Table, Statistic, Space, Spin } from "antd";
-import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
+import { Row, Col, Card, Typography, Table, Statistic, Space, Spin, Button, message } from "antd";
+import { obtenerDashboard, obtenerTesoreria } from "../../../api/admin/axios_dashboard";
 import CardInfo from "../components/Cards";
 import { io } from "socket.io-client";
 import { useStore } from "../../../context/StoreContext";
-import { ShoppingOutlined } from "@ant-design/icons";
+import { ShoppingOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 
 
 const { Title } = Typography;
 
 function Dashboard() {
   const [datos, setDatos] = useState(null);
+  const [tesoreria, setTesoreria] = useState(null);
+  const [tesoreriaVisible, setTesoreriaVisible] = useState(false);
+  const [tesoreriaLoading, setTesoreriaLoading] = useState(false);
   const socketRef = useRef(null);
   const { selectedStoreId } = useStore();
 
@@ -28,9 +31,33 @@ function Dashboard() {
     }
   };
 
+  const handleToggleTesoreria = async () => {
+    if (tesoreriaVisible) {
+      setTesoreriaVisible(false);
+      return;
+    }
+    setTesoreriaLoading(true);
+    try {
+      const data = await obtenerTesoreria(selectedStoreId);
+      setTesoreria(data);
+      setTesoreriaVisible(true);
+    } catch (error) {
+      message.error("Error al cargar la tesorería");
+    } finally {
+      setTesoreriaLoading(false);
+    }
+  };
+
   // Cargar datos cuando cambia la sucursal seleccionada
   useEffect(() => {
     cargarDatos();
+  }, [selectedStoreId]);
+
+  // La tesorería es a demanda: al cambiar de sucursal se oculta y se descarta,
+  // para nunca mostrar (ni dejar cacheado) el número de una sucursal distinta
+  useEffect(() => {
+    setTesoreria(null);
+    setTesoreriaVisible(false);
   }, [selectedStoreId]);
 
   // Conexión WebSocket
@@ -80,13 +107,29 @@ function Dashboard() {
                             }}
                             bordered={false}
                         >
-                            <Statistic
-                                title={<Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Tesorería</Text>}
-                                value={datos.mes_actual.saldo_caja}
-                                precision={2}
-                                prefix="$"
-                                valueStyle={{ color: 'white', fontSize: '2.5em', fontWeight: 'bold' }}
-                            />
+                            <Space align="center" style={{ marginBottom: 4 }}>
+                                <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Tesorería</Text>
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    icon={tesoreriaVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                                    loading={tesoreriaLoading}
+                                    onClick={handleToggleTesoreria}
+                                    style={{ color: 'white' }}
+                                />
+                            </Space>
+                            {tesoreriaVisible ? (
+                                <Statistic
+                                    value={tesoreria?.saldo_caja ?? 0}
+                                    precision={2}
+                                    prefix="$"
+                                    valueStyle={{ color: 'white', fontSize: '2.5em', fontWeight: 'bold' }}
+                                />
+                            ) : (
+                                <div style={{ fontSize: '2.5em', fontWeight: 'bold', letterSpacing: '4px', margin: '4px 0' }}>
+                                    ••••••
+                                </div>
+                            )}
                             <Text style={{ color: 'rgba(255,255,255,0.65)' }}>
                                 Todo el efectivo histórico acumulado (Entradas - Salidas)
                             </Text>
