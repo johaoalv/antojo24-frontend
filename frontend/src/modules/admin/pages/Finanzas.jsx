@@ -14,6 +14,7 @@ const METODO_LABEL = {
     efectivo: "Efectivo",
     tarjeta: "Tarjeta",
     transferencia: "Transferencia",
+    fondos: "Fondos (Tesorería)",
 };
 
 const CATEGORIA_LABEL = {
@@ -135,7 +136,7 @@ function Finanzas() {
                         <Tag color="green" style={{ margin: 0 }}>Efectivo</Tag>
                     </Space>
                 ) : (
-                    <Tag color={v === "yappy" ? "blue" : v === "efectivo" ? "green" : "default"}>
+                    <Tag color={v === "yappy" ? "blue" : v === "efectivo" ? "green" : v === "fondos" ? "gold" : "default"}>
                         {METODO_LABEL[v] || v}
                     </Tag>
                 ),

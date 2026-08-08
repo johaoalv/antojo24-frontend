@@ -127,13 +127,23 @@ function Dashboard() {
                           title="Flujo Caja del Mes"
                           value={100 + (datos.mes_actual.saldo_caja_mes || 0)}
                           color="#d48d68"
-                          info="Inicia con $50 yappy + $50 efectivo. Se mueve con entradas y salidas reales del mes."
+                          info="Inicia con $50 yappy + $50 efectivo. Se mueve con entradas y salidas reales del mes. No incluye gastos pagados con Fondos."
                           subItems={datos.mes_actual.flujo_por_metodo ? [
                             { label: "yappy", value: 50 + (datos.mes_actual.flujo_por_metodo.yappy || 0) },
                             { label: "efectivo", value: 50 + (datos.mes_actual.flujo_por_metodo.efectivo || 0) }
                           ] : null}
                         />
                     </Col>
+                    {datos.mes_actual.gastos_fondos > 0 && (
+                        <Col xs={24} sm={12} md={8}>
+                            <CardInfo
+                              title="Gastos con Fondos (Tesorería)"
+                              value={datos.mes_actual.gastos_fondos}
+                              color="#d4a017"
+                              info="Compras grandes pagadas con la cuenta de Fondos Antojo24. No afectan la utilidad ni el flujo de caja del mes: solo reducen la Tesorería total."
+                            />
+                        </Col>
+                    )}
                 </Row>
             </div>
 

@@ -85,11 +85,15 @@ function Gastos() {
             key: 'sucursal_id',
             render: (id) => stores.find(t => t.sucursal_id === id)?.nombre || "Global / Central"
         },
-        { 
-            title: 'Método', 
-            dataIndex: 'metodo_pago', 
+        {
+            title: 'Método',
+            dataIndex: 'metodo_pago',
             key: 'metodo_pago',
-            render: (metodo) => <Tag color={metodo === 'yappy' ? 'purple' : 'green'}>{metodo?.toUpperCase() || 'EFECTIVO'}</Tag>
+            render: (metodo) => {
+                const colors = { yappy: 'purple', efectivo: 'green', fondos: 'gold' };
+                const labels = { fondos: 'FONDOS (TESORERÍA)' };
+                return <Tag color={colors[metodo] || 'green'}>{labels[metodo] || metodo?.toUpperCase() || 'EFECTIVO'}</Tag>;
+            }
         },
         { title: 'Monto', dataIndex: 'monto', key: 'monto', render: (val) => `$${Number(val || 0).toFixed(2)}` },
         {
@@ -155,10 +159,16 @@ function Gastos() {
                             ))}
                         </Select>
                     </Form.Item>
-                    <Form.Item name="metodo_pago" label="Método de Pago" rules={[{ required: true }]}>
+                    <Form.Item
+                        name="metodo_pago"
+                        label="Método de Pago"
+                        rules={[{ required: true }]}
+                        extra="Fondos = plata de la cuenta de Fondos Antojo24 (tesorería). No afecta la utilidad ni el flujo de caja del mes."
+                    >
                         <Select options={[
                             { label: "Efectivo", value: "efectivo" },
-                            { label: "Yappy", value: "yappy" }
+                            { label: "Yappy", value: "yappy" },
+                            { label: "Fondos (Tesorería)", value: "fondos" }
                         ]} />
                     </Form.Item>
                     <Form.Item name="fecha" label="Fecha (Opcional)">
