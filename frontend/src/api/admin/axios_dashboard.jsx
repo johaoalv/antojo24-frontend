@@ -1,8 +1,9 @@
 import axiosInstance from "../core/axios_base";
 
-export const obtenerDashboard = async (sucursalId = "global") => {
+export const obtenerDashboard = async (sucursalId = "global", mesesHistorial = 3) => {
   try {
-    const params = sucursalId !== "global" ? { sucursal_id: sucursalId } : {};
+    const params = { meses_historial: mesesHistorial };
+    if (sucursalId !== "global") params.sucursal_id = sucursalId;
     const response = await axiosInstance.get("/dashboard", { params });
     return response.data;
   } catch (error) {

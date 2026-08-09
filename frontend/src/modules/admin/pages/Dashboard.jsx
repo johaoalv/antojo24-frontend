@@ -15,6 +15,7 @@ function Dashboard() {
   const [tesoreriaVisible, setTesoreriaVisible] = useState(false);
   const [tesoreriaLoading, setTesoreriaLoading] = useState(false);
   const socketRef = useRef(null);
+  const dashboardUpdateDebounceRef = useRef(null);
   const { selectedStoreId } = useStore();
 
   const columns = [
@@ -66,13 +67,22 @@ function Dashboard() {
       transports: ["websocket"],
     });
 
-    socketRef.current.on("dashboard_update", (updatedData) => {
-      // Solo actualizamos si el update viene sin filtro (global) o si coincide con nuestra sucursal
-      // Por simplicidad, recargamos los datos para asegurar coherencia con el filtro
-      cargarDatos();
+    socketRef.current.on("dashboard_update", () => {
+      // Debounce: una ráfaga de ventas dispara varios eventos seguidos; agrupamos
+      // esas ráfagas en una sola recarga en lugar de una petición HTTP por evento.
+      if (dashboardUpdateDebounceRef.current) {
+        clearTimeout(dashboardUpdateDebounceRef.current);
+      }
+      dashboardUpdateDebounceRef.current = setTimeout(() => {
+        dashboardUpdateDebounceRef.current = null;
+        cargarDatos();
+      }, 1500);
     });
 
     return () => {
+      if (dashboardUpdateDebounceRef.current) {
+        clearTimeout(dashboardUpdateDebounceRef.current);
+      }
       socketRef.current.disconnect();
     };
   }, [selectedStoreId]);
