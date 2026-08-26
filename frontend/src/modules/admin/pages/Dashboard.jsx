@@ -107,31 +107,43 @@ function Dashboard() {
             <div style={{ marginBottom: '40px' }}>
                 <Title level={3} style={{ marginBottom: '20px' }}>Rendimiento del Mes Actual</Title>
                 <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={12} md={8}>
+                    <Col xs={24} sm={12} md={6}>
                         <CardInfo title="Ventas del Mes" value={datos.mes_actual.ventas} icon={<ShoppingOutlined />} />
                     </Col>
-                    <Col xs={24} sm={12} md={8}>
+                    <Col xs={24} sm={12} md={6}>
                         <CardInfo
-                          title="Gastos del Mes"
+                          title="Gastos Operativos"
                           value={(datos.mes_actual.compras_inventario || 0) + (datos.mes_actual.gastos_operativos || 0) + (datos.mes_actual.mermas || 0)}
                           color="#f5222d"
-                          info="Inventario + Operativos + Mermas"
+                          info="Inventario + Operativos + Mermas (OPEX)"
                           subItems={datos.mes_actual.gastos_por_metodo ? [
                             { label: "yappy", value: datos.mes_actual.gastos_por_metodo.yappy || 0 },
                             { label: "efectivo", value: datos.mes_actual.gastos_por_metodo.efectivo || 0 }
                           ] : null}
                         />
                     </Col>
-                    <Col xs={24} sm={12} md={8}>
+                    <Col xs={24} sm={12} md={6}>
                         <CardInfo
                           title="Flujo Caja del Mes"
                           value={100 + (datos.mes_actual.saldo_caja_mes || 0)}
                           color="#d48d68"
-                          info="Inicia con $50 yappy + $50 efectivo. Se mueve con entradas y salidas reales del mes."
+                          info="Inicia con $50 yappy + $50 efectivo. Entradas y salidas del mes."
                           subItems={datos.mes_actual.flujo_por_metodo ? [
                             { label: "yappy", value: 50 + (datos.mes_actual.flujo_por_metodo.yappy || 0) },
                             { label: "efectivo", value: 50 + (datos.mes_actual.flujo_por_metodo.efectivo || 0) }
                           ] : null}
+                        />
+                    </Col>
+                    <Col xs={24} sm={12} md={6}>
+                        <CardInfo
+                          title="Inversión / Fondos (CAPEX)"
+                          value={datos.mes_actual.inversiones || 0}
+                          color="#722ed1"
+                          info="Equipos y activos fijos financiados con reservas de fondos o inyecciones pareadas."
+                          subItems={[
+                            { label: "Fondo Entró", value: datos.mes_actual.inyecciones || 0 },
+                            { label: "Equipo Comprado", value: datos.mes_actual.inversiones || 0 }
+                          ]}
                         />
                     </Col>
                 </Row>

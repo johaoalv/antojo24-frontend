@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Button, Modal, Form, Input, InputNumber, Space, message, Popconfirm, Select, Tag } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Button, Modal, Form, Input, InputNumber, Space, message, Popconfirm, Select, Tag, Switch, Tooltip } from "antd";
+import { PlusOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { obtenerGastos, agregarGasto, eliminarGasto } from "../../../api/admin/axios_gastos";
 import { useStore } from "../../../context/StoreContext";
 
@@ -10,7 +10,7 @@ const CATEGORIAS_GASTO = [
     { label: "Operativo (Luz, Agua, internet)", value: "operativo" },
     { label: "Inventario (Compra de Insumos/Materia Prima)", value: "inventario" },
     { label: "Personal (Salarios, Bonos)", value: "personal" },
-    { label: "Inversión (Equipos, Mobiliario)", value: "inversion" },
+    { label: "Inversión (Equipos, Mobiliario - CAPEX)", value: "inversion" },
     { label: "Publicidad / Marketing", value: "publicidad" },
     { label: "Otro", value: "otro" },
 ];
@@ -21,6 +21,7 @@ function Gastos() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const { selectedStoreId, stores } = useStore();
+    const categoriaSeleccionada = Form.useWatch('categoria', form);
 
     const cargarDatos = async () => {
         setLoading(true);
@@ -41,7 +42,7 @@ function Gastos() {
     const handleAdd = async (values) => {
         try {
             await agregarGasto(values);
-            message.success("Gasto registrado");
+            message.success("Gasto registrado correctamente");
             setIsModalOpen(false);
             form.resetFields();
             cargarDatos();
@@ -75,7 +76,7 @@ function Gastos() {
                     inversion: 'purple',
                     otro: 'default'
                 };
-                return <Tag color={colors[cat] || 'default'}>{cat.toUpperCase()}</Tag>;
+                return <Tag color={colors[cat] || 'default'}>{cat === 'inversion' ? 'INVERSIÓN (CAPEX)' : cat.toUpperCase()}</Tag>;
             }
         },
         { title: 'Concepto / Descripción', dataIndex: 'descripcion', key: 'descripcion' },
@@ -114,7 +115,8 @@ function Gastos() {
                     form.setFieldsValue({
                         sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId,
                         categoria: 'operativo',
-                        metodo_pago: 'efectivo'
+                        metodo_pago: 'efectivo',
+                        crear_entrada_fondo: true
                     });
                 }}>
                     Registrar Gasto
@@ -142,8 +144,26 @@ function Gastos() {
                     <Form.Item name="categoria" label="Categoría de Gasto" rules={[{ required: true }]}>
                         <Select options={CATEGORIAS_GASTO} />
                     </Form.Item>
+
+                    {categoriaSeleccionada === "inversion" && (
+                        <Form.Item 
+                            name="crear_entrada_fondo" 
+                            label={
+                                <span>
+                                    ¿Financiado con Fondos de Reserva? &nbsp;
+                                    <Tooltip title="Al activar esta opción, el sistema registrará automáticamente una Entrada de Fondos por el mismo monto en Aportes/Inyecciones, logrando que el flujo operativo de tu mes no caiga en un saldo negativo irreal.">
+                                        <InfoCircleOutlined style={{ color: '#1890ff' }} />
+                                    </Tooltip>
+                                </span>
+                            }
+                            valuePropName="checked"
+                        >
+                            <Switch checkedChildren="Sí (Entrada de Fondos Pareada)" unCheckedChildren="No (Usar saldo operativo actual)" />
+                        </Form.Item>
+                    )}
+
                     <Form.Item name="descripcion" label="Descripción / Factura" rules={[{ required: true }]}>
-                        <Input placeholder="Ej: Pago de luz local 1" />
+                        <Input placeholder="Ej: Pago de congelador para sucursal" />
                     </Form.Item>
                     <Form.Item name="monto" label="Monto ($)" rules={[{ required: true }]}>
                         <InputNumber style={{ width: '100%' }} precision={2} min={0} />
