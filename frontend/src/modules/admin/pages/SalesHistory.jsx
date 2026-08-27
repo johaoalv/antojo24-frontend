@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Table, Card, Typography, Tag } from "antd";
-import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
+import { Table, Card, Typography, Tag, Spin } from "antd";
+import { obtenerDashboard, obtenerHistorialDiarioMes } from "../../../api/admin/axios_dashboard";
 import { useStore } from "../../../context/StoreContext";
 
 const { Title } = Typography;
@@ -8,6 +8,8 @@ const { Title } = Typography;
 function SalesHistory() {
     const [datos, setDatos] = useState(null);
     const [loading, setLoading] = useState(true);
+    // Caché de detalle diario por mes, cargado bajo demanda al expandir una fila: { "YYYY-MM": { loading, dias } }
+    const [detallesPorMes, setDetallesPorMes] = useState({});
     const { selectedStoreId } = useStore();
 
     const cargarDatos = async () => {
@@ -24,35 +26,37 @@ function SalesHistory() {
 
     useEffect(() => {
         cargarDatos();
+        setDetallesPorMes({});
     }, [selectedStoreId]);
 
-    // Agrupar historial diario por mes para la tabla expandible
+    // Filas de nivel mes: vienen directo de historial_mensual (rápido, hasta 12 meses)
     const dataAgrupada = useMemo(() => {
-        if (!datos || !datos.historial_diario) return [];
-
-        const meses = {};
-        datos.historial_diario.forEach(dia => {
-            const mesKey = dia.dia.substring(0, 7); // YYYY-MM
-            if (!meses[mesKey]) {
-                meses[mesKey] = {
-                    key: mesKey,
-                    mes: mesKey,
-                    total_ventas: 0,
-                    detalles: []
-                };
-            }
-            const v = Number(dia.total_ventas);
-            meses[mesKey].total_ventas += isNaN(v) ? 0 : v;
-            meses[mesKey].detalles.push({
-                ...dia,
-                key: dia.dia
-            });
-        });
-
-        return Object.values(meses).sort((a, b) => b.mes.localeCompare(a.mes));
+        if (!datos || !datos.historial_mensual) return [];
+        return datos.historial_mensual.map(h => ({
+            key: h.mes,
+            mes: h.mes,
+            total_ventas: Number(h.total_ventas) || 0,
+        }));
     }, [datos]);
 
+    const cargarDetalleMes = async (mes) => {
+        if (detallesPorMes[mes]) return; // ya cargado o cargando
+        setDetallesPorMes(prev => ({ ...prev, [mes]: { loading: true, dias: [] } }));
+        try {
+            const dias = await obtenerHistorialDiarioMes(mes, selectedStoreId);
+            setDetallesPorMes(prev => ({ ...prev, [mes]: { loading: false, dias } }));
+        } catch (error) {
+            setDetallesPorMes(prev => ({ ...prev, [mes]: { loading: false, dias: [] } }));
+        }
+    };
+
     const expandedRowRender = (record) => {
+        const detalle = detallesPorMes[record.mes];
+
+        if (!detalle || detalle.loading) {
+            return <Spin size="small" />;
+        }
+
         const columns = [
             { title: 'Día', dataIndex: 'dia', key: 'dia' },
             {
@@ -67,7 +71,7 @@ function SalesHistory() {
         return (
             <Table
                 columns={columns}
-                dataSource={record.detalles}
+                dataSource={detalle.dias.map(d => ({ ...d, key: d.dia }))}
                 pagination={false}
                 size="small"
                 bordered
@@ -111,6 +115,9 @@ function SalesHistory() {
                     expandable={{
                         expandedRowRender,
                         defaultExpandAllRows: false,
+                        onExpand: (expanded, record) => {
+                            if (expanded) cargarDetalleMes(record.mes);
+                        },
                     }}
                     pagination={{ pageSize: 12 }}
                 />

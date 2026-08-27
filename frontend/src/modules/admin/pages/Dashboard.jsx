@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Card, Typography, Table, Statistic, Space, Spin } from "antd";
-import { obtenerDashboard } from "../../../api/admin/axios_dashboard";
+import { Row, Col, Card, Typography, Table, Statistic, Space, Spin, Button, message } from "antd";
+import { obtenerDashboard, obtenerTesoreria } from "../../../api/admin/axios_dashboard";
 import CardInfo from "../components/Cards";
 import { io } from "socket.io-client";
 import { useStore } from "../../../context/StoreContext";
-import { ShoppingOutlined } from "@ant-design/icons";
+import { ShoppingOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 
 
 const { Title } = Typography;
 
 function Dashboard() {
   const [datos, setDatos] = useState(null);
+  const [tesoreria, setTesoreria] = useState(null);
+  const [tesoreriaVisible, setTesoreriaVisible] = useState(false);
+  const [tesoreriaLoading, setTesoreriaLoading] = useState(false);
   const socketRef = useRef(null);
+  const dashboardUpdateDebounceRef = useRef(null);
   const { selectedStoreId } = useStore();
 
   const columns = [
@@ -28,9 +32,33 @@ function Dashboard() {
     }
   };
 
+  const handleToggleTesoreria = async () => {
+    if (tesoreriaVisible) {
+      setTesoreriaVisible(false);
+      return;
+    }
+    setTesoreriaLoading(true);
+    try {
+      const data = await obtenerTesoreria(selectedStoreId);
+      setTesoreria(data);
+      setTesoreriaVisible(true);
+    } catch (error) {
+      message.error("Error al cargar la tesorería");
+    } finally {
+      setTesoreriaLoading(false);
+    }
+  };
+
   // Cargar datos cuando cambia la sucursal seleccionada
   useEffect(() => {
     cargarDatos();
+  }, [selectedStoreId]);
+
+  // La tesorería es a demanda: al cambiar de sucursal se oculta y se descarta,
+  // para nunca mostrar (ni dejar cacheado) el número de una sucursal distinta
+  useEffect(() => {
+    setTesoreria(null);
+    setTesoreriaVisible(false);
   }, [selectedStoreId]);
 
   // Conexión WebSocket
@@ -39,13 +67,22 @@ function Dashboard() {
       transports: ["websocket"],
     });
 
-    socketRef.current.on("dashboard_update", (updatedData) => {
-      // Solo actualizamos si el update viene sin filtro (global) o si coincide con nuestra sucursal
-      // Por simplicidad, recargamos los datos para asegurar coherencia con el filtro
-      cargarDatos();
+    socketRef.current.on("dashboard_update", () => {
+      // Debounce: una ráfaga de ventas dispara varios eventos seguidos; agrupamos
+      // esas ráfagas en una sola recarga en lugar de una petición HTTP por evento.
+      if (dashboardUpdateDebounceRef.current) {
+        clearTimeout(dashboardUpdateDebounceRef.current);
+      }
+      dashboardUpdateDebounceRef.current = setTimeout(() => {
+        dashboardUpdateDebounceRef.current = null;
+        cargarDatos();
+      }, 1500);
     });
 
     return () => {
+      if (dashboardUpdateDebounceRef.current) {
+        clearTimeout(dashboardUpdateDebounceRef.current);
+      }
       socketRef.current.disconnect();
     };
   }, [selectedStoreId]);
@@ -80,13 +117,29 @@ function Dashboard() {
                             }}
                             bordered={false}
                         >
-                            <Statistic
-                                title={<Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Tesorería</Text>}
-                                value={datos.mes_actual.saldo_caja}
-                                precision={2}
-                                prefix="$"
-                                valueStyle={{ color: 'white', fontSize: '2.5em', fontWeight: 'bold' }}
-                            />
+                            <Space align="center" style={{ marginBottom: 4 }}>
+                                <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Tesorería</Text>
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    icon={tesoreriaVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                                    loading={tesoreriaLoading}
+                                    onClick={handleToggleTesoreria}
+                                    style={{ color: 'white' }}
+                                />
+                            </Space>
+                            {tesoreriaVisible ? (
+                                <Statistic
+                                    value={tesoreria?.saldo_caja ?? 0}
+                                    precision={2}
+                                    prefix="$"
+                                    valueStyle={{ color: 'white', fontSize: '2.5em', fontWeight: 'bold' }}
+                                />
+                            ) : (
+                                <div style={{ fontSize: '2.5em', fontWeight: 'bold', letterSpacing: '4px', margin: '4px 0' }}>
+                                    ••••••
+                                </div>
+                            )}
                             <Text style={{ color: 'rgba(255,255,255,0.65)' }}>
                                 Todo el efectivo histórico acumulado (Entradas - Salidas)
                             </Text>
@@ -127,25 +180,23 @@ function Dashboard() {
                           title="Flujo Caja del Mes"
                           value={100 + (datos.mes_actual.saldo_caja_mes || 0)}
                           color="#d48d68"
-                          info="Inicia con $50 yappy + $50 efectivo. Entradas y salidas del mes."
+                          info="Inicia con $50 yappy + $50 efectivo. Se mueve con entradas y salidas reales del mes. No incluye gastos pagados con Fondos."
                           subItems={datos.mes_actual.flujo_por_metodo ? [
                             { label: "yappy", value: 50 + (datos.mes_actual.flujo_por_metodo.yappy || 0) },
                             { label: "efectivo", value: 50 + (datos.mes_actual.flujo_por_metodo.efectivo || 0) }
                           ] : null}
                         />
                     </Col>
-                    <Col xs={24} sm={12} md={6}>
-                        <CardInfo
-                          title="Inversión / Fondos (CAPEX)"
-                          value={datos.mes_actual.inversiones || 0}
-                          color="#722ed1"
-                          info="Equipos y activos fijos financiados con reservas de fondos o inyecciones pareadas."
-                          subItems={[
-                            { label: "Fondo Entró", value: datos.mes_actual.inyecciones || 0 },
-                            { label: "Equipo Comprado", value: datos.mes_actual.inversiones || 0 }
-                          ]}
-                        />
-                    </Col>
+                    {datos.mes_actual.gastos_fondos > 0 && (
+                        <Col xs={24} sm={12} md={8}>
+                            <CardInfo
+                              title="Gastos con Fondos (Tesorería)"
+                              value={datos.mes_actual.gastos_fondos}
+                              color="#d4a017"
+                              info="Compras grandes pagadas con la cuenta de Fondos Antojo24. No afectan la utilidad ni el flujo de caja del mes: solo reducen la Tesorería total."
+                            />
+                        </Col>
+                    )}
                 </Row>
             </div>
 

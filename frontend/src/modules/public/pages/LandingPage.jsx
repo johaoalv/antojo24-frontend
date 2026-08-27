@@ -4,7 +4,6 @@ import { ShopOutlined, PhoneOutlined, EnvironmentOutlined, ArrowRightOutlined } 
 import { useNavigate } from "react-router-dom";
 import PublicNavbar from "../components/PublicNavbar";
 import dinaLogo from "../../../../public/assets/menu/Dina.png";
-import heroImg from "../../../../public/assets/menu/Photoroom_20260309_233038.jpeg";
 import duoBurgerClasica from "../../../../public/assets/duos/duo burger clasica y sodas.png";
 import duoChiliBurger from "../../../../public/assets/duos/duo_chili_burger_sodas.png";
 import comboHawaiBurger from "../../../../public/assets/duos/combo_hawai_burger.png";
@@ -52,94 +51,65 @@ const LandingPage = () => {
             <Content style={{ margin: 0, padding: 0 }}>
                 {/* Hero Section */}
                 <div style={{
-                    padding: '60px 5% 50px',
-                    background: 'radial-gradient(circle at top right, #333 0%, #000 100%)',
+                    padding: '45px 5% 40px',
+                    background: 'radial-gradient(circle at center, #222 0%, #000 100%)',
                     color: '#fff',
                     textAlign: 'center',
                     position: 'relative',
                     overflow: 'hidden',
                     margin: 0
                 }}>
-                    <Row gutter={[32, 32]} align="middle">
-                        <Col xs={24} md={12} style={{ textAlign: window.innerWidth < 768 ? 'center' : 'left', zIndex: 2 }}>
-                            <Title style={{ 
-                                color: '#fff', 
-                                fontSize: 'clamp(2.2rem, 8vw, 4rem)', 
-                                marginBottom: '12px', 
-                                lineHeight: 1.1, 
-                                fontWeight: 900, 
-                                textTransform: 'uppercase' 
-                            }}>
-                                Calidad <br />
-                                <span style={{ 
-                                    background: '#FFD60A', 
-                                    color: '#000', 
-                                    padding: '4px 12px', 
-                                    display: 'inline-block',
-                                    transform: 'skewX(-10deg)',
-                                    borderRadius: '5px',
-                                    marginTop: '8px'
-                                }}>Irresistible.</span>
-                            </Title>
-                            <Paragraph style={{ 
-                                color: 'rgba(255,255,255,0.7)', 
-                                fontSize: 'clamp(0.95rem, 3.5vw, 1.2rem)', 
-                                marginBottom: '25px', 
-                                maxWidth: window.innerWidth < 768 ? '100%' : '550px', 
-                                fontWeight: 300, 
-                                letterSpacing: '0.5px' 
-                            }}>
-                                Street Food para llevar. Nuestra cocina está diseñada para que recibas el mejor sabor, recién hecho y listo para retirar.
-                            </Paragraph>
-                            <Space size="middle" wrap style={{ justifyContent: window.innerWidth < 768 ? 'center' : 'flex-start' }}>
-                                <Button 
-                                    type="primary" 
-                                    size="large" 
-                                    onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })} 
-                                    style={{ height: '50px', padding: '0 25px', background: '#FFD60A', borderColor: '#FFD60A', color: '#000', fontWeight: 900, fontSize: '1rem', borderRadius: '12px' }}
-                                >
-                                    VER MENÚ
-                                </Button>
-                                <Button 
-                                    href={WHATSAPP_URL}
-                                    target="_blank"
-                                    type="primary"
-                                    size="large"
-                                    icon={<WhatsAppOutlined />}
-                                    style={{ height: '50px', padding: '0 25px', background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 900, fontSize: '1rem', borderRadius: '12px' }}
-                                >
-                                    WhatsApp
-                                </Button>
-                            </Space>
-                        </Col>
-                        <Col xs={24} md={12}>
-                            <div style={{
-                                position: 'relative',
+                    <div style={{ maxWidth: '750px', margin: '0 auto' }}>
+                        <Title style={{ 
+                            color: '#fff', 
+                            fontSize: 'clamp(2.2rem, 6vw, 3.8rem)', 
+                            marginBottom: '12px', 
+                            lineHeight: 1.1, 
+                            fontWeight: 900, 
+                            textTransform: 'uppercase' 
+                        }}>
+                            Calidad{' '}
+                            <span style={{ 
+                                background: '#FFD60A', 
+                                color: '#000', 
+                                padding: '4px 14px', 
                                 display: 'inline-block',
-                                width: '100%'
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    top: 0,
-                                    left: 0,
-                                    background: 'rgba(255, 214, 102, 0.15)',
-                                    borderRadius: '50%',
-                                    filter: 'blur(60px)',
-                                    zIndex: 1
-                                }}></div>
-                                <img src={heroImg} alt="Hero Product" style={{ 
-                                    width: '100%', 
-                                    maxWidth: '460px', 
-                                    filter: 'drop-shadow(0 0 25px rgba(255,214,102,0.3))', 
-                                    position: 'relative', 
-                                    zIndex: 2, 
-                                    borderRadius: '20px' 
-                                }} />
-                            </div>
-                        </Col>
-                    </Row>
+                                transform: 'skewX(-10deg)',
+                                borderRadius: '5px'
+                            }}>Irresistible.</span>
+                        </Title>
+                        <Paragraph style={{ 
+                            color: 'rgba(255,255,255,0.75)', 
+                            fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', 
+                            marginBottom: '25px', 
+                            fontWeight: 300, 
+                            letterSpacing: '0.5px',
+                            maxWidth: '620px',
+                            margin: '0 auto 25px'
+                        }}>
+                            Street Food para llevar. Nuestra cocina está diseñada para que recibas el mejor sabor, recién hecho y listo para retirar.
+                        </Paragraph>
+                        <Space size="middle" wrap style={{ justifyContent: 'center' }}>
+                            <Button 
+                                type="primary" 
+                                size="large" 
+                                onClick={() => document.getElementById('menu-section').scrollIntoView({ behavior: 'smooth' })} 
+                                style={{ height: '48px', padding: '0 28px', background: '#FFD60A', borderColor: '#FFD60A', color: '#000', fontWeight: 900, fontSize: '1rem', borderRadius: '12px' }}
+                            >
+                                VER MENÚ
+                            </Button>
+                            <Button 
+                                href={WHATSAPP_URL}
+                                target="_blank"
+                                type="primary"
+                                size="large"
+                                icon={<WhatsAppOutlined />}
+                                style={{ height: '48px', padding: '0 28px', background: '#25D366', borderColor: '#25D366', color: '#fff', fontWeight: 900, fontSize: '1rem', borderRadius: '12px' }}
+                            >
+                                WhatsApp
+                            </Button>
+                        </Space>
+                    </div>
                 </div>
 
                 {/* Menu Section */}
