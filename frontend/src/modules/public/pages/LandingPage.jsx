@@ -20,11 +20,11 @@ const { Title, Text, Paragraph } = Typography;
 const WHATSAPP_URL = "https://wa.me/c/50764829340";
 
 const MENU_HIGHLIGHTS = [
-    { title: "Dúo Burger Clásica", img: duoBurgerClasica, price: "8" },
-    { title: "Dúo Chili Burger", img: duoChiliBurger, price: "9" },
+    { title: "Dúo Burger Clásica", img: duoBurgerClasica, price: "7.75" },
+    { title: "Dúo Chili Burger", img: duoChiliBurger, price: "8.5" },
     { title: "Combo Hawai Burger", img: comboHawaiBurger, price: "4.5" },
-    { title: "Dúo Hot Dog Clásico", img: duoHotDogClasico, price: "6" },
-    { title: "Dúo Chili Dog", img: duoChiliDog, price: "7.5" },
+    { title: "Dúo Hot Dog Clásico", img: duoHotDogClasico, price: "5.5" },
+    { title: "Dúo Chili Dog", img: duoChiliDog, price: "6" },
     { title: "Hot Dog Hawaiano", img: hotDogHawaiano, price: "2.5" },
 ];
 
