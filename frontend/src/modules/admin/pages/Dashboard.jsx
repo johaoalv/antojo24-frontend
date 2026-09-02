@@ -23,6 +23,14 @@ function Dashboard() {
     { title: 'Total Ventas', dataIndex: 'total_ventas', key: 'total_ventas', render: (val) => `$${Number(val || 0).toFixed(2)}` },
   ];
 
+  const rentabilidadColumns = [
+    { title: 'Mes', dataIndex: 'mes', key: 'mes' },
+    { title: 'Ingresos', dataIndex: 'ingresos', key: 'ingresos', align: 'right', render: (val) => <Typography.Text strong style={{ color: '#52c41a' }}>${Number(val || 0).toFixed(2)}</Typography.Text> },
+    { title: 'Gastos', dataIndex: 'gastos', key: 'gastos', align: 'right', render: (val) => <Typography.Text strong style={{ color: '#f5222d' }}>${Number(val || 0).toFixed(2)}</Typography.Text> },
+    { title: 'Utilidad neta', dataIndex: 'utilidad_neta', key: 'utilidad_neta', align: 'right', render: (val) => <Typography.Text strong>${Number(val || 0).toFixed(2)}</Typography.Text> },
+    { title: 'Rentabilidad', dataIndex: 'rentabilidad_pct', key: 'rentabilidad_pct', align: 'right', render: (val) => <Typography.Text strong style={{ color: Number(val) >= 0 ? '#389e0d' : '#cf1322' }}>{Number(val || 0).toFixed(1)}%</Typography.Text> },
+  ];
+
   const cargarDatos = async () => {
     try {
       const data = await obtenerDashboard(selectedStoreId);
@@ -199,6 +207,22 @@ function Dashboard() {
                     )}
                 </Row>
             </div>
+
+            <Card
+              title={<span style={{ fontSize: '1.2em', fontWeight: 600 }}>Rentabilidad — últimos 3 meses</span>}
+              style={{ borderRadius: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', marginBottom: '40px' }}
+            >
+              <Table
+                columns={rentabilidadColumns}
+                dataSource={datos.rentabilidad_mensual || []}
+                rowKey="mes"
+                pagination={false}
+                scroll={{ x: 'max-content' }}
+              />
+              <Typography.Text type="secondary" style={{ display: 'block', marginTop: 12, fontSize: 12 }}>
+                No incluye movimientos pagados con Fondos (Tesorería).
+              </Typography.Text>
+            </Card>
 
             <Row gutter={[24, 24]}>
         <Col xs={24} lg={16}>
