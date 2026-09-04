@@ -6,6 +6,7 @@ import PaymentsSelect from "./PaymentsSelect";
 import { formatCurrency } from "../utils/formatters";
 import PrimaryButton from "../../common/components/PrimaryButton";
 import SecondaryButton from "../../common/components/SecondaryButton";
+import { getProductImage } from "../utils/imageMapper";
 
 const Cart = ({
   pedido,
@@ -61,7 +62,7 @@ const Cart = ({
           key={producto}
           producto={producto}
           cantidad={cantidad}
-          imagen={productoInfo?.imagen}
+          imagen={getProductImage(productoInfo || { nombre: producto })}
           precio={precio}
           onDecrease={() => onAjustarCantidad(producto, cantidad - 1)}
           onIncrease={() => onAjustarCantidad(producto, cantidad + 1)}
