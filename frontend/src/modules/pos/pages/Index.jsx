@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Input } from "antd";
+import { Input, Tooltip, Button } from "antd";
+import { LogoutOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../common/components/Navbar";
+import AlertasStock from "../../common/components/AlertasStock";
 
 import ProductsList from "../components/ProductsList";
 import CategoryTabs from "../components/CategoryTabs";

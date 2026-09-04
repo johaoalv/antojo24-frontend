@@ -2,7 +2,6 @@ import React from "react";
 import { DollarCircleOutlined } from "@ant-design/icons";
 import { Input, Select } from "antd";
 import CartItem from "./CartItem";
-import PaymentsSelect from "./PaymentsSelect";
 import { formatCurrency } from "../utils/formatters";
 import PrimaryButton from "../../common/components/PrimaryButton";
 import SecondaryButton from "../../common/components/SecondaryButton";
@@ -104,24 +103,46 @@ const Cart = ({
     </div>
 
     <div style={{ marginTop: 20 }}>
-      <Input
-        placeholder="Nombre del cliente (opcional)"
-        value={nombreCliente}
-        onChange={(e) => onNombreClienteChange(e.target.value)}
-        style={{
-          fontSize: "1.2em",
-          padding: "10px",
-          borderRadius: "8px"
-        }}
-      />
-    </div>
-
-    <div style={{ marginTop: 20 }}>
-      <PaymentsSelect
-        value={metodoPago}
-        options={paymentOptions}
-        onChange={onMetodoPagoChange}
-      />
+      <h4 style={{ margin: "0 0 12px 0", fontSize: "1.1em", textAlign: "center", color: "#555" }}>
+        Método de Pago
+      </h4>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+        {paymentOptions.map((opt) => {
+          const isSelected = metodoPago === opt.value;
+          return (
+            <div
+              key={opt.value}
+              onClick={() => onMetodoPagoChange(opt.value)}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "16px 10px",
+                borderRadius: "14px",
+                cursor: "pointer",
+                border: isSelected ? "4px solid #000" : "2px solid #eaeaea",
+                backgroundColor: isSelected ? "#fff9e6" : "#fff",
+                boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none",
+                transition: "all 0.1s ease-in-out"
+              }}
+            >
+              {opt.isComponent ? (
+                opt.icon
+              ) : (
+                <img 
+                  src={opt.icon} 
+                  alt={opt.label} 
+                  style={{ height: "45px", marginBottom: "8px", objectFit: "contain" }} 
+                />
+              )}
+              <span style={{ fontSize: "1.15em", fontWeight: isSelected ? 800 : 500, color: "#111" }}>
+                {opt.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
 
     <div
