@@ -7,8 +7,10 @@ import { WhatsAppOutlined } from "@ant-design/icons";
 import qrYappy from "../../../../public/assets/qr_yappy.png";
 import yappyLogo from "../../../../public/assets/yappy.png";
 import { fetchProductos } from "../../../api/pos/axios_productos";
+import { fetchRecetas } from "../../../api/public/axios_recetas";
 import { getProductImage } from "../../pos/utils/imageMapper";
 import useProductosRealtime from "../../../hooks/useProductosRealtime";
+import { buildIngredientsByProduct, getProductIngredients } from "../utils/productIngredients";
 
 const { Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -16,7 +18,7 @@ const { Title, Text, Paragraph } = Typography;
 const WHATSAPP_URL = "https://wa.me/c/50764829340";
 
 // Componente de tarjeta de producto reutilizable
-const ProductCard = ({ item, colSize }) => (
+const ProductCard = ({ item, colSize, ingredients }) => (
     <Col xs={24} sm={12} {...colSize}>
         <Card
             hoverable
@@ -83,7 +85,7 @@ const ProductCard = ({ item, colSize }) => (
 
             {/* Ingredientes */}
             <Text style={{ fontSize: "0.78rem", color: "#888", lineHeight: 1.6, display: "block" }}>
-                {item.categoria || "Nuestro menú"}
+                {ingredients.join(", ")}
             </Text>
         </Card>
     </Col>
@@ -92,10 +94,14 @@ const ProductCard = ({ item, colSize }) => (
 const LandingPage = () => {
     const navigate = useNavigate();
     const [productos, setProductos] = useState([]);
+    const [ingredientsByProduct, setIngredientsByProduct] = useState({});
 
     useEffect(() => {
-        fetchProductos()
-            .then((data) => setProductos(Array.isArray(data) ? data.filter((p) => p.disponible !== false) : []))
+        Promise.all([fetchProductos(), fetchRecetas()])
+            .then(([productsData, recipesData]) => {
+                setProductos(Array.isArray(productsData) ? productsData.filter((p) => p.disponible !== false) : []);
+                setIngredientsByProduct(buildIngredientsByProduct(recipesData));
+            })
             .catch((error) => console.error("Error cargando menú público", error));
     }, []);
 
@@ -281,7 +287,14 @@ const LandingPage = () => {
                                 </Title>
                             </div>
                             <Row gutter={[20, 20]}>
-                                {items.map((item) => <ProductCard key={item.id || item.nombre} item={item} colSize={{ md: 8 }} />)}
+                                {items.map((item) => (
+                                    <ProductCard
+                                        key={item.id || item.nombre}
+                                        item={item}
+                                        ingredients={getProductIngredients(item, ingredientsByProduct)}
+                                        colSize={{ md: 8 }}
+                                    />
+                                ))}
                             </Row>
                         </div>
                     ))}
