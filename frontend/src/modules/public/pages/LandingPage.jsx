@@ -1,71 +1,19 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Layout, Typography, Row, Col, Card, Button, Space } from "antd";
 import { PhoneOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import PublicNavbar from "../components/PublicNavbar";
 import { WhatsAppOutlined } from "@ant-design/icons";
-
-// Imágenes individuales — Hamburguesas
-import hamburguesaClasica from "../../../../public/assets/menu/hamburguesa clasica.png";
-import chiliBurger from "../../../../public/assets/menu/chili burger.jpeg";
-import hawaiBurger from "../../../../public/assets/menu/hawai burger.jpeg";
-
-// Imágenes individuales — Hot Dogs
-import hotDogClasico from "../../../../public/assets/menu/hotdog_clasico.png";
-import chiliDog from "../../../../public/assets/menu/chili dog.jpeg";
-import hotDogHawaiano from "../../../../public/assets/menu/hot dog hawaiano.jpeg";
-
-// Soda & Pago
-import sodaImg from "../../../../public/assets/soda.png";
 import qrYappy from "../../../../public/assets/qr_yappy.png";
 import yappyLogo from "../../../../public/assets/yappy.png";
+import { fetchProductos } from "../../../api/pos/axios_productos";
+import { getProductImage } from "../../pos/utils/imageMapper";
+import useProductosRealtime from "../../../hooks/useProductosRealtime";
 
 const { Content, Footer } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
 const WHATSAPP_URL = "https://wa.me/c/50764829340";
-
-const HAMBURGUESAS = [
-    {
-        title: "Hamburguesa de la Casa",
-        img: hamburguesaClasica,
-        price: "3",
-        ingredientes: ["Pan de hamburguesa", "Carne", "Queso cheddar", "Pepinillo", "Lechuga", "Salsa de la casa", "Ketchup"],
-    },
-    {
-        title: "Chili Burger",
-        img: chiliBurger,
-        price: "3.5",
-        ingredientes: ["Pan de hamburguesa", "Carne", "Queso cheddar", "Chile con carne", "Salsa cheddar"],
-    },
-    {
-        title: "Hamburguesa Hawaiana",
-        img: hawaiBurger,
-        price: "3.75",
-        ingredientes: ["Pan de hamburguesa", "Carne", "Queso prensado", "Salsa de piña", "Salsa de ajo", "Papas fosforitos"],
-    },
-];
-
-const HOTDOGS = [
-    {
-        title: "Hot Dog de la Casa",
-        img: hotDogClasico,
-        price: "2.5",
-        ingredientes: ["Pan de hot dog", "Salchicha", "Pepinillo", "Queso cheddar", "Papas fosforitos"],
-    },
-    {
-        title: "Chili Dog",
-        img: chiliDog,
-        price: "2.75",
-        ingredientes: ["Pan de hot dog", "Salchicha", "Chile con carne", "Salsa cheddar"],
-    },
-    {
-        title: "Hot Dog Hawaiano",
-        img: hotDogHawaiano,
-        price: "2.5",
-        ingredientes: ["Pan de hot dog", "Salchicha", "Queso prensado", "Salsa de piña", "Salsa de ajo", "Papas fosforitos"],
-    },
-];
 
 // Componente de tarjeta de producto reutilizable
 const ProductCard = ({ item, colSize }) => (
@@ -81,8 +29,8 @@ const ProductCard = ({ item, colSize }) => (
                     background: "#111",
                 }}>
                     <img
-                        alt={item.title}
-                        src={item.img}
+                        alt={item.nombre}
+                        src={getProductImage(item)}
                         style={{
                             width: "100%",
                             height: "100%",
@@ -115,7 +63,7 @@ const ProductCard = ({ item, colSize }) => (
                         color: "#111",
                     }}
                 >
-                    {item.title}
+                    {item.nombre}
                 </Title>
                 <Text
                     strong
@@ -129,13 +77,13 @@ const ProductCard = ({ item, colSize }) => (
                         flexShrink: 0,
                     }}
                 >
-                    {item.price}
+                    ${Number(item.precio || 0).toFixed(2)}
                 </Text>
             </div>
 
             {/* Ingredientes */}
             <Text style={{ fontSize: "0.78rem", color: "#888", lineHeight: 1.6, display: "block" }}>
-                {item.ingredientes.join(" · ")}
+                {item.categoria || "Nuestro menú"}
             </Text>
         </Card>
     </Col>
@@ -143,6 +91,37 @@ const ProductCard = ({ item, colSize }) => (
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const [productos, setProductos] = useState([]);
+
+    useEffect(() => {
+        fetchProductos()
+            .then((data) => setProductos(Array.isArray(data) ? data.filter((p) => p.disponible !== false) : []))
+            .catch((error) => console.error("Error cargando menú público", error));
+    }, []);
+
+    const handleProductUpdated = useCallback((updatedProduct) => {
+        setProductos((current) => {
+            if (updatedProduct.disponible === false) {
+                return current.filter((product) => product.id !== updatedProduct.id);
+            }
+            const exists = current.some((product) => product.id === updatedProduct.id);
+            return exists
+                ? current.map((product) => product.id === updatedProduct.id ? updatedProduct : product)
+                : [...current, updatedProduct];
+        });
+    }, []);
+
+    useProductosRealtime(handleProductUpdated);
+
+    const categorias = useMemo(() => {
+        const grouped = productos.reduce((result, product) => {
+            const categoria = product.categoria || "Otros";
+            if (!result[categoria]) result[categoria] = [];
+            result[categoria].push(product);
+            return result;
+        }, {});
+        return Object.entries(grouped);
+    }, [productos]);
 
     return (
         <Layout
@@ -291,53 +270,21 @@ const LandingPage = () => {
                         </Title>
                     </div>
 
-                    {/* ── Categoría: Hamburguesas ── */}
-                    <div style={{ marginBottom: "44px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-                            <span style={{ fontSize: "1.6rem" }}>🍔</span>
-                            <Title
-                                level={3}
-                                style={{
-                                    margin: 0,
-                                    fontWeight: 900,
-                                    letterSpacing: "1px",
-                                    textTransform: "uppercase",
-                                    fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
-                                }}
-                            >
-                                Hamburguesas
-                            </Title>
+                    {categorias.length === 0 ? (
+                        <Text type="secondary">No hay productos disponibles en este momento.</Text>
+                    ) : categorias.map(([categoria, items]) => (
+                        <div key={categoria} style={{ marginBottom: "44px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+                                <span style={{ fontSize: "1.6rem" }}>🍔</span>
+                                <Title level={3} style={{ margin: 0, fontWeight: 900, letterSpacing: "1px", textTransform: "uppercase", fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)" }}>
+                                    {categoria}
+                                </Title>
+                            </div>
+                            <Row gutter={[20, 20]}>
+                                {items.map((item) => <ProductCard key={item.id || item.nombre} item={item} colSize={{ md: 8 }} />)}
+                            </Row>
                         </div>
-                        <Row gutter={[20, 20]}>
-                            {HAMBURGUESAS.map((item, index) => (
-                                <ProductCard key={`burger-${index}`} item={item} colSize={{ md: 8 }} />
-                            ))}
-                        </Row>
-                    </div>
-
-                    {/* ── Categoría: Hot Dogs ── */}
-                    <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
-                            <span style={{ fontSize: "1.6rem" }}>🌭</span>
-                            <Title
-                                level={3}
-                                style={{
-                                    margin: 0,
-                                    fontWeight: 900,
-                                    letterSpacing: "1px",
-                                    textTransform: "uppercase",
-                                    fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
-                                }}
-                            >
-                                Hot Dogs
-                            </Title>
-                        </div>
-                        <Row gutter={[20, 20]}>
-                            {HOTDOGS.map((item, index) => (
-                                <ProductCard key={`hotdog-${index}`} item={item} colSize={{ md: 8 }} />
-                            ))}
-                        </Row>
-                    </div>
+                    ))}
                 </div>
 
                 {/* ── Final CTA / Yappy QR & Info ── */}

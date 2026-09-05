@@ -23,6 +23,7 @@ const GestionProductos = () => {
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState(null);
   const [isCombo, setIsCombo] = useState(false);
+  const [updatingAvailabilityId, setUpdatingAvailabilityId] = useState(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -67,6 +68,7 @@ const GestionProductos = () => {
       precio_delivery: record.precio_delivery,
       imagen: record.imagen,
       es_combo: record.es_combo,
+      disponible: record.disponible !== false,
       combo_items: combo_items,
     });
     setIsModalVisible(true);
@@ -79,6 +81,21 @@ const GestionProductos = () => {
       loadData();
     } catch (error) {
       notifyError({ message: "Error al eliminar producto" });
+    }
+  };
+
+  const handleAvailabilityChange = async (record, disponible) => {
+    setUpdatingAvailabilityId(record.id);
+    try {
+      await axiosInstance.put(`/productos/${record.id}`, { disponible });
+      setProductos((current) => current.map((product) =>
+        product.id === record.id ? { ...product, disponible } : product
+      ));
+      notifySuccess({ message: disponible ? "Producto activado" : "Producto desactivado" });
+    } catch (error) {
+      notifyError({ message: "Error al cambiar disponibilidad" });
+    } finally {
+      setUpdatingAvailabilityId(null);
     }
   };
 
@@ -134,6 +151,18 @@ const GestionProductos = () => {
       render: (isCombo) => (isCombo ? "Combo / Caja" : "Producto Individual"),
     },
     {
+      title: "Disponible",
+      dataIndex: "disponible",
+      key: "disponible",
+      render: (disponible, record) => (
+        <Switch
+          checked={disponible !== false}
+          loading={updatingAvailabilityId === record.id}
+          onChange={(value) => handleAvailabilityChange(record, value)}
+        />
+      ),
+    },
+    {
       title: "Acciones",
       key: "acciones",
       render: (_, record) => (
@@ -171,7 +200,7 @@ const GestionProductos = () => {
         footer={null}
         destroyOnClose
       >
-        <Form form={form} layout="vertical" onFinish={handleSave} initialValues={{ es_combo: false }}>
+        <Form form={form} layout="vertical" onFinish={handleSave} initialValues={{ es_combo: false, disponible: true }}>
           <Form.Item name="nombre" label="Nombre" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -190,6 +219,10 @@ const GestionProductos = () => {
 
           <Form.Item name="es_combo" label="¿Es un Combo o Caja?" valuePropName="checked">
             <Switch onChange={setIsCombo} />
+          </Form.Item>
+
+          <Form.Item name="disponible" label="Disponible" valuePropName="checked">
+            <Switch />
           </Form.Item>
 
           {isCombo && (

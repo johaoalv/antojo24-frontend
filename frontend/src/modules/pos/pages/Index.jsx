@@ -15,6 +15,8 @@ import usePedidoActions from "../hooks/usePedidoActions";
 import { buildPriceMap, createProductoFinder } from "../utils/pedido-utils";
 import { PAYMENT_OPTIONS } from "../constants/payments";
 import { getPanamaTime12h } from "../utils/get_time";
+import useProductosRealtime from "../../../hooks/useProductosRealtime";
+import { notifyInfo } from "../../common/components/notifications";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ const Index = () => {
         const { fetchProductos } = await import("../../../api/pos/axios_productos");
         const data = await fetchProductos();
         if (Array.isArray(data)) {
-          setProductosData(data);
+          setProductosData(data.filter((product) => product.disponible !== false));
         } else {
           console.error("La respuesta de productos no es un arreglo válido", data);
           setProductosData([]);
@@ -60,6 +62,34 @@ const Index = () => {
     calcularTotal,
     resetPedido,
   } = usePedidoState(priceMap);
+
+  const handleProductUpdated = useCallback((updatedProduct) => {
+    setProductosData((current) => {
+      const exists = current.some((product) => product.id === updatedProduct.id);
+      if (!exists && updatedProduct.disponible !== false) return [...current, updatedProduct];
+      if (!exists) return current;
+      if (updatedProduct.disponible === false) {
+        return current.filter((product) => product.id !== updatedProduct.id);
+      }
+      return current.map((product) =>
+        product.id === updatedProduct.id ? updatedProduct : product
+      );
+    });
+
+    if (updatedProduct.disponible === false) {
+      const nombre = updatedProduct.nombre || updatedProduct.producto;
+      if (nombre && pedido[nombre]) {
+        ajustarCantidad(nombre, 0);
+        notifyInfo({
+          message: "Producto no disponible",
+          description: `${nombre} fue retirado del carrito porque ya no está disponible.`,
+          placement: "bottomRight",
+        });
+      }
+    }
+  }, [ajustarCantidad, pedido]);
+
+  useProductosRealtime(handleProductUpdated);
 
   const metodoPagoState = useMetodoPago(calcularTotal);
 
@@ -102,6 +132,7 @@ const Index = () => {
     setSearchQuery("");
     metodoPagoState.resetPagoState();
   }, [resetPedido, metodoPagoState]);
+
 
   const total = calcularTotal();
   const isPedidoVacio = Object.keys(pedido).length === 0;
