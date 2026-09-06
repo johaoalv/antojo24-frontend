@@ -15,6 +15,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { fetchProductos } from "../../../api/pos/axios_productos";
 import axiosInstance from "../../../api/core/axios_base";
 import { notifySuccess, notifyError } from "../../common/components/notifications";
+import { getProductImage } from "../../pos/utils/imageMapper";
 
 const GestionProductos = () => {
   const [productos, setProductos] = useState([]);
@@ -66,7 +67,8 @@ const GestionProductos = () => {
       nombre: record.nombre,
       precio: record.precio,
       precio_delivery: record.precio_delivery,
-      imagen: record.imagen,
+      // Mantener en administración la misma imagen nueva que usa POS/Home.
+      imagen: getProductImage({ ...record, imagen: "" }),
       es_combo: record.es_combo,
       disponible: record.disponible !== false,
       combo_items: combo_items,
@@ -128,8 +130,8 @@ const GestionProductos = () => {
       dataIndex: "imagen",
       key: "imagen",
       width: 100,
-      render: (img) =>
-        img ? <img src={img} alt="prod" style={{ width: 50, height: 50, objectFit: "cover" }} /> : "N/A",
+      render: (_, record) =>
+        <img src={getProductImage(record)} alt={record.nombre || "prod"} style={{ width: 50, height: 50, objectFit: "cover" }} />,
     },
     { title: "Nombre", dataIndex: "nombre", key: "nombre" },
     {

@@ -28,13 +28,14 @@ const IMAGE_OVERRIDE_MAP = {
 
 export const getProductImage = (item) => {
   if (!item) return defaultImg;
-  
+
   const nombre = (item.nombre || item.producto || "").toLowerCase().trim();
-  
+
+  // Estas son las imágenes nuevas que ya utiliza el POS y la página pública.
   if (IMAGE_OVERRIDE_MAP[nombre]) {
     return IMAGE_OVERRIDE_MAP[nombre];
   }
-  
+
   if (item.imagen && item.imagen.trim() !== "") {
     return item.imagen;
   }
