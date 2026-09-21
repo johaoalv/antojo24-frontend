@@ -28,12 +28,13 @@ const ProductCard = ({ item, colSize, ingredients }) => (
                     aspectRatio: "4 / 3",
                     overflow: "hidden",
                     borderRadius: "20px 20px 0 0",
-                    background: "#111",
+                    background: "#fff",
                 }}>
                     <img
                         alt={item.nombre}
                         src={getProductImage(item)}
                         style={{
+                            display: "block",
                             width: "100%",
                             height: "100%",
                             objectFit: "cover",
