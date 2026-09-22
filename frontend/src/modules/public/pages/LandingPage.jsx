@@ -100,7 +100,7 @@ const LandingPage = () => {
     useEffect(() => {
         Promise.all([fetchProductos(), fetchRecetas()])
             .then(([productsData, recipesData]) => {
-                setProductos(Array.isArray(productsData) ? productsData.filter((p) => p.disponible !== false) : []);
+                setProductos(Array.isArray(productsData) ? productsData.filter((p) => p.disponible !== false && p.es_combo === true) : []);
                 setIngredientsByProduct(buildIngredientsByProduct(recipesData));
             })
             .catch((error) => console.error("Error cargando menú público", error));
@@ -108,7 +108,7 @@ const LandingPage = () => {
 
     const handleProductUpdated = useCallback((updatedProduct) => {
         setProductos((current) => {
-            if (updatedProduct.disponible === false) {
+            if (updatedProduct.disponible === false || updatedProduct.es_combo === false) {
                 return current.filter((product) => product.id !== updatedProduct.id);
             }
             const exists = current.some((product) => product.id === updatedProduct.id);
@@ -122,12 +122,21 @@ const LandingPage = () => {
 
     const categorias = useMemo(() => {
         const grouped = productos.reduce((result, product) => {
-            const categoria = product.categoria || "Otros";
+            let categoria = product.categoria;
+            if (!categoria) {
+                categoria = "Otros";
+            } else {
+                // Capitalizar primera letra de la categoría
+                categoria = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+            }
+
             if (!result[categoria]) result[categoria] = [];
             result[categoria].push(product);
             return result;
         }, {});
-        return Object.entries(grouped);
+        
+        // Opcional: ordenar alfabéticamente
+        return Object.entries(grouped).sort(([catA], [catB]) => catA.localeCompare(catB));
     }, [productos]);
 
     return (
