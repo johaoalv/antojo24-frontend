@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { enviarPedido } from "../../../api/pos/axios_pedidos";
 import { getPanamaTime } from "../utils/get_time";
 import { imprimirTicket } from "../utils/print";
+import { prepararItemsTicket } from "../utils/ticket-items";
 import { generateUUID } from "../utils/uuid-generetaro";
 import { formatCurrency } from "../utils/formatters";
 import {
@@ -19,6 +20,7 @@ const usePedidoActions = ({
   resetPedido,
   resetPagoState,
   priceMap,
+  catalogoProductos,
   tipoPedido = "local",
   bolsas = 0,
   resetBolsas,
@@ -95,7 +97,10 @@ const usePedidoActions = ({
       console.log("✅ Estado de carrito y pago reiniciado.");
       console.log("-----------------------------------------");
 
-      await imprimirTicket(datos);
+      await imprimirTicket({
+        ...datos,
+        pedido: prepararItemsTicket(pedidoFormateado, catalogoProductos),
+      });
 
       notifySuccess({
         message: "Venta Registrada",
@@ -130,6 +135,7 @@ const usePedidoActions = ({
     montoRecibido,
     metodosPagoDetalles,
     priceMap,
+    catalogoProductos,
     pedido,
     resetPagoState,
     resetPedido,
