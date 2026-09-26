@@ -13,9 +13,18 @@ const PrintTicket = ({ pedido, total_pedido, metodo_pago, nombre_cliente }) => {
       <div className="linea" />
 
       {pedido.map((item, index) => (
-        <div key={index} className="producto">
-          <span>{item.cantidad}x {item.producto}</span>
-          <span>${item.total_item.toFixed(2)}</span>
+        <div key={index} className="ticket-item">
+          <div className="producto">
+            <span>{item.cantidad}x {item.producto}</span>
+            <span>${item.total_item.toFixed(2)}</span>
+          </div>
+          {item.incluidos?.length > 0 && (
+            <ul className="ticket-incluidos">
+              {item.incluidos.map((incluido, componentIndex) => (
+                <li key={componentIndex}>{incluido.cantidad}x {incluido.producto}</li>
+              ))}
+            </ul>
+          )}
         </div>
       ))}
 

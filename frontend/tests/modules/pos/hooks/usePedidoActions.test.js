@@ -137,6 +137,28 @@ describe('usePedidoActions', () => {
     expect(notifyError).not.toHaveBeenCalled();
   });
 
+  it('envía la venta normal y agrega los componentes únicamente al ticket', async () => {
+    const props = {
+      ...baseProps(),
+      pedido: { 'Combo 1': 2 },
+      priceMap: { 'Combo 1': 5.25 },
+      calcularTotal: () => 10.50,
+      catalogoProductos: [
+        { id: 26, nombre: 'Combo 1', es_combo: true, combo_items: [{ id: 1, cantidad: 1 }] },
+        { id: 1, nombre: 'Sodas' },
+      ],
+    };
+    const { result } = renderHook(() => usePedidoActions(props));
+    await act(async () => { await result.current.confirmarPedido(); });
+    const venta = enviarPedido.mock.calls[0][0];
+    const ticket = imprimirTicket.mock.calls[0][0];
+    expect(venta.pedido[0]).not.toHaveProperty('incluidos');
+    expect(ticket.pedido[0]).toEqual({
+      ...venta.pedido[0], incluidos: [{ producto: 'Sodas', cantidad: 2 }],
+    });
+    expect(ticket.total_pedido).toBe(10.50);
+  });
+
   it('muestra una notificación de error cuando la API falla', async () => {
     enviarPedido.mockRejectedValueOnce(new Error('network'));
     const props = baseProps();

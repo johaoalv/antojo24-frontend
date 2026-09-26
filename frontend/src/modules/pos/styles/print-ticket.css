@@ -4,6 +4,12 @@
     size: 58mm auto;
   }
 
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
   body * {
     visibility: hidden;
   }
@@ -17,15 +23,16 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 58mm;
   }
 }
 
 .ticket-container {
   font-family: 'Courier New', monospace;
   font-size: 16px;
-  width: 230px;
-  padding: 10px;
+  box-sizing: border-box;
+  width: 52mm;
+  padding: 2mm;
   text-align: center;
   font-weight: bold;
   color: #000;
@@ -49,6 +56,36 @@
   text-align: left;
   color: #000;
   font-weight: bold;
+}
+
+.ticket-container .producto {
+  gap: 2mm;
+  align-items: flex-start;
+}
+
+.ticket-container .producto > span:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ticket-container .producto > span:last-child {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.ticket-container .ticket-item {
+  margin-bottom: 2mm;
+  break-inside: avoid;
+}
+
+.ticket-container .ticket-incluidos {
+  margin: 1mm 0 0;
+  padding-left: 3mm;
+  list-style: none;
+  font-size: 14px;
+  text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .left {

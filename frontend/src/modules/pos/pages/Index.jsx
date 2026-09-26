@@ -20,7 +20,12 @@ import { notifyInfo } from "../../common/components/notifications";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [productosData, setProductosData] = useState([]);
+  const [catalogoProductos, setCatalogoProductos] = useState([]);
+  // Conservamos también los no disponibles para nombrar componentes en el ticket.
+  const productosData = useMemo(
+    () => catalogoProductos.filter((product) => product.disponible !== false),
+    [catalogoProductos]
+  );
   const [loadingProductos, setLoadingProductos] = useState(true);
   const [tipoPedido, setTipoPedido] = useState("local");
   const [bolsas, setBolsas] = useState(0);
@@ -33,10 +38,10 @@ const Index = () => {
         const { fetchProductos } = await import("../../../api/pos/axios_productos");
         const data = await fetchProductos();
         if (Array.isArray(data)) {
-          setProductosData(data.filter((product) => product.disponible !== false));
+          setCatalogoProductos(data);
         } else {
           console.error("La respuesta de productos no es un arreglo válido", data);
-          setProductosData([]);
+          setCatalogoProductos([]);
         }
       } catch (error) {
         console.error("Error cargando productos", error);
@@ -64,13 +69,9 @@ const Index = () => {
   } = usePedidoState(priceMap);
 
   const handleProductUpdated = useCallback((updatedProduct) => {
-    setProductosData((current) => {
+    setCatalogoProductos((current) => {
       const exists = current.some((product) => product.id === updatedProduct.id);
-      if (!exists && updatedProduct.disponible !== false) return [...current, updatedProduct];
-      if (!exists) return current;
-      if (updatedProduct.disponible === false) {
-        return current.filter((product) => product.id !== updatedProduct.id);
-      }
+      if (!exists) return [...current, updatedProduct];
       return current.map((product) =>
         product.id === updatedProduct.id ? updatedProduct : product
       );
@@ -103,6 +104,7 @@ const Index = () => {
     resetPedido,
     resetPagoState: metodoPagoState.resetPagoState,
     priceMap,
+    catalogoProductos,
     tipoPedido,
     bolsas,
     resetBolsas: () => setBolsas(0),
