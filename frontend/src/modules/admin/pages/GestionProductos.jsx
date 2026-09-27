@@ -23,6 +23,7 @@ const GestionProductos = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState(null);
+  const [originalImage, setOriginalImage] = useState("");
   const [isCombo, setIsCombo] = useState(false);
   const [updatingAvailabilityId, setUpdatingAvailabilityId] = useState(null);
 
@@ -52,6 +53,7 @@ const GestionProductos = () => {
 
   const handleEdit = (record) => {
     setEditingId(record.id);
+    setOriginalImage(record.imagen || "");
     setIsCombo(record.es_combo);
     
     let combo_items = [];
@@ -67,8 +69,8 @@ const GestionProductos = () => {
       nombre: record.nombre,
       precio: record.precio,
       precio_delivery: record.precio_delivery,
-      // Mantener en administración la misma imagen nueva que usa POS/Home.
-      imagen: getProductImage({ ...record, imagen: "" }),
+      // El formulario edita el valor persistido, no la imagen de presentación.
+      imagen: record.imagen || "",
       es_combo: record.es_combo,
       disponible: record.disponible !== false,
       combo_items: combo_items,
@@ -110,6 +112,9 @@ const GestionProductos = () => {
       };
 
       if (editingId) {
+        if (values.imagen === originalImage) {
+          delete payload.imagen;
+        }
         await axiosInstance.put(`/productos/${editingId}`, payload);
         notifySuccess({ message: "Producto actualizado" });
       } else {
