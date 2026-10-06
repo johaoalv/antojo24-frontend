@@ -12,6 +12,7 @@ function Inyecciones() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const { selectedStoreId, stores } = useStore();
+    const metodoSeleccionado = Form.useWatch('metodo_pago', form);
 
     const cargarDatos = async () => {
         setLoading(true);
@@ -31,7 +32,10 @@ function Inyecciones() {
 
     const handleAdd = async (values) => {
         try {
-            await agregarInyeccion(values);
+            await agregarInyeccion({
+                ...values,
+                crear_salida_inversion: values.metodo_pago === 'fondos' ? false : values.crear_salida_inversion,
+            });
             message.success("Aporte / Inyección de fondo registrado correctamente");
             setIsModalOpen(false);
             form.resetFields();
@@ -61,10 +65,14 @@ function Inyecciones() {
             render: (id) => stores.find(t => t.sucursal_id === id)?.nombre || "Global / Central"
         },
         {
-            title: 'Método',
+            title: 'Cuenta destino',
             dataIndex: 'metodo_pago',
             key: 'metodo_pago',
-            render: (metodo) => <Tag color={metodo === 'yappy' ? 'purple' : 'green'}>{metodo?.toUpperCase() || 'EFECTIVO'}</Tag>
+            render: (metodo) => {
+                const colors = { yappy: 'purple', efectivo: 'green', fondos: 'gold' };
+                const labels = { fondos: 'FONDOS ANTOJO24 (TESORERÍA)' };
+                return <Tag color={colors[metodo] || 'green'}>{labels[metodo] || metodo?.toUpperCase() || 'EFECTIVO'}</Tag>;
+            }
         },
         {
             title: 'Monto Entrada',
@@ -90,11 +98,12 @@ function Inyecciones() {
                     Inyecciones y Fondos de Reserva
                 </Title>
                 <Button type="primary" icon={<PlusOutlined />} onClick={() => {
+                    form.resetFields();
                     setIsModalOpen(true);
                     form.setFieldsValue({ 
                         sucursal_id: selectedStoreId === "global" ? undefined : selectedStoreId, 
                         metodo_pago: 'yappy',
-                        crear_salida_inversion: true
+                        crear_salida_inversion: false
                     });
                 }}>
                     Registrar Aporte / Fondo
@@ -128,13 +137,22 @@ function Inyecciones() {
                     <Form.Item name="monto" label="Monto ($)" rules={[{ required: true }]}>
                         <InputNumber style={{ width: '100%' }} precision={2} min={0} placeholder="300.00" />
                     </Form.Item>
-                    <Form.Item name="metodo_pago" label="Cuenta / Método donde ingresa" rules={[{ required: true }]}>
+                    <Form.Item
+                        name="metodo_pago"
+                        label="Cuenta destino de la entrada"
+                        rules={[{ required: true }]}
+                        extra={metodoSeleccionado === 'fondos'
+                            ? 'La entrada aumenta Fondos Antojo24 y la tesorería total, sin aumentar el saldo operativo del mes.'
+                            : 'La entrada aumenta el saldo operativo del mes y la tesorería total.'}
+                    >
                         <Select options={[
-                            { label: "Yappy (Cuenta Antojo24 Operativa)", value: "yappy" },
-                            { label: "Efectivo (Caja Chica Operativa)", value: "efectivo" }
-                        ]} />
+                            { label: "Antojo24 del mes — Yappy", value: "yappy" },
+                            { label: "Antojo24 del mes — Efectivo", value: "efectivo" },
+                            { label: "Fondos Antojo24 (Tesorería)", value: "fondos" }
+                        ]} onChange={() => form.setFieldValue('crear_salida_inversion', false)} />
                     </Form.Item>
 
+                    {metodoSeleccionado !== 'fondos' && (
                     <Form.Item 
                         name="crear_salida_inversion" 
                         label={
@@ -149,6 +167,7 @@ function Inyecciones() {
                     >
                         <Switch checkedChildren="Sí (Entrada + Salida CAPEX)" unCheckedChildren="Solo Entrada de Fondo" />
                     </Form.Item>
+                    )}
 
                     <Form.Item name="sucursal_id" label="Sucursal (Opcional)">
                         <Select placeholder="Selecciona una sucursal" allowClear>
