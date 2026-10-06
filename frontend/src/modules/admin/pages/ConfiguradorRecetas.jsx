@@ -30,7 +30,7 @@ const ConfiguradorRecetas = () => {
                 axiosInstance.get("/produccion/recetas")
             ]);
             setRecetas(recetasRes.data);
-            setInsumos(insumosRes.data);
+            setInsumos(insumosRes.data.filter(i => i.tipo !== "material"));
             setComposiciones(composicionesRes.data);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -327,7 +327,7 @@ const ConfiguradorRecetas = () => {
             nuevoInsumoForm.resetFields();
             // Recargamos insumos para que aparezca en el select de la receta
             const insumosRes = await axiosInstance.get("/insumos");
-            setInsumos(insumosRes.data);
+            setInsumos(insumosRes.data.filter(i => i.tipo !== "material"));
         } catch (error) {
             message.error("Error al crear insumo rápido");
         }

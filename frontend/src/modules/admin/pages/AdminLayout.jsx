@@ -51,6 +51,7 @@ const AdminLayoutContent = () => {
   };
 
   const menuItems = [
+    { key: "materiales", icon: <BlockOutlined />, label: <span style={{ fontSize: "1.3em" }}>Materiales</span> },
     {
       key: "inicio",
       icon: <DashboardOutlined style={{ fontSize: '1.5em' }} />,

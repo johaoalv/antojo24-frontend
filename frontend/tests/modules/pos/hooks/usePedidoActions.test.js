@@ -44,6 +44,8 @@ describe('usePedidoActions', () => {
     resetPedido: vi.fn(),
     resetPagoState: vi.fn(),
     priceMap,
+    bolsas: 2,
+    resetBolsas: vi.fn(),
   });
 
   beforeEach(() => {
@@ -108,7 +110,7 @@ describe('usePedidoActions', () => {
       metodo_pago: 'efectivo',
       tipo_pedido: 'local',
       estado_pago: 'pagado',
-      bolsas: 0,
+      bolsas: 2,
       fecha: '2024-01-01T10:00:00',
       sucursal_id: 'sucursal-1',
       monto_recibido: 30,
@@ -121,7 +123,7 @@ describe('usePedidoActions', () => {
       metodo_pago: 'efectivo',
       tipo_pedido: 'local',
       estado_pago: 'pagado',
-      bolsas: 0,
+      bolsas: 2,
       fecha: '2024-01-01T10:00:00',
       sucursal_id: 'sucursal-1',
       monto_recibido: 30,
@@ -182,4 +184,18 @@ describe('usePedidoActions', () => {
 
     consoleError.mockRestore();
   });
+  it('no confirma mientras la configuración de bolsas está pendiente', async () => {
+    const { result } = renderHook(() => usePedidoActions({...baseProps(), bolsas: null}));
+    await act(async () => { await result.current.confirmarPedido(); });
+    expect(enviarPedido).not.toHaveBeenCalled();
+  });
+
+  it('respeta cero bolsas explícitas y reinicia la selección tras confirmar', async () => {
+    const props = {...baseProps(), bolsas: 0};
+    const { result } = renderHook(() => usePedidoActions(props));
+    await act(async () => { await result.current.confirmarPedido(); });
+    expect(enviarPedido).toHaveBeenCalledWith(expect.objectContaining({bolsas: 0}));
+    expect(props.resetBolsas).toHaveBeenCalledOnce();
+  });
+
 });

@@ -134,6 +134,7 @@ const GestionInsumos = () => {
     };
 
     const columns = [
+        { title: "Tipo", dataIndex: "tipo", filters: [{text: "Ingrediente", value: "ingrediente"}, {text: "Material", value: "material"}], onFilter: (v, r) => r.tipo === v, render: (v) => <Tag>{v || "ingrediente"}</Tag> },
         {
             title: "Insumo",
             dataIndex: "nombre",
@@ -249,6 +250,9 @@ const GestionInsumos = () => {
                     style={{ marginTop: 20 }}
                     onValuesChange={handleValuesChange}
                 >
+                    <Form.Item name="tipo" label="Tipo" initialValue="ingrediente">
+                        <Select disabled={!!editingInsumo} options={[{value: "ingrediente", label: "Ingrediente"}, {value: "material", label: "Material"}]} />
+                    </Form.Item>
                     <Form.Item name="nombre" label="Nombre del Insumo" rules={[{ required: true }]}>
                         <Input placeholder="Ej: Pan de hamburguesa" />
                     </Form.Item>

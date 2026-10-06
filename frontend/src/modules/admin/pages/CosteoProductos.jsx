@@ -9,6 +9,7 @@ const { Title } = Typography;
 const CosteoProductos = () => {
     const [costeos, setCosteos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [materialesPedido, setMaterialesPedido] = useState([]);
     const [targetMargin, setTargetMargin] = useState(60);
 
     const fetchCosteos = async () => {
@@ -16,6 +17,8 @@ const CosteoProductos = () => {
         try {
             const response = await axiosInstance.get("/costeo/productos");
             setCosteos(response.data);
+            const materiales = await axiosInstance.get("/materiales");
+            setMaterialesPedido(materiales.data.pedido);
         } catch (error) {
             console.error("Error al obtener costeo:", error);
         } finally {
@@ -38,14 +41,14 @@ const CosteoProductos = () => {
             title: 'Costo de Producción',
             dataIndex: 'costo_total',
             key: 'costo_total',
-            render: (val) => <Tag color="blue" style={{ fontSize: '1.1em' }}>${Number(val || 0).toFixed(2)}</Tag>
+            render: (val, record) => record.costeo_incompleto ? <Tag color="red">Incompleto</Tag> : <Tag color="blue" style={{ fontSize: '1.1em' }}>${Number(val || 0).toFixed(2)}</Tag>
         },
         {
             title: 'Disp. Venta (unid)',
             key: 'disponibilidad',
             render: (_, record) => {
                 // Cálculo de inteligencia: ¿Cuántas unidades podemos vender según el ingrediente limitante?
-                const disponibilidad = record.ingredientes.map(ing => {
+                const disponibilidad = [...record.ingredientes, ...(record.materiales || [])].map(ing => {
                     const req = parseFloat(ing.cantidad);
                     const stock = parseFloat(ing.stock || 0);
                     return req > 0 ? Math.floor(stock / req) : Infinity;
@@ -69,6 +72,7 @@ const CosteoProductos = () => {
             key: 'margen_local',
             render: (_, record) => {
                 const costo = parseFloat(record.costo_total || 0);
+                if (record.costeo_incompleto) return '—';
                 const precio = parseFloat(record.precio || 0);
                 if (precio <= 0) return '—';
                 const margen = ((precio - costo) / precio * 100);
@@ -86,6 +90,7 @@ const CosteoProductos = () => {
             key: 'margen_delivery',
             render: (_, record) => {
                 const costo = parseFloat(record.costo_total || 0);
+                if (record.costeo_incompleto) return '—';
                 const precio = parseFloat(record.precio_delivery || 0);
                 if (precio <= 0) return '—';
                 const margen = ((precio - costo) / precio * 100);
@@ -97,6 +102,7 @@ const CosteoProductos = () => {
             key: 'ganancia_pedidosya',
             render: (_, record) => {
                 const costo = parseFloat(record.costo_total || 0);
+                if (record.costeo_incompleto) return '—';
                 const precio = parseFloat(record.precio_delivery || 0);
                 if (precio <= 0) return '—';
                 const comision = precio * 0.24;
@@ -109,6 +115,7 @@ const CosteoProductos = () => {
             key: 'ganancia_ubereats',
             render: (_, record) => {
                 const costo = parseFloat(record.costo_total || 0);
+                if (record.costeo_incompleto) return '—';
                 const precio = parseFloat(record.precio_delivery || 0);
                 if (precio <= 0) return '—';
                 const comision = precio * 0.23;
@@ -120,6 +127,7 @@ const CosteoProductos = () => {
             title: `Precio Sugerido (${targetMargin}% Margen)`,
             key: 'sugerido',
             render: (_, record) => {
+                if (record.costeo_incompleto) return '—';
                 const costo = parseFloat(record.costo_total);
                 const sugerido = costo / (1 - targetMargin / 100);
                 return <strong style={{ color: '#52c41a', fontSize: '1.2em' }}>${Number(sugerido || 0).toFixed(2)}</strong>;
@@ -134,7 +142,13 @@ const CosteoProductos = () => {
             { title: 'Costo Unitario', dataIndex: 'costo_unitario', key: 'unitario', render: (v) => `$${Number(v || 0).toFixed(4)}` },
             { title: 'Subtotal', dataIndex: 'subtotal', key: 'subtotal', render: (v) => <strong>$${Number(v || 0).toFixed(2)}</strong> },
         ];
-        return <Table columns={subColumns} dataSource={record.ingredientes} pagination={false} size="small" rowKey="nombre_insumo" />;
+        return <Space direction="vertical" style={{width: "100%"}}>
+            {record.costeo_incompleto && <Alert type="warning" message={record.error} />}
+            <Typography.Text strong>Ingredientes: ${Number(record.costo_ingredientes || 0).toFixed(2)}</Typography.Text>
+            <Table columns={subColumns} dataSource={record.ingredientes} pagination={false} size="small" rowKey="insumo_id" />
+            <Typography.Text strong>Materiales por producto: ${Number(record.costo_materiales || 0).toFixed(2)}</Typography.Text>
+            <Table columns={subColumns.map(c => c.key === 'nombre' ? {...c, title: 'Material'} : c)} dataSource={record.materiales || []} pagination={false} size="small" rowKey="insumo_id" />
+        </Space>;
     };
 
     return (
@@ -142,6 +156,7 @@ const CosteoProductos = () => {
             <Title level={2}><PieChartOutlined /> Análisis de Costos y Rentabilidad</Title>
             <Typography.Text type="secondary">Calcula automáticamente cuánto te cuesta producir cada plato basándose en las recetas y precios de insumos actuales.</Typography.Text>
 
+            <Alert type="info" showIcon style={{marginTop: 16}} message="El costo del producto incluye ingredientes y materiales. Los materiales por pedido se suman una sola vez al confirmar la venta." description={materialesPedido.map(m => `${m.nombre}: ${m.cantidad} × $${Number(m.costo_unidad).toFixed(4)}`).join(" · ")} />
             <Divider />
 
             <Row gutter={24} style={{ marginBottom: 24 }}>
