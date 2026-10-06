@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Input, Tooltip, Button, Alert } from "antd";
+import { Input, Tooltip, Button } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../../api/core/axios_base";
 import Navbar from "../../common/components/Navbar";
 
 import ProductsList from "../components/ProductsList";
@@ -29,20 +28,7 @@ const Index = () => {
   );
   const [loadingProductos, setLoadingProductos] = useState(true);
   const [tipoPedido, setTipoPedido] = useState("local");
-  const [bolsas, setBolsas] = useState(null);
-  const [bolsasDefault, setBolsasDefault] = useState(null);
-  const [errorMateriales, setErrorMateriales] = useState(false);
-  const cargarMateriales = useCallback(async () => {
-    setErrorMateriales(false);
-    try {
-      const { data } = await axiosInstance.get("/materiales");
-      const config = data.pedido.find(m => m.codigo === "bolsas");
-      if (!config || !Number.isInteger(Number(config.cantidad)) || Number(config.cantidad) < 0) throw new Error("Configuración inválida");
-      setBolsasDefault(Number(config.cantidad));
-      setBolsas(Number(config.cantidad));
-    } catch { setErrorMateriales(true); }
-  }, []);
-  useEffect(() => { cargarMateriales(); }, [cargarMateriales]);
+  const [bolsas, setBolsas] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("todos");
 
@@ -121,7 +107,7 @@ const Index = () => {
     catalogoProductos,
     tipoPedido,
     bolsas,
-    resetBolsas: () => setBolsas(bolsasDefault),
+    resetBolsas: () => setBolsas(0),
   });
 
   const productosFiltrados = useMemo(() => {
@@ -143,11 +129,11 @@ const Index = () => {
   const handleTipoPedidoChange = useCallback((valor) => {
     setTipoPedido(valor);
     resetPedido();
-    setBolsas(bolsasDefault);
+    setBolsas(0);
     setSelectedCategory("todos");
     setSearchQuery("");
     metodoPagoState.resetPagoState();
-  }, [resetPedido, metodoPagoState, bolsasDefault]);
+  }, [resetPedido, metodoPagoState]);
 
 
   const total = calcularTotal();
@@ -207,7 +193,6 @@ const Index = () => {
           overflow: "hidden",
         }}>
           <div style={{ flex: 1, overflowY: "auto" }}>
-            {errorMateriales && <Alert type="error" message="No se pudo cargar la cantidad de bolsas" action={<Button onClick={cargarMateriales}>Reintentar</Button>} />}
             <Cart
               pedido={pedido}
               buscarProducto={buscarProducto}
@@ -218,7 +203,7 @@ const Index = () => {
               paymentOptions={PAYMENT_OPTIONS}
               onMetodoPagoChange={metodoPagoState.handleMetodoPagoChange}
               onConfirmar={confirmarPedido}
-              disabled={isPedidoVacio || !metodoPagoState.metodoPago || loading || bolsas === null || errorMateriales}
+              disabled={isPedidoVacio || !metodoPagoState.metodoPago || loading}
               loading={loading}
               onNavigateToCierre={() => navigate("/cierre")}
               nombreCliente={nombreCliente}

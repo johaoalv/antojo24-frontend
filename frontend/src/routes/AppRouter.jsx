@@ -7,7 +7,6 @@ import PrivateRoute from "./PrivateRoute";
 
 import AdminLayout from "../modules/admin/pages/AdminLayout";
 import Dashboard from "../modules/admin/pages/Dashboard";
-import Materiales from "../modules/admin/pages/Materiales";
 import GestionInsumos from "../modules/admin/pages/GestionInsumos";
 import VentasDelDia from "../modules/admin/pages/VentasDelDia";
 import Gastos from "../modules/admin/pages/Gastos";
@@ -43,7 +42,6 @@ const AppRouter = () => {
             <Route path="costeo" element={<CosteoProductos />} />
             <Route path="recetas" element={<ConfigurarRecetas />} />
             <Route path="mermas" element={<Mermas />} />
-            <Route path="materiales" element={<Materiales />} />
             <Route path="insumos" element={<GestionInsumos />} />
             <Route path="productos" element={<GestionProductos />} />
           </Route>

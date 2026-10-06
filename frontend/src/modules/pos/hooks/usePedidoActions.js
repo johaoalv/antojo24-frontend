@@ -22,13 +22,13 @@ const usePedidoActions = ({
   priceMap,
   catalogoProductos,
   tipoPedido = "local",
-  bolsas,
+  bolsas = 0,
   resetBolsas,
 }) => {
   const [loading, setLoading] = useState(false);
 
   const confirmarPedido = useCallback(async () => {
-    if (loading || !metodoPago || Object.keys(pedido).length === 0 || (bolsas !== undefined && (!Number.isInteger(bolsas) || bolsas < 0))) {
+    if (loading || !metodoPago || Object.keys(pedido).length === 0) {
       return;
     }
 
@@ -111,7 +111,7 @@ const usePedidoActions = ({
       });
 
     } catch (error) {
-      if (error.response && [400, 409].includes(error.response.status)) {
+      if (error.response && error.response.status === 400) {
         notifyError({
           message: error.response.data.error || "Agotado",
           description: error.response.data.detalles || "No hay stock suficiente.",

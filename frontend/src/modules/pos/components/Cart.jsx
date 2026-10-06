@@ -88,11 +88,10 @@ const Cart = ({
             backgroundColor: bolsas === 0 ? "#f5f5f5" : "#fff", cursor: bolsas === 0 ? "default" : "pointer",
             fontSize: "1.2em", display: "flex", alignItems: "center", justifyContent: "center"
           }}
-          disabled={bolsas === null || bolsas === 0}
+          disabled={bolsas === 0}
         >-</button>
-        <span style={{ fontSize: "1.3em", fontWeight: "bold", minWidth: 24, textAlign: "center" }}>{bolsas ?? "…"}</span>
+        <span style={{ fontSize: "1.3em", fontWeight: "bold", minWidth: 24, textAlign: "center" }}>{bolsas}</span>
         <button
-          disabled={bolsas === null}
           onClick={() => onBolsasChange(bolsas + 1)}
           style={{
             width: 32, height: 32, borderRadius: 6, border: "1px solid #d9d9d9",
