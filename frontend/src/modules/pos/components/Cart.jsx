@@ -106,7 +106,7 @@ const Cart = ({
       <h4 style={{ margin: "0 0 12px 0", fontSize: "1.1em", textAlign: "center", color: "#555" }}>
         Método de Pago
       </h4>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "12px" }}>
         {paymentOptions.map((opt) => {
           const isSelected = metodoPago === opt.value;
           return (
