@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Input, Tooltip, Button } from "antd";
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, ShopOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../common/components/Navbar";
+import AlertasStock from "../../common/components/AlertasStock";
 
 import ProductsList from "../components/ProductsList";
 import CategoryTabs from "../components/CategoryTabs";
@@ -20,6 +20,12 @@ import { notifyInfo } from "../../common/components/notifications";
 
 const Index = () => {
   const navigate = useNavigate();
+  const nombreTienda = JSON.parse(localStorage.getItem("user"))?.nombre_tienda || "Sucursal";
+  const cerrarSesion = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "/login";
+  };
   const [catalogoProductos, setCatalogoProductos] = useState([]);
   // Conservamos también los no disponibles para nombrar componentes en el ticket.
   const productosData = useMemo(
@@ -148,9 +154,8 @@ const Index = () => {
   }, []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
-      <Navbar />
-      <div style={{ flex: 1, display: "flex", overflow: "hidden", gap: 10, padding: 10 }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100dvh", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+      <div style={{ flex: 1, display: "flex", minHeight: 0, overflow: "hidden", gap: 8, padding: 8 }}>
         {/* Panel izquierdo — productos */}
         <div style={{
           flex: 3,
@@ -186,12 +191,46 @@ const Index = () => {
         {/* Panel derecho — carrito */}
         <div style={{
           flex: 2,
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
           backgroundColor: "#fff",
           borderRadius: 12,
           overflow: "hidden",
         }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 16px",
+            borderBottom: "1px solid #eee",
+            flexShrink: 0,
+          }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 10,
+              backgroundColor: "#fff3d6", color: "#946200",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}>
+              <ShopOutlined style={{ fontSize: 18 }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div title={nombreTienda} style={{ fontWeight: 700, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {nombreTienda}
+              </div>
+              <div style={{ fontSize: 11, color: "#888" }}>Punto de venta · {panamaClock}</div>
+            </div>
+            <AlertasStock />
+            <Tooltip title="Cerrar sesión">
+              <Button
+                type="text"
+                aria-label="Cerrar sesión"
+                icon={<LogoutOutlined />}
+                onClick={cerrarSesion}
+                style={{ color: "#666", flexShrink: 0 }}
+              />
+            </Tooltip>
+          </div>
           <div style={{ flex: 1, overflowY: "auto" }}>
             <Cart
               pedido={pedido}
