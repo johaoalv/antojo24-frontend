@@ -1,6 +1,5 @@
 import React from "react";
-import { DollarCircleOutlined } from "@ant-design/icons";
-import { Input, Select } from "antd";
+import { CheckCircleFilled, DollarCircleOutlined, ShopOutlined, CarOutlined } from "@ant-design/icons";
 import CartItem from "./CartItem";
 import { formatCurrency } from "../utils/formatters";
 import PrimaryButton from "../../common/components/PrimaryButton";
@@ -33,25 +32,56 @@ const Cart = ({
       height: "100%",
       display: "flex",
       flexDirection: "column",
-      padding: "20px 16px",
+      padding: "12px 16px",
       backgroundColor: "#fff",
       boxSizing: "border-box",
     }}
   >
-    <h3 style={{ fontSize: "clamp(1.5em, 5vw, 2.5em)", textAlign: "center", marginBottom: 10 }}>
+    <h3 style={{ fontSize: 16, fontWeight: 600, color: "#777", margin: "0 0 10px" }}>
       Carrito
     </h3>
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 20 }}>
-      <Select
-        value={tipoPedido}
-        onChange={onTipoPedidoChange}
-        style={{ width: 200 }}
-        options={[
-          { label: "Local", value: "local" },
-          { label: "PedidosYa", value: "pedidosya" },
-          { label: "Uber", value: "uber" }
-        ]}
-      />
+    <div role="group" aria-label="Tipo de pedido" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8, marginBottom: 16 }}>
+      {[
+        { label: "Local", value: "local", icon: <ShopOutlined /> },
+        { label: "PedidosYa", value: "pedidosya", icon: <CarOutlined /> },
+        { label: "Uber", value: "uber", icon: <CarOutlined /> },
+      ].map((option) => {
+        const selected = tipoPedido === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => {
+              if (!selected) onTipoPedidoChange(option.value);
+            }}
+            style={{
+              position: "relative",
+              minWidth: 0,
+              minHeight: 76,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              padding: "12px 4px",
+              border: selected ? "2px solid #222" : "2px solid #eaeaea",
+              borderRadius: 12,
+              backgroundColor: selected ? "#fff3d6" : "#fafafa",
+              color: selected ? "#222" : "#666",
+              fontFamily: "inherit",
+              fontSize: "clamp(12px, 1.4vw, 16px)",
+              fontWeight: selected ? 800 : 600,
+              cursor: "pointer",
+              transition: "background-color 0.15s, border-color 0.15s",
+            }}
+          >
+            <span style={{ fontSize: 22 }}>{option.icon}</span>
+            <span>{option.label}</span>
+            {selected && <CheckCircleFilled style={{ position: "absolute", top: 6, right: 6, fontSize: 13 }} />}
+          </button>
+        );
+      })}
     </div>
     {Object.entries(pedido).map(([producto, cantidad]) => {
       const productoInfo = buscarProducto(producto);
