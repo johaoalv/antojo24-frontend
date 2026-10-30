@@ -11,7 +11,7 @@ import { notifyError, notifySuccess, notifyWarning } from "../../common/componen
 
 const { Title, Text } = Typography;
 
-const SALDO_INICIAL_DEFAULT = { yappy: 50, efectivo: 50 };
+const SALDO_INICIAL_DEFAULT = { yappy: 0, efectivo: 0 };
 
 const METODO_LABEL = {
   yappy: "Yappy",
@@ -94,8 +94,8 @@ const CierreCaja = () => {
       const data = await getMovimientosHoy();
       setMovimientos(data.movimientos || []);
       setSaldoInicial({
-        yappy: data.saldo_inicial_yappy ?? 50,
-        efectivo: data.saldo_inicial_efectivo ?? 50,
+        yappy: data.saldo_inicial_yappy ?? 0,
+        efectivo: data.saldo_inicial_efectivo ?? 0,
       });
     } catch (error) {
       console.error("Error al cargar movimientos:", error);

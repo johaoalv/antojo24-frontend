@@ -17,3 +17,13 @@ export const getLibroCaja = async (sucursal_id, fecha) => {
     });
     return response.data;
 };
+
+export const obtenerTraspasos = async (sucursal_id) => {
+    const response = await axiosInstance.get('/finanzas/traspasos', { params: { sucursal_id } });
+    return response.data;
+};
+
+export const crearTraspaso = async (data) => {
+    const response = await axiosInstance.post('/finanzas/traspasos', data);
+    return response.data;
+};
