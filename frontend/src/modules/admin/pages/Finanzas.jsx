@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 
-const SALDO_INICIAL_DEFAULT = { yappy: 50, efectivo: 50 };
+const SALDO_INICIAL_DEFAULT = { yappy: 0, efectivo: 0 };
 
 const METODO_LABEL = {
     yappy: "Yappy",
@@ -18,6 +18,7 @@ const METODO_LABEL = {
 };
 
 const CATEGORIA_LABEL = {
+    traspaso: "Traspaso a fondos",
     venta: "Venta",
     operativo: "Gasto Operativo",
     inventario: "Inventario",
@@ -86,8 +87,8 @@ function Finanzas() {
             const data = await getLibroCaja(selectedStoreId, f.format("YYYY-MM-DD"));
             setMovimientos(data.movimientos || []);
             setSaldoInicial({
-                yappy: data.saldo_inicial_yappy ?? 50,
-                efectivo: data.saldo_inicial_efectivo ?? 50,
+                yappy: data.saldo_inicial_yappy ?? 0,
+                efectivo: data.saldo_inicial_efectivo ?? 0,
             });
         } catch (error) {
             console.error("Error al cargar libro de caja:", error);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Card, Typography, Table, Statistic, Space, Spin, Button, message } from "antd";
 import { obtenerDashboard, obtenerTesoreria } from "../../../api/admin/axios_dashboard";
 import CardInfo from "../components/Cards";
+import TraspasosFondos from "../components/TraspasosFondos";
 import { io } from "socket.io-client";
 import { useStore } from "../../../context/StoreContext";
 import { ShoppingOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
@@ -148,6 +149,9 @@ function Dashboard() {
                                     ••••••
                                 </div>
                             )}
+                            {tesoreriaVisible && <Text style={{ display: 'block', color: 'white', marginBottom: 8 }}>
+                                Fondos Antojo24: ${Number(tesoreria?.saldo_fondos ?? 0).toFixed(2)}
+                            </Text>}
                             <Text style={{ color: 'rgba(255,255,255,0.65)' }}>
                                 Todo el efectivo histórico acumulado (Entradas - Salidas)
                             </Text>
@@ -157,11 +161,18 @@ function Dashboard() {
                         <Card style={{ borderRadius: '15px', height: '100%', display: 'flex', alignItems: 'center' }} bordered={false}>
                             <div>
                                 <Text strong style={{ fontSize: '1.1em' }}>¿Qué significa este número?</Text>
-                                <p style={{ margin: 0, color: '#666' }}>Es el fondo total de tu negocio. Cuentas de banco del mes, fondos y efectivo del mes.</p>
+                                <p style={{ margin: 0, color: '#666' }}>Es el fondo total de tu negocio. Incluye el saldo operativo y Fondos Antojo24.</p>
                             </div>
                         </Card>
                     </Col>
                 </Row>
+                <TraspasosFondos sucursalId={selectedStoreId} onConfirmado={async () => {
+                    await cargarDatos();
+                    if (tesoreriaVisible) {
+                        try { setTesoreria(await obtenerTesoreria(selectedStoreId)); }
+                        catch { setTesoreriaVisible(false); }
+                    }
+                }} />
             </div>
 
             {/* SECCIÓN 2: MÉTRICAS DEL MES */}
@@ -185,13 +196,13 @@ function Dashboard() {
                     </Col>
                     <Col xs={24} sm={12} md={6}>
                         <CardInfo
-                          title="Flujo Caja del Mes"
-                          value={100 + (datos.mes_actual.saldo_caja_mes || 0)}
+                          title="Saldo operativo disponible"
+                          value={datos.saldo_operativo_total ?? 0}
                           color="#d48d68"
-                          info="Inicia con $50 yappy + $50 efectivo. Se mueve con entradas y salidas reales del mes. No incluye gastos pagados con Fondos."
-                          subItems={datos.mes_actual.flujo_por_metodo ? [
-                            { label: "yappy", value: 50 + (datos.mes_actual.flujo_por_metodo.yappy || 0) },
-                            { label: "efectivo", value: 50 + (datos.mes_actual.flujo_por_metodo.efectivo || 0) }
+                          info="Saldo disponible en Yappy y efectivo. Continúa entre meses y cambia con ventas, gastos y traspasos manuales a Fondos."
+                          subItems={datos.saldos_operativos ? [
+                            { label: "yappy", value: datos.saldos_operativos.yappy || 0 },
+                            { label: "efectivo", value: datos.saldos_operativos.efectivo || 0 }
                           ] : null}
                         />
                     </Col>
