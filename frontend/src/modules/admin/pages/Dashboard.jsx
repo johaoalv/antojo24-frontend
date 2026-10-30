@@ -18,6 +18,10 @@ function Dashboard() {
   const socketRef = useRef(null);
   const dashboardUpdateDebounceRef = useRef(null);
   const { selectedStoreId } = useStore();
+  const sucursalActualRef = useRef(selectedStoreId);
+  const tesoreriaVisibleRef = useRef(tesoreriaVisible);
+  sucursalActualRef.current = selectedStoreId;
+  tesoreriaVisibleRef.current = tesoreriaVisible;
 
   const columns = [
     { title: 'Fecha', dataIndex: 'dia', key: 'dia' },
@@ -35,9 +39,24 @@ function Dashboard() {
   const cargarDatos = async () => {
     try {
       const data = await obtenerDashboard(selectedStoreId);
-      setDatos(data);
+      if (sucursalActualRef.current === selectedStoreId) setDatos(data);
     } catch (error) {
       console.error("Error al obtener datos del dashboard:", error);
+    }
+  };
+
+  const refrescarTesoreria = async () => {
+    try {
+      const data = await obtenerTesoreria(selectedStoreId);
+      if (sucursalActualRef.current === selectedStoreId && tesoreriaVisibleRef.current) {
+        setTesoreria(data);
+      }
+    } catch {
+      if (sucursalActualRef.current === selectedStoreId) {
+        setTesoreria(null);
+        setTesoreriaVisible(false);
+        message.error("No se pudo actualizar la tesorería. Vuelve a mostrarla para reintentar.");
+      }
     }
   };
 
@@ -49,6 +68,7 @@ function Dashboard() {
     setTesoreriaLoading(true);
     try {
       const data = await obtenerTesoreria(selectedStoreId);
+      if (sucursalActualRef.current !== selectedStoreId) return;
       setTesoreria(data);
       setTesoreriaVisible(true);
     } catch (error) {
@@ -85,6 +105,7 @@ function Dashboard() {
       dashboardUpdateDebounceRef.current = setTimeout(() => {
         dashboardUpdateDebounceRef.current = null;
         cargarDatos();
+        if (tesoreriaVisibleRef.current) refrescarTesoreria();
       }, 1500);
     });
 
@@ -130,6 +151,7 @@ function Dashboard() {
                                 <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2em' }}>Tesorería</Text>
                                 <Button
                                     type="text"
+                                    aria-label={tesoreriaVisible ? "Ocultar tesorería" : "Mostrar tesorería"}
                                     size="small"
                                     icon={tesoreriaVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                                     loading={tesoreriaLoading}
@@ -169,8 +191,7 @@ function Dashboard() {
                 <TraspasosFondos sucursalId={selectedStoreId} onConfirmado={async () => {
                     await cargarDatos();
                     if (tesoreriaVisible) {
-                        try { setTesoreria(await obtenerTesoreria(selectedStoreId)); }
-                        catch { setTesoreriaVisible(false); }
+                        await refrescarTesoreria();
                     }
                 }} />
             </div>
