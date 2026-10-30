@@ -18,10 +18,12 @@ const METODO_LABEL = {
   efectivo: "Efectivo",
   tarjeta: "Tarjeta",
   transferencia: "Transferencia",
+  fondos: "Fondos (Tesorería)",
 };
 
 const CATEGORIA_LABEL = {
   venta: "Venta",
+  traspaso: "Traspaso a fondos",
   operativo: "Gasto Operativo",
   inventario: "Inventario",
   inversion: "Capital",
@@ -149,7 +151,7 @@ const CierreCaja = () => {
       const resultado = await hacerCierreCaja(totalReal);
       notifySuccess({
         message: "Cierre exitoso",
-        description: `Efectivo: $${resultado.resumen?.total_efectivo?.toFixed(2) ?? "0.00"}`,
+        description: `Efectivo esperado: $${resultado.resumen?.saldo_efectivo_esperado?.toFixed(2) ?? "0.00"}`,
         placement: "bottomRight",
       });
       setModalVisible(false);
